@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- 
+        SEO OPTIMIZATION & METADATA 
+        Optimized to rank for: Music Visualizer, Web Audio API, Spectrum Analyzer, Beat Detection.
+    -->
+    <title>WaveForge | Professional Online Music Visualizer & Audio Spectrum Analyzer</title>
+    <meta name="description" content="WaveForge is a high-performance, free online music visualizer. Turn audio into visual art with real-time spectrum analysis, beat detection, and particle effects. Works offline.">
+    <meta name="keywords" content="music visualizer, spectrum analyzer, audio waveform, beat detector, web audio api, javascript visualizer, visualization, oscilloscope, particles, creative coding">
+    <meta name="author" content="WaveForge Team">
+    <meta name="theme-color" content="#00f2ff">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="WaveForge - Advanced Audio Visualization">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://waveforge.app/">
+    <meta property="og:description" content="Real-time professional music visualization in your browser. No login required.">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630.png?text=WaveForge+Visualizer">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="WaveForge Visualizer">
+    <meta name="twitter:description" content="Experience music visually with WaveForge. Real-time frequency analysis and beat detection.">
+
+    <!-- Structured Data (JSON-LD) for SEO Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "WaveForge",
+      "url": "https://waveforge.app",
+      "description": "A professional-grade, browser-based music visualizer and audio spectrum analyzer featuring real-time rendering and beat detection.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": "Spectrogram, Oscilloscope, Particle Emitter, Beat Detection, Microphone Input"
+    }
+    </script>
+
+    <!-- APPLICATION STYLES -->
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: rgba(15, 15, 20, 0.85);
+            --accent-color: #00f2ff;
+            --accent-secondary: #ff0099;
+            --text-main: #ffffff;
+            --text-dim: #999999;
+            --danger-color: #ff4444;
+            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --border-radius: 8px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --z-canvas: 1;
+            --z-ui: 10;
+            --z-modal: 100;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            overflow: hidden; /* Prevent scroll on mobile */
+            touch-action: none; /* Prevent default touch actions */
+        }
+
+        /* ACCESSIBILITY: Visually hidden class for SEO content */
+        .visually-hidden {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+
+        /* CANVAS LAYER */
+        #viz-canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: var(--z-canvas);
+            display: block;
+        }
+
+        /* UI OVERLAY */
+        #ui-layer {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: var(--z-ui);
+            pointer-events: none;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: var(--spacing-md);
+            transition: opacity 0.3s ease;
+        }
+
+        .interactive { pointer-events: auto; }
+
+        /* TOP BAR */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+
+        /* BRANDING - H1 for SEO */
+        h1.brand {
+            margin: 0; padding: 0;
+            font-weight: 800; font-size: 1.4rem; letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, var(--accent-color), white);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+
+        .status-display {
+            font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; font-family: monospace;
+        }
+
+        /* BUTTONS & CONTROLS */
+        button {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);
+            color: white; padding: 8px 16px; border-radius: var(--border-radius);
+            cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+            backdrop-filter: blur(4px); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;
+        }
+        button:hover, button:focus { background: rgba(255,255,255,0.15); outline: none; border-color: var(--accent-color); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
+        button:active { transform: scale(0.96); }
+        button.active { background: var(--accent-color); color: #000; border-color: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); }
+
+        /* BOTTOM CONTROL BAR */
+        .control-bar {
+            background: var(--panel-bg);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(12px);
+            display: flex; flex-direction: column; gap: var(--spacing-sm);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .transport-controls {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+
+        .scrubber-container {
+            width: 100%; display: flex; align-items: center; gap: var(--spacing-sm); font-family: monospace; font-size: 0.8rem; color: var(--accent-color);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none; width: 100%; background: transparent; height: 24px; cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--accent-color); margin-top: -6px; box-shadow: 0 0 10px var(--accent-color); transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        
+        /* SETTINGS MODAL */
+        #settings-modal {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto;
+            background: #111; border: 1px solid #333;
+            padding: 25px; border-radius: 12px; z-index: var(--z-modal);
+            box-shadow: 0 0 100px rgba(0, 242, 255, 0.1);
+            display: none; opacity: 0; transition: opacity 0.2s;
+            scrollbar-width: thin; scrollbar-color: #333 #111;
+        }
+        #settings-modal.open { display: block; opacity: 1; }
+
+        .settings-group { margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 15px; }
+        .settings-group h3 { margin: 0 0 12px 0; font-size: 0.9rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 1px; }
+        .control-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .control-row label { font-size: 0.9rem; color: var(--text-dim); }
+        .control-row select, .control-row input[type="number"] {
+            background: #222; border: 1px solid #444; color: white; padding: 6px; border-radius: 4px;
+        }
+
+        /* UTILITIES */
+        .hidden { display: none !important; }
+        
+        /* ACCESSIBILITY & HIGH CONTRAST */
+        .high-contrast {
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --accent-color: #ffff00;
+            --panel-bg: #000000;
+            border: 2px solid white;
+        }
+
+        /* MOBILE ADJUSTMENTS */
+        @media (max-width: 600px) {
+            .transport-controls { justify-content: space-between; }
+            .transport-controls button { flex: 1; padding: 10px 5px; font-size: 0.8rem; }
+            .control-bar { margin-bottom: 20px; }
+        }
+
+        /* DRAG & DROP OVERLAY */
+        #drop-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0, 242, 255, 0.1); border: 4px dashed var(--accent-color);
+            z-index: var(--z-modal); display: none; align-items: center; justify-content: center;
+            font-size: 2rem; font-weight: bold; pointer-events: none; backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SEO CONTENT BLOCK (Visually hidden but readable by bots) -->
+    <main class="visually-hidden">
+        <h2>About WaveForge</h2>
+        <p>WaveForge is a professional-grade HTML5 Music Visualizer and Spectrum Analyzer using the Web Audio API.</p>
+        <p>Features include:</p>
+        <ul>
+            <li>Real-time FFT analysis and waveform rendering.</li>
+            <li>Beat detection algorithms for dynamic visual reactivity.</li>
+            <li>Microphone input support for live audio visualization.</li>
+            <li>Customizable particle systems and glow effects.</li>
+            <li>Offline capability and highly optimized WebGL performance.</li>
+        </ul>
+        <p>Upload your MP3, WAV, or OGG files to see your music come to life.</p>
+    </main>
+
+    <!-- MAIN CANVAS -->
+    <canvas id="viz-canvas" aria-label="Music Visualization Display"></canvas>
+
+    <!-- DRAG & DROP FEEDBACK -->
+    <div id="drop-overlay">DROP AUDIO FILE</div>
+
+    <!-- UI LAYER -->
+    <nav id="ui-layer">
+        <!-- HEADER -->
+        <header class="top-bar interactive">
+            <div>
+                <h1 class="brand">WAVEFORGE</h1>
+                <div id="fps-display" class="status-display">READY</div>
+            </div>
+            <div>
+                <button id="btn-settings" aria-label="Open Settings" title="Visualizer Settings">⚙️ Config</button>
+                <button id="btn-fullscreen" aria-label="Toggle Fullscreen" title="Fullscreen Mode">⛶</button>
+            </div>
+        </header>
+
+        <!-- ERROR MESSAGE TOAST -->
+        <div id="error-toast" role="alert" style="background:var(--danger-color); padding:10px; border-radius:4px; display:none; text-align:center; box-shadow:0 5px 15px black;" class="interactive"></div>
+
+        <!-- MAIN CONTROLS -->
+        <div class="control-bar interactive">
+            <!-- Scrubber -->
+            <div class="scrubber-container">
+                <span id="time-current">0:00</span>
+                <input type="range" id="seek-bar" value="0" min="0" max="100" step="0.1" aria-label="Seek Bar">
+                <span id="time-total">0:00</span>
+            </div>
+
+            <!-- Transport -->
+            <div class="transport-controls">
+                <input type="file" id="file-input" accept="audio/*,application/json" class="hidden">
+                
+                <button id="btn-upload" aria-label="Upload Audio File">📁 Open File</button>
+                <button id="btn-mic" aria-label="Use Microphone">🎤 Live Mic</button>
+                
+                <button id="btn-play" class="active" aria-label="Play or Pause">▶</button>
+                <button id="btn-stop" aria-label="Stop">⏹</button>
+                
+                <button id="btn-mode" aria-label="Change Visualization Mode">📊 Mode</button>
+                
+                <div style="display:flex; align-items:center; gap:5px; flex: 0 0 auto;">
+                    <label for="vol-slider" style="font-size:0.7rem; text-transform:uppercase;">Vol</label>
+                    <input type="range" id="vol-slider" min="0" max="1.5" step="0.05" value="0.8" style="width:60px" aria-label="Volume">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="interactive" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h2 id="settings-title" style="margin:0; color:white;">Visualizer Config</h2>
+            <button id="btn-close-settings" aria-label="Close Settings">✕</button>
+        </div>
+
+        <div class="settings-group">
+            <h3>Audio Analysis (FFT)</h3>
+            <div class="control-row">
+                <label for="set-fft">Resolution (FFT Size)</label>
+                <select id="set-fft">
+                    <option value="512">512 (High Performance)</option>
+                    <option value="1024">1024</option>
+                    <option value="2048" selected>2048 (Balanced)</option>
+                    <option value="4096">4096</option>
+                    <option value="8192">8192</option>
+                    <option value="16384">16384 (Ultra Detail)</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <label for="set-smoothing">Smoothing Response</label>
+                <input type="range" id="set-smoothing" min="0" max="0.99" step="0.01" value="0.85">
+            </div>
+            <div class="control-row">
+                <label for="set-sensitivity">Gain Sensitivity</label>
+                <input type="range" id="set-sensitivity" min="0.5" max="5.0" step="0.1" value="1.5">
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>Render Engine</h3>
+            <div class="control-row">
+                <label for="set-bloom">Glow / Bloom Intensity</label>
+                <input type="range" id="set-bloom" min="0" max="100" value="60">
+            </div>
+            <div class="control-row">
+                <label for="set-palette">Color Palette</label>
+                <select id="set-palette">
+                    <option value="cyberpunk">Cyberpunk (Cyan/Pink)</option>
+                    <option value="fire">Inferno (Red/Orange)</option>
+                    <option value="ocean">Oceanic (Blue/Teal)</option>
+                    <option value="matrix">Matrix (Green)</option>
+                    <option value="rainbow">Spectrum (Rainbow)</option>
+                    <option value="gold">Luxury Gold</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>Reactivity</h3>
+            <div class="control-row">
+                <label for="set-beat-enabled">Beat Detection Pulse</label>
+                <input type="checkbox" id="set-beat-enabled" checked>
+            </div>
+            <div class="control-row">
+                <label for="set-beat-thresh">Beat Threshold</label>
+                <input type="range" id="set-beat-thresh" min="1.0" max="2.0" step="0.05" value="1.3">
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3>System</h3>
+            <div class="control-row">
+                <button id="btn-export-preset" style="width:48%">Export Preset</button>
+                <button id="btn-screenshot" style="width:48%">Snapshot</button>
+            </div>
+            <div class="control-row" style="margin-top:10px;">
+                 <label for="set-hc">High Contrast (Accessibility)</label>
+                 <input type="checkbox" id="set-hc">
+            </div>
+        </div>
+        
+        <div style="font-size:0.7rem; color:#555; text-align:center; margin-top:20px;">
+            WaveForge v1.0.0 • Built with Web Audio API & Vanilla JS
+        </div>
+    </div>
+
+    <!-- 
+        APPLICATION CORE
+    -->
+    <script>
+    /**
+     * GLOBAL STATE & CONSTANTS
+     */
+    const APP_STATE = {
+        isPlaying: false,
+        mode: 0, // 0: Bars, 1: Wave, 2: Radial, 3: Particles
+        modesCount: 4,
+        lastTime: 0,
+        fps: 0,
+        showStats: true,
+        mouseActive: false,
+        mouseTimeout: null,
+        beatDetected: false,
+        beatTimer: 0,
+    };
+
+    const CONFIG = {
+        fftSize: 2048,
+        smoothing: 0.85,
+        minDecibels: -90,
+        maxDecibels: -10,
+        sensitivity: 1.5,
+        bloomIntensity: 0.6,
+        beatThreshold: 1.3, 
+        palette: 'cyberpunk',
+        highContrast: false
+    };
+
+    // Extended Palettes
+    const PALETTES = {
+        cyberpunk: ['#00f2ff', '#ff0099', '#ffffff'],
+        fire: ['#ff0000', '#ffaa00', '#ffff00'],
+        ocean: ['#001133', '#0066ff', '#00ffff'],
+        matrix: ['#003300', '#00ff00', '#ccffcc'],
+        rainbow: ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff'],
+        gold: ['#bf953f', '#fcf6ba', '#b38728', '#fbf5b7']
+    };
+
+    /**
+     * AUDIO ENGINE
+     * Handles Web Audio API Context, Analyzers, Inputs
+     */
+    class AudioEngine {
+        constructor() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+            this.analyser = this.ctx.createAnalyser();
+            this.gainNode = this.ctx.createGain();
+            
+            this.analyser.fftSize = CONFIG.fftSize;
+            this.analyser.smoothingTimeConstant = CONFIG.smoothing;
+            
+            this.gainNode.connect(this.ctx.destination);
+            
+            this.micSource = null;
+            this.audioElement = new Audio();
+            this.audioElement.crossOrigin = "anonymous";
+
+            this.sourceNode = this.ctx.createMediaElementSource(this.audioElement);
+            this.sourceNode.connect(this.analyser);
+            this.analyser.connect(this.gainNode);
+
+            this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
+            this.waveData = new Uint8Array(this.analyser.fftSize);
+            
+            this.audioElement.addEventListener('ended', () => {
+                APP_STATE.isPlaying = false;
+                UI.updatePlayButton();
+            });
+            this.audioElement.addEventListener('timeupdate', UI.updateProgressBar);
+        }
+
+        resume() { if (this.ctx.state === 'suspended') this.ctx.resume(); }
+
+        playFile(url) {
+            this.resume();
+            this.stopMic();
+            this.audioElement.src = url;
+            this.audioElement.play().then(() => {
+                APP_STATE.isPlaying = true;
+                UI.updatePlayButton();
+            }).catch(e => UI.showError("Error: " + e.message));
+        }
+
+        togglePlay() {
+            this.resume();
+            if (this.micSource) return; 
+
+            if (this.audioElement.paused) {
+                this.audioElement.play();
+                APP_STATE.isPlaying = true;
+            } else {
+                this.audioElement.pause();
+                APP_STATE.isPlaying = false;
+            }
+            UI.updatePlayButton();
+        }
+
+        stop() {
+            this.audioElement.pause();
+            this.audioElement.currentTime = 0;
+            APP_STATE.isPlaying = false;
+            UI.updatePlayButton();
+        }
+
+        async enableMic() {
+            this.resume();
+            this.stop();
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                this.micSource = this.ctx.createMediaStreamSource(stream);
+                this.micSource.connect(this.analyser);
+                APP_STATE.isPlaying = true;
+                UI.showError("Microphone Active", false);
+            } catch (err) {
+                UI.showError("Mic Permission Denied");
+            }
+        }
+
+        stopMic() {
+            if (this.micSource) {
+                this.micSource.disconnect();
+                this.micSource = null;
+            }
+        }
+
+        updateSettings() {
+            this.analyser.fftSize = CONFIG.fftSize;
+            this.analyser.smoothingTimeConstant = CONFIG.smoothing;
+            this.gainNode.gain.value = parseFloat(document.getElementById('vol-slider').value);
+            if (this.freqData.length !== this.analyser.frequencyBinCount) {
+                this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
+                this.waveData = new Uint8Array(this.analyser.fftSize);
+            }
+        }
+
+        getAnalysis() {
+            this.analyser.getByteFrequencyData(this.freqData);
+            this.analyser.getByteTimeDomainData(this.waveData);
+            return { freq: this.freqData, wave: this.waveData };
+        }
+    }
+
+    /**
+     * BEAT DETECTOR
+     * Energy-based algorithm
+     */
+    const BeatDetector = {
+        history: [],
+        update(freqData) {
+            if (!CONFIG.beatThreshold) return false;
+            
+            let energy = 0;
+            // Focus on bass frequencies (approx first 10-15% of spectrum)
+            const range = Math.floor(freqData.length * 0.15);
+            for(let i=0; i<range; i++) energy += freqData[i];
+            energy /= range;
+
+            this.history.push(energy);
+            if (this.history.length > 40) this.history.shift();
+
+            const avg = this.history.reduce((a,b)=>a+b,0) / this.history.length;
+
+            // Cooldown logic
+            if (APP_STATE.beatTimer > 0) {
+                APP_STATE.beatTimer--;
+                APP_STATE.beatDetected = false;
+                return false;
+            }
+
+            if (energy > avg * CONFIG.beatThreshold && energy > 40) {
+                APP_STATE.beatDetected = true;
+                APP_STATE.beatTimer = 10; // Frames to wait
+                return true;
+            }
+            return false;
+        }
+    };
+
+    /**
+     * VISUALIZER ENGINE
+     */
+    class VisualizerEngine {
+        constructor() {
+            this.canvas = document.getElementById('viz-canvas');
+            this.ctx = this.canvas.getContext('2d', { alpha: false, desynchronized: true });
+            
+            this.particles = [];
+            for(let i=0; i<150; i++) this.particles.push(this.createParticle());
+
+            this.resize();
+            window.addEventListener('resize', () => {
+                clearTimeout(this.resizeTimer);
+                this.resizeTimer = setTimeout(() => this.resize(), 200);
+            });
+        }
+
+        resize() {
+            const dpr = window.devicePixelRatio || 1;
+            this.canvas.width = window.innerWidth * dpr;
+            this.canvas.height = window.innerHeight * dpr;
+            this.ctx.scale(dpr, dpr);
+            this.width = window.innerWidth;
+            this.height = window.innerHeight;
+            this.cx = this.width / 2;
+            this.cy = this.height / 2;
+        }
+
+        createParticle() {
+            return {
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                size: Math.random() * 4 + 1,
+                color: Math.floor(Math.random() * 3)
+            };
+        }
+
+        loop() {
+            requestAnimationFrame(() => this.loop());
+            
+            // FPS
+            const now = performance.now();
+            const delta = now - APP_STATE.lastTime;
+            if (delta >= 1000) {
+                APP_STATE.fps = Math.round((APP_STATE.frames || 0) * 1000 / delta);
+                APP_STATE.frames = 0;
+                APP_STATE.lastTime = now;
+                if(APP_STATE.showStats) document.getElementById('fps-display').textContent = `FPS: ${APP_STATE.fps}`;
+            }
+            APP_STATE.frames = (APP_STATE.frames || 0) + 1;
+
+            const data = audio.getAnalysis();
+            const isBeat = BeatDetector.update(data.freq);
+
+            // Fade out background (creates trails)
+            this.ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.25)';
+            this.ctx.fillRect(0, 0, this.width, this.height);
+
+            this.ctx.lineWidth = 2;
+            this.ctx.lineCap = 'round';
+
+            if(APP_STATE.mode === 0) this.renderBars(data.freq, isBeat);
+            else if(APP_STATE.mode === 1) this.renderWave(data.wave, isBeat);
+            else if(APP_STATE.mode === 2) this.renderRadial(data.freq, isBeat);
+            else if(APP_STATE.mode === 3) this.renderParticles(data.freq, isBeat);
+        }
+
+        getColor(index) {
+            const p = PALETTES[CONFIG.palette];
+            return p[index % p.length];
+        }
+
+        getGradient(h) {
+            const grad = this.ctx.createLinearGradient(0, h, 0, 0);
+            const p = PALETTES[CONFIG.palette];
+            grad.addColorStop(0, p[0]);
+            grad.addColorStop(0.5, p[1]);
+            grad.addColorStop(1, p[p.length-1]);
+            return grad;
+        }
+
+        renderBars(freqData, isBeat) {
+            const barWidth = (this.width / freqData.length) * 2.5;
+            let x = 0;
+            const scale = isBeat ? 1.05 : 1.0;
+            const sens = CONFIG.sensitivity * scale;
+
+            this.ctx.fillStyle = this.getGradient(this.height);
+            
+            const len = freqData.length / 1.5; 
+            this.ctx.beginPath();
+            for(let i = 0; i < len; i++) {
+                const barHeight = (freqData[i] * sens / 255) * this.height * 0.8;
+                this.ctx.fillRect(this.cx + x, this.cy - barHeight/2, barWidth, barHeight);
+                if(x!==0) this.ctx.fillRect(this.cx - x, this.cy - barHeight/2, barWidth, barHeight);
+                x += barWidth + 1;
+                if (x > this.cx) break;
+            }
+        }
+
+        renderWave(waveData, isBeat) {
+            this.ctx.beginPath();
+            const sliceWidth = this.width * 1.0 / waveData.length;
+            let x = 0;
+            
+            this.ctx.strokeStyle = this.getColor(0);
+            this.ctx.shadowBlur = isBeat ? 20 : 5;
+            this.ctx.shadowColor = this.getColor(1);
+            this.ctx.lineWidth = isBeat ? 4 : 2;
+
+            for(let i = 0; i < waveData.length; i++) {
+                const v = waveData[i] / 128.0;
+                const y = this.cy + (v - 1) * (this.height / 2) * CONFIG.sensitivity;
+                if(i === 0) this.ctx.moveTo(x, y);
+                else this.ctx.lineTo(x, y);
+                x += sliceWidth;
+            }
+            this.ctx.stroke();
+            this.ctx.shadowBlur = 0;
+        }
+
+        renderRadial(freqData, isBeat) {
+            const radius = Math.min(this.cx, this.cy) * 0.3;
+            const bars = 100; 
+            const step = Math.floor(freqData.length / bars);
+            const angleStep = (Math.PI * 2) / bars;
+            const kick = isBeat ? 1.15 : 1.0;
+
+            this.ctx.save();
+            this.ctx.translate(this.cx, this.cy);
+            this.ctx.scale(kick, kick);
+
+            for(let i = 0; i < bars; i++) {
+                const val = freqData[i * step];
+                const h = (val / 255) * (Math.min(this.cx, this.cy) * 0.5) * CONFIG.sensitivity;
+                
+                this.ctx.save();
+                this.ctx.rotate(i * angleStep);
+                this.ctx.fillStyle = this.getColor(i);
+                this.ctx.fillRect(-2, radius, 4, h);
+                this.ctx.fillStyle = this.getColor(i) + '44'; 
+                this.ctx.fillRect(-2, radius - 5, 4, -h * 0.2);
+                this.ctx.restore();
+            }
+            this.ctx.restore();
+        }
+
+        renderParticles(freqData, isBeat) {
+            this.ctx.globalCompositeOperation = 'lighter';
+            
+            // Get Bass Energy
+            let bass = 0; for(let i=0; i<20; i++) bass += freqData[i];
+            bass /= 20;
+            const speed = (bass / 255) * 8;
+
+            const pList = PALETTES[CONFIG.palette];
+
+            this.particles.forEach((p, i) => {
+                p.x += p.vx * (1 + speed);
+                p.y += p.vy * (1 + speed);
+
+                if(p.x < 0) p.x = this.width; if(p.x > this.width) p.x = 0;
+                if(p.y < 0) p.y = this.height; if(p.y > this.height) p.y = 0;
+
+                const freqIdx = Math.floor((i / this.particles.length) * freqData.length * 0.5);
+                const r = p.size * (0.5 + (freqData[freqIdx] / 255) * CONFIG.sensitivity * 3);
+
+                this.ctx.beginPath();
+                this.ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                this.ctx.fillStyle = pList[p.color % pList.length];
+                
+                if(isBeat && i % 5 === 0) {
+                    this.ctx.shadowBlur = 20;
+                    this.ctx.shadowColor = this.ctx.fillStyle;
+                } else {
+                    this.ctx.shadowBlur = 0;
+                }
+                
+                this.ctx.fill();
+            });
+
+            if(isBeat) {
+                this.ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                this.ctx.fillRect(0,0,this.width, this.height);
+            }
+
+            this.ctx.globalCompositeOperation = 'source-over';
+            this.ctx.shadowBlur = 0;
+        }
+    }
+
+    /**
+     * UI CONTROLLER
+     */
+    const UI = {
+        init() {
+            this.els = {
+                fileInput: document.getElementById('file-input'),
+                playBtn: document.getElementById('btn-play'),
+                seek: document.getElementById('seek-bar'),
+                dropOverlay: document.getElementById('drop-overlay'),
+                settingsModal: document.getElementById('settings-modal'),
+                uiLayer: document.getElementById('ui-layer')
+            };
+
+            document.getElementById('btn-upload').onclick = () => this.els.fileInput.click();
+            this.els.fileInput.onchange = (e) => this.handleFile(e.target.files[0]);
+            this.els.playBtn.onclick = () => audio.togglePlay();
+            document.getElementById('btn-stop').onclick = () => audio.stop();
+            document.getElementById('btn-mic').onclick = () => audio.enableMic();
+            
+            document.getElementById('btn-mode').onclick = () => {
+                APP_STATE.mode = (APP_STATE.mode + 1) % APP_STATE.modesCount;
+                const modes = ['Bar Spectrum', 'Waveform', 'Radial EQ', 'Particles'];
+                this.showError(modes[APP_STATE.mode], false);
+            };
+
+            this.els.seek.oninput = (e) => {
+                if (audio.audioElement.duration) {
+                    audio.audioElement.currentTime = (e.target.value / 100) * audio.audioElement.duration;
+                }
+            };
+
+            document.getElementById('vol-slider').oninput = () => audio.updateSettings();
+
+            // Drag & Drop
+            window.ondragover = (e) => { e.preventDefault(); this.els.dropOverlay.style.display = 'flex'; };
+            window.ondragleave = (e) => { if(e.target === this.els.dropOverlay) this.els.dropOverlay.style.display = 'none'; };
+            window.ondrop = (e) => {
+                e.preventDefault();
+                this.els.dropOverlay.style.display = 'none';
+                if (e.dataTransfer.files.length) this.handleFile(e.dataTransfer.files[0]);
+            };
+
+            // Settings
+            document.getElementById('btn-settings').onclick = () => this.toggleSettings(true);
+            document.getElementById('btn-close-settings').onclick = () => this.toggleSettings(false);
+            
+            const linkInput = (id, key, type='float') => {
+                const el = document.getElementById(id);
+                el.onchange = el.oninput = (e) => {
+                    let val = e.target.value;
+                    if (type === 'float') val = parseFloat(val);
+                    else if (type === 'int') val = parseInt(val);
+                    else if (type === 'bool') val = e.target.checked;
+                    CONFIG[key] = val;
+                    audio.updateSettings();
+                };
+            };
+
+            linkInput('set-fft', 'fftSize', 'int');
+            linkInput('set-smoothing', 'smoothing');
+            linkInput('set-sensitivity', 'sensitivity');
+            linkInput('set-bloom', 'bloomIntensity');
+            linkInput('set-beat-thresh', 'beatThreshold');
+            linkInput('set-palette', 'palette', 'string');
+            
+            document.getElementById('set-hc').onchange = (e) => {
+                CONFIG.highContrast = e.target.checked;
+                document.body.classList.toggle('high-contrast', CONFIG.highContrast);
+            };
+
+            document.getElementById('btn-export-preset').onclick = () => {
+                const blob = new Blob([JSON.stringify(CONFIG)], {type:'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = 'waveforge_preset.json'; a.click();
+            };
+
+            document.getElementById('btn-screenshot').onclick = () => {
+                const a = document.createElement('a');
+                a.href = document.getElementById('viz-canvas').toDataURL('image/png');
+                a.download = 'waveforge_snap.png'; a.click();
+            };
+
+            // Keys
+            document.addEventListener('keydown', (e) => {
+                if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+                switch(e.code) {
+                    case 'Space': e.preventDefault(); audio.togglePlay(); break;
+                    case 'KeyS': audio.stop(); break;
+                    case 'KeyM': document.getElementById('btn-mode').click(); break;
+                    case 'ArrowRight': audio.audioElement.currentTime += 5; break;
+                    case 'ArrowLeft': audio.audioElement.currentTime -= 5; break;
+                }
+            });
+
+            document.getElementById('btn-fullscreen').onclick = () => {
+                if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+                else document.exitFullscreen();
+            };
+
+            // Auto Hide UI
+            document.onmousemove = () => {
+                this.els.uiLayer.style.opacity = 1;
+                this.els.uiLayer.classList.add('interactive');
+                clearTimeout(APP_STATE.mouseTimeout);
+                APP_STATE.mouseTimeout = setTimeout(() => {
+                    if(!this.settingsOpen && APP_STATE.isPlaying) {
+                        this.els.uiLayer.style.opacity = 0;
+                        this.els.uiLayer.classList.remove('interactive');
+                    }
+                }, 3500);
+            };
+        },
+
+        handleFile(file) {
+            if (file.type.includes('json')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        Object.assign(CONFIG, JSON.parse(e.target.result));
+                        document.getElementById('set-smoothing').value = CONFIG.smoothing;
+                        document.getElementById('set-sensitivity').value = CONFIG.sensitivity;
+                        this.showError("Preset Loaded", false);
+                        audio.updateSettings();
+                    } catch(err) { this.showError("Invalid JSON"); }
+                };
+                reader.readAsText(file);
+            } else if (file.type.includes('audio')) {
+                audio.playFile(URL.createObjectURL(file));
+            } else {
+                this.showError("Unsupported file type.");
+            }
+        },
+
+        toggleSettings(show) {
+            this.settingsOpen = show;
+            this.els.settingsModal.classList.toggle('open', show);
+        },
+
+        updatePlayButton() {
+            this.els.playBtn.textContent = APP_STATE.isPlaying ? "⏸" : "▶";
+            this.els.playBtn.classList.toggle('active', APP_STATE.isPlaying);
+        },
+
+        updateProgressBar() {
+            const el = audio.audioElement;
+            if (!el.duration) return;
+            const pct = (el.currentTime / el.duration) * 100;
+            document.getElementById('seek-bar').value = pct;
+            
+            const fmt = (s) => {
+                const m = Math.floor(s / 60);
+                const sec = Math.floor(s % 60);
+                return `${m}:${sec<10?'0':''}${sec}`;
+            };
+            document.getElementById('time-current').textContent = fmt(el.currentTime);
+            document.getElementById('time-total').textContent = fmt(el.duration);
+        },
+
+        showError(msg, isError=true) {
+            const toast = document.getElementById('error-toast');
+            toast.style.display = 'block';
+            toast.style.background = isError ? 'var(--danger-color)' : 'var(--accent-color)';
+            toast.style.color = isError ? 'white' : '#000';
+            toast.style.fontWeight = 'bold';
+            toast.textContent = msg;
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+    };
+
+    // STARTUP
+    const audio = new AudioEngine();
+    const viz = new VisualizerEngine();
+    UI.init();
+    viz.loop();
+    
+    </script>
+</body>
+</html>
