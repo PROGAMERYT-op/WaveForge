@@ -1,0 +1,904 @@
+        renderRadial(ctx, w, h, cx, cy, freqData, isBeat) {
+            const radius = Math.min(cx, cy) * 0.25;
+            const bars = 120;
+            const step = Math.floor(freqData.length / bars);
+            const angleStep = (Math.PI * 2) / bars;
+            const kick = isBeat ? 1.12 : 1.0;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.scale(kick, kick);
+
+            for (let i = 0; i < bars; i++) {
+                const val = freqData[i * step];
+                const barH = (val / 255) * (Math.min(cx, cy) * 0.45) * CONFIG.sensitivity;
+                
+                ctx.save();
+                ctx.rotate(i * angleStep);
+                ctx.fillStyle = viz.getColor(i % PALETTES[CONFIG.palette].length);
+                ctx.fillRect(-2, radius, 4, barH);
+                ctx.restore();
+            }
+            ctx.restore();
+        },
+
+        renderSpectrogram(ctx, w, h, freqData) {
+            // Implementation handled by viz class
+            viz.renderSpectrogramExport(ctx, w, h, freqData);
+        },
+
+        render3DBars(ctx, w, h, cx, cy, freqData, isBeat) {
+            viz.render3DBarsExport(ctx, w, h, cx, cy, freqData, isBeat);
+        },
+
+        renderDNAHelix(ctx, w, h, cx, cy, freqData, isBeat) {
+            viz.renderDNAHelixExport(ctx, w, h, cx, cy, freqData, isBeat);
+        },
+
+        renderGalaxy(ctx, w, h, cx, cy, freqData, isBeat) {
+            viz.renderGalaxyExport(ctx, w, h, cx, cy, freqData, isBeat);
+        }
+    };
+
+    // ============================================
+    // VISUALIZER ENGINE
+    // ============================================
+    
+    class VisualizerEngine {
+        constructor() {
+            this.canvas = document.getElementById('viz-canvas');
+            this.ctx = this.canvas.getContext('2d', { alpha: false, desynchronized: true });
+            
+            this.particles = [];
+            for (let i = 0; i < 200; i++) {
+                this.particles.push(this.createParticle());
+            }
+
+            this.spectrogramHistory = [];
+            this.maxSpectrogramHistory = 200;
+
+            this.resize();
+            window.addEventListener('resize', () => {
+                clearTimeout(this.resizeTimer);
+                this.resizeTimer = setTimeout(() => this.resize(), 150);
+            });
+        }
+
+        resize() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            this.canvas.width = window.innerWidth * dpr;
+            this.canvas.height = window.innerHeight * dpr;
+            this.ctx.scale(dpr, dpr);
+            this.width = window.innerWidth;
+            this.height = window.innerHeight;
+            this.cx = this.width / 2;
+            this.cy = this.height / 2;
+        }
+
+        createParticle() {
+            return {
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: (Math.random() - 0.5) * 2.5,
+                vy: (Math.random() - 0.5) * 2.5,
+                size: Math.random() * 4 + 1,
+                color: Math.floor(Math.random() * 4),
+                life: Math.random()
+            };
+        }
+
+        getColor(index) {
+            const p = PALETTES[CONFIG.palette];
+            return p[index % p.length];
+        }
+
+        getGradient(ctx, h) {
+            const grad = ctx.createLinearGradient(0, h, 0, 0);
+            const p = PALETTES[CONFIG.palette];
+            p.forEach((color, i) => {
+                grad.addColorStop(i / (p.length - 1), color);
+            });
+            return grad;
+        }
+
+        loop() {
+            requestAnimationFrame(() => this.loop());
+            
+            // FPS Calculation
+            const now = performance.now();
+            const delta = now - APP_STATE.lastTime;
+            APP_STATE.frames++;
+            
+            if (delta >= 1000) {
+                APP_STATE.fps = Math.round((APP_STATE.frames * 1000) / delta);
+                APP_STATE.frames = 0;
+                APP_STATE.lastTime = now;
+                if (CONFIG.showFps) {
+                    document.getElementById('fps-display').textContent = `${APP_STATE.fps} FPS`;
+                }
+            }
+
+            const data = audio.getAnalysis();
+            const isBeat = BeatDetector.update(data.freq);
+
+            // Render to main canvas
+            this.render(this.ctx, this.width, this.height, this.cx, this.cy, data, isBeat);
+
+            // Render to export canvas if recording
+            if (APP_STATE.isRecording && APP_STATE.exportCtx) {
+                const expW = APP_STATE.exportCanvas.width;
+                const expH = APP_STATE.exportCanvas.height;
+                Exporter.renderFrame(APP_STATE.exportCtx, expW, expH, data, isBeat);
+            }
+        }
+
+        render(ctx, w, h, cx, cy, data, isBeat) {
+            // Background fade
+            ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+
+            switch (APP_STATE.mode) {
+                case 0: this.renderBars(ctx, w, h, cx, cy, data.freq, isBeat); break;
+                case 1: this.renderWave(ctx, w, h, cx, cy, data.wave, isBeat); break;
+                case 2: this.renderRadial(ctx, w, h, cx, cy, data.freq, isBeat); break;
+                case 3: this.renderParticles(ctx, w, h, data.freq, isBeat); break;
+                case 4: this.renderSpectrogram(ctx, w, h, data.freq); break;
+                case 5: this.render3DBars(ctx, w, h, cx, cy, data.freq, isBeat); break;
+                case 6: this.renderDNAHelix(ctx, w, h, cx, cy, data.freq, isBeat); break;
+                case 7: this.renderGalaxy(ctx, w, h, cx, cy, data.freq, isBeat); break;
+            }
+        }
+
+        renderBars(ctx, w, h, cx, cy, freqData, isBeat) {
+            const barWidth = (w / freqData.length) * 2.5;
+            let x = 0;
+            const scale = isBeat ? 1.08 : 1.0;
+            const sens = CONFIG.sensitivity * scale;
+
+            ctx.fillStyle = this.getGradient(ctx, h);
+            
+            const len = freqData.length / 1.5;
+            for (let i = 0; i < len; i++) {
+                const barHeight = (freqData[i] * sens / 255) * h * 0.75;
+                ctx.fillRect(cx + x, cy - barHeight / 2, barWidth, barHeight);
+                if (x !== 0) ctx.fillRect(cx - x - barWidth, cy - barHeight / 2, barWidth, barHeight);
+                x += barWidth + 1;
+                if (x > cx) break;
+            }
+
+            // Beat flash
+            if (isBeat) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.fillRect(0, 0, w, h);
+            }
+        }
+
+        renderWave(ctx, w, h, cx, cy, waveData, isBeat) {
+            ctx.beginPath();
+            const sliceWidth = w / waveData.length;
+            let x = 0;
+            
+            ctx.strokeStyle = this.getColor(0);
+            ctx.shadowBlur = isBeat ? 25 : 8;
+            ctx.shadowColor = this.getColor(1);
+            ctx.lineWidth = isBeat ? 4 : 2;
+
+            for (let i = 0; i < waveData.length; i++) {
+                const v = waveData[i] / 128.0;
+                const y = cy + (v - 1) * (h / 2) * CONFIG.sensitivity;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+                x += sliceWidth;
+            }
+            ctx.stroke();
+
+            // Mirror effect
+            if (CONFIG.mirror) {
+                ctx.save();
+                ctx.scale(1, -1);
+                ctx.translate(0, -h);
+                ctx.globalAlpha = 0.3;
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            ctx.shadowBlur = 0;
+        }
+
+        renderRadial(ctx, w, h, cx, cy, freqData, isBeat) {
+            const radius = Math.min(cx, cy) * 0.25;
+            const bars = 120;
+            const step = Math.floor(freqData.length / bars);
+            const angleStep = (Math.PI * 2) / bars;
+            const kick = isBeat ? 1.12 : 1.0;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.scale(kick, kick);
+
+            // Inner glow circle
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+            gradient.addColorStop(0, this.getColor(0) + '33');
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            for (let i = 0; i < bars; i++) {
+                const val = freqData[i * step];
+                const barH = (val / 255) * (Math.min(cx, cy) * 0.45) * CONFIG.sensitivity;
+                
+                ctx.save();
+                ctx.rotate(i * angleStep);
+                
+                const grad = ctx.createLinearGradient(0, radius, 0, radius + barH);
+                grad.addColorStop(0, this.getColor(0));
+                grad.addColorStop(1, this.getColor(1));
+                ctx.fillStyle = grad;
+                
+                ctx.fillRect(-2, radius, 4, barH);
+                
+                // Reflection
+                ctx.fillStyle = this.getColor(i % PALETTES[CONFIG.palette].length) + '22';
+                ctx.fillRect(-2, radius - 5, 4, -barH * 0.15);
+                
+                ctx.restore();
+            }
+            ctx.restore();
+        }
+
+        renderParticles(ctx, w, h, freqData, isBeat) {
+            ctx.globalCompositeOperation = 'lighter';
+            
+            // Bass energy for speed
+            let bass = 0;
+            for (let i = 0; i < 25; i++) bass += freqData[i];
+            bass /= 25;
+            const speed = (bass / 255) * 6 + 0.5;
+
+            const pList = PALETTES[CONFIG.palette];
+
+            this.particles.forEach((p, idx) => {
+                p.x += p.vx * (1 + speed);
+                p.y += p.vy * (1 + speed);
+
+                // Wrap around
+                if (p.x < 0) p.x = w;
+                if (p.x > w) p.x = 0;
+                if (p.y < 0) p.y = h;
+                if (p.y > h) p.y = 0;
+
+                const freqIdx = Math.floor((idx / this.particles.length) * freqData.length * 0.5);
+                const r = p.size * (0.5 + (freqData[freqIdx] / 255) * CONFIG.sensitivity * 2.5);
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, Math.max(r, 1), 0, Math.PI * 2);
+                ctx.fillStyle = pList[p.color % pList.length];
+                
+                if (isBeat && idx % 4 === 0) {
+                    ctx.shadowBlur = 25;
+                    ctx.shadowColor = ctx.fillStyle;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                
+                ctx.fill();
+            });
+
+            // Beat flash
+            if (isBeat) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                ctx.fillRect(0, 0, w, h);
+            }
+
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.shadowBlur = 0;
+        }
+
+        renderParticlesExport(ctx, w, h, freqData, isBeat) {
+            ctx.globalCompositeOperation = 'lighter';
+            
+            let bass = 0;
+            for (let i = 0; i < 25; i++) bass += freqData[i];
+            bass /= 25;
+            const speed = (bass / 255) * 6 + 0.5;
+
+            const pList = PALETTES[CONFIG.palette];
+            const scaleX = w / this.width;
+            const scaleY = h / this.height;
+
+            this.particles.forEach((p, idx) => {
+                const px = p.x * scaleX;
+                const py = p.y * scaleY;
+
+                const freqIdx = Math.floor((idx / this.particles.length) * freqData.length * 0.5);
+                const r = p.size * (0.5 + (freqData[freqIdx] / 255) * CONFIG.sensitivity * 2.5) * Math.min(scaleX, scaleY);
+
+                ctx.beginPath();
+                ctx.arc(px, py, Math.max(r, 1), 0, Math.PI * 2);
+                ctx.fillStyle = pList[p.color % pList.length];
+                
+                if (isBeat && idx % 4 === 0) {
+                    ctx.shadowBlur = 25 * Math.min(scaleX, scaleY);
+                    ctx.shadowColor = ctx.fillStyle;
+                }
+                
+                ctx.fill();
+            });
+
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.shadowBlur = 0;
+        }
+
+        renderSpectrogram(ctx, w, h, freqData) {
+            // Add current frame to history
+            const slice = new Uint8Array(freqData.length);
+            slice.set(freqData);
+            this.spectrogramHistory.push(slice);
+            
+            if (this.spectrogramHistory.length > this.maxSpectrogramHistory) {
+                this.spectrogramHistory.shift();
+            }
+
+            // Clear
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, w, h);
+
+            const sliceWidth = w / this.maxSpectrogramHistory;
+            const barHeight = h / (freqData.length * 0.4);
+
+            for (let x = 0; x < this.spectrogramHistory.length; x++) {
+                const data = this.spectrogramHistory[x];
+                const xPos = x * sliceWidth;
+                
+                for (let y = 0; y < data.length * 0.4; y++) {
+                    const value = data[y];
+                    const intensity = value / 255;
+                    
+                    if (intensity > 0.05) {
+                        const hue = (1 - intensity) * 240; // Blue to red
+                        ctx.fillStyle = `hsla(${hue}, 100%, ${intensity * 60}%, ${intensity})`;
+                        ctx.fillRect(xPos, h - (y * barHeight) - barHeight, sliceWidth + 1, barHeight + 1);
+                    }
+                }
+            }
+        }
+
+        renderSpectrogramExport(ctx, w, h, freqData) {
+            const slice = new Uint8Array(freqData.length);
+            slice.set(freqData);
+            this.spectrogramHistory.push(slice);
+            
+            if (this.spectrogramHistory.length > this.maxSpectrogramHistory) {
+                this.spectrogramHistory.shift();
+            }
+
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, w, h);
+
+            const sliceWidth = w / this.maxSpectrogramHistory;
+            const barHeight = h / (freqData.length * 0.4);
+
+            for (let x = 0; x < this.spectrogramHistory.length; x++) {
+                const data = this.spectrogramHistory[x];
+                const xPos = x * sliceWidth;
+                
+                for (let y = 0; y < data.length * 0.4; y++) {
+                    const value = data[y];
+                    const intensity = value / 255;
+                    
+                    if (intensity > 0.05) {
+                        const hue = (1 - intensity) * 240;
+                        ctx.fillStyle = `hsla(${hue}, 100%, ${intensity * 60}%, ${intensity})`;
+                        ctx.fillRect(xPos, h - (y * barHeight) - barHeight, sliceWidth + 1, barHeight + 1);
+                    }
+                }
+            }
+        }
+
+        render3DBars(ctx, w, h, cx, cy, freqData, isBeat) {
+            const bars = 64;
+            const step = Math.floor(freqData.length / bars);
+            const barWidth = w / bars * 0.6;
+            const maxHeight = h * 0.5;
+            const depth = 150;
+            const kick = isBeat ? 1.1 : 1.0;
+
+            ctx.save();
+            ctx.translate(cx, cy + 50);
+
+            for (let i = 0; i < bars; i++) {
+                const val = freqData[i * step] / 255;
+                const barH = val * maxHeight * CONFIG.sensitivity * kick;
+                
+                const x = (i - bars / 2) * (barWidth + 4);
+                const y = -barH / 2;
+
+                // 3D effect - back face
+                ctx.fillStyle = this.getColor(2) + '44';
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + depth * 0.3, y - depth * 0.2);
+                ctx.lineTo(x + barWidth + depth * 0.3, y - depth * 0.2);
+                ctx.lineTo(x + barWidth, y);
+                ctx.closePath();
+                ctx.fill();
+
+                // Side face
+                ctx.fillStyle = this.getColor(1) + '88';
+                ctx.beginPath();
+                ctx.moveTo(x + barWidth, y);
+                ctx.lineTo(x + barWidth + depth * 0.3, y - depth * 0.2);
+                ctx.lineTo(x + barWidth + depth * 0.3, y + barH - depth * 0.2);
+                ctx.lineTo(x + barWidth, y + barH);
+                ctx.closePath();
+                ctx.fill();
+
+                // Front face
+                const grad = ctx.createLinearGradient(x, y + barH, x, y);
+                grad.addColorStop(0, this.getColor(0));
+                grad.addColorStop(1, this.getColor(1));
+                ctx.fillStyle = grad;
+                ctx.fillRect(x, y, barWidth, barH);
+            }
+
+            ctx.restore();
+        }
+
+        render3DBarsExport(ctx, w, h, cx, cy, freqData, isBeat) {
+            this.render3DBars(ctx, w, h, cx, cy, freqData, isBeat);
+        }
+
+        renderDNAHelix(ctx, w, h, cx, cy, freqData, isBeat) {
+            APP_STATE.helixAngle += isBeat ? 0.08 : 0.03;
+            
+            const points = 80;
+            const amplitude = Math.min(cx, cy) * 0.35;
+            const spacing = h / points;
+            const phase = APP_STATE.helixAngle;
+
+            ctx.save();
+            ctx.translate(cx, 0);
+
+            for (let i = 0; i < points; i++) {
+                const freqIdx = Math.floor((i / points) * freqData.length * 0.5);
+                const freqVal = freqData[freqIdx] / 255;
+                const y = i * spacing;
+                
+                const x1 = Math.sin(phase + i * 0.15) * amplitude * (0.5 + freqVal * CONFIG.sensitivity);
+                const x2 = Math.sin(phase + i * 0.15 + Math.PI) * amplitude * (0.5 + freqVal * CONFIG.sensitivity);
+                
+                const size = 4 + freqVal * 12;
+
+                // Strand 1
+                ctx.beginPath();
+                ctx.arc(x1, y, size, 0, Math.PI * 2);
+                ctx.fillStyle = this.getColor(0);
+                ctx.shadowBlur = isBeat ? 20 : 5;
+                ctx.shadowColor = this.getColor(0);
+                ctx.fill();
+
+                // Strand 2
+                ctx.beginPath();
+                ctx.arc(x2, y, size, 0, Math.PI * 2);
+                ctx.fillStyle = this.getColor(1);
+                ctx.shadowColor = this.getColor(1);
+                ctx.fill();
+
+                // Connecting line (base pair)
+                if (i % 4 === 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y);
+                    ctx.lineTo(x2, y);
+                    ctx.strokeStyle = this.getColor(2) + '66';
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 0;
+                    ctx.stroke();
+                }
+            }
+
+            ctx.restore();
+            ctx.shadowBlur = 0;
+        }
+
+        renderDNAHelixExport(ctx, w, h, cx, cy, freqData, isBeat) {
+            this.renderDNAHelix(ctx, w, h, cx, cy, freqData, isBeat);
+        }
+
+        renderGalaxy(ctx, w, h, cx, cy, freqData, isBeat) {
+            APP_STATE.galaxyAngle += isBeat ? 0.025 : 0.008;
+            
+            const arms = 4;
+            const pointsPerArm = 120;
+            const maxRadius = Math.min(cx, cy) * 0.85;
+            
+            ctx.save();
+            ctx.translate(cx, cy);
+
+            // Center glow
+            const centerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, maxRadius * 0.3);
+            centerGrad.addColorStop(0, this.getColor(0) + '44');
+            centerGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = centerGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, maxRadius * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            for (let arm = 0; arm < arms; arm++) {
+                const armOffset = (arm / arms) * Math.PI * 2;
+                
+                for (let i = 0; i < pointsPerArm; i++) {
+                    const progress = i / pointsPerArm;
+                    const freqIdx = Math.floor(progress * freqData.length * 0.5);
+                    const freqVal = freqData[freqIdx] / 255;
+                    
+                    const radius = progress * maxRadius;
+                    const spiralAngle = progress * Math.PI * 3 + armOffset + APP_STATE.galaxyAngle;
+                    
+                    // Add some randomness for natural look
+                    const jitter = (Math.sin(i * 0.5 + APP_STATE.galaxyAngle * 2) * 0.1);
+                    
+                    const x = Math.cos(spiralAngle + jitter) * radius;
+                    const y = Math.sin(spiralAngle + jitter) * radius * 0.6; // Elliptical
+                    
+                    const size = (1 + freqVal * CONFIG.sensitivity * 3) * (1 - progress * 0.5);
+                    const alpha = (1 - progress * 0.7) * (0.3 + freqVal * 0.7);
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, Math.max(size, 0.5), 0, Math.PI * 2);
+                    ctx.fillStyle = this.getColor(arm % PALETTES[CONFIG.palette].length);
+                    ctx.globalAlpha = alpha;
+                    
+                    if (isBeat && i % 8 === 0) {
+                        ctx.shadowBlur = 15;
+                        ctx.shadowColor = ctx.fillStyle;
+                    } else {
+                        ctx.shadowBlur = 0;
+                    }
+                    
+                    ctx.fill();
+                }
+            }
+
+            ctx.globalAlpha = 1;
+            ctx.restore();
+            ctx.shadowBlur = 0;
+        }
+
+        renderGalaxyExport(ctx, w, h, cx, cy, freqData, isBeat) {
+            this.renderGalaxy(ctx, w, h, w / 2, h / 2, freqData, isBeat);
+        }
+    }
+
+    // ============================================
+    // UI CONTROLLER
+    // ============================================
+    
+    const UI = {
+        init() {
+            this.cacheElements();
+            this.bindEvents();
+            this.setupDragDrop();
+            this.setupKeyboard();
+            this.setupSettings();
+        },
+
+        cacheElements() {
+            this.els = {
+                fileInput: document.getElementById('file-input'),
+                playBtn: document.getElementById('btn-play'),
+                playIcon: document.getElementById('play-icon'),
+                seek: document.getElementById('seek-bar'),
+                dropOverlay: document.getElementById('drop-overlay'),
+                settingsModal: document.getElementById('settings-modal'),
+                exportModal: document.getElementById('export-modal'),
+                uiLayer: document.getElementById('ui-layer'),
+                modeName: document.getElementById('mode-name'),
+                toastContainer: document.getElementById('toast-container')
+            };
+        },
+
+        bindEvents() {
+            document.getElementById('btn-upload').onclick = () => this.els.fileInput.click();
+            this.els.fileInput.onchange = (e) => this.handleFile(e.target.files[0]);
+            this.els.playBtn.onclick = () => audio.togglePlay();
+            document.getElementById('btn-stop').onclick = () => audio.stop();
+            document.getElementById('btn-mic').onclick = () => audio.enableMic();
+            
+            document.getElementById('btn-mode').onclick = () => {
+                APP_STATE.mode = (APP_STATE.mode + 1) % APP_STATE.modesCount;
+                this.updateModeDisplay();
+                this.showToast(APP_STATE.modeNames[APP_STATE.mode], 'info');
+            };
+
+            this.els.seek.oninput = (e) => {
+                if (audio.audioElement.duration) {
+                    audio.audioElement.currentTime = (e.target.value / 100) * audio.audioElement.duration;
+                }
+            };
+
+            document.getElementById('vol-slider').oninput = () => audio.updateSettings();
+
+            document.getElementById('btn-settings').onclick = () => this.toggleSettings(true);
+            document.getElementById('btn-close-settings').onclick = () => this.toggleSettings(false);
+
+            document.getElementById('btn-fullscreen').onclick = () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(console.log);
+                } else {
+                    document.exitFullscreen();
+                }
+            };
+
+            // Auto-hide UI
+            let hideTimeout;
+            document.onmousemove = () => {
+                this.els.uiLayer.style.opacity = '1';
+                clearTimeout(hideTimeout);
+                hideTimeout = setTimeout(() => {
+                    if (APP_STATE.isPlaying && !this.settingsOpen && !APP_STATE.isRecording) {
+                        this.els.uiLayer.style.opacity = '0';
+                    }
+                }, 3000);
+            };
+
+            // Click on settings overlay to close
+            this.els.settingsModal.onclick = (e) => {
+                if (e.target === this.els.settingsModal) this.toggleSettings(false);
+            };
+
+            document.getElementById('export-modal').onclick = (e) => {
+                if (e.target.id === 'export-modal' && !APP_STATE.isRecording) {
+                    Exporter.hideModal();
+                }
+            };
+        },
+
+        setupDragDrop() {
+            window.ondragover = (e) => {
+                e.preventDefault();
+                this.els.dropOverlay.style.display = 'flex';
+            };
+
+            window.ondragleave = (e) => {
+                if (e.relatedTarget === null) {
+                    this.els.dropOverlay.style.display = 'none';
+                }
+            };
+
+            window.ondrop = (e) => {
+                e.preventDefault();
+                this.els.dropOverlay.style.display = 'none';
+                if (e.dataTransfer.files.length) {
+                    this.handleFile(e.dataTransfer.files[0]);
+                }
+            };
+        },
+
+        setupKeyboard() {
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+                
+                switch (e.code) {
+                    case 'Space':
+                        e.preventDefault();
+                        audio.togglePlay();
+                        break;
+                    case 'KeyS':
+                        audio.stop();
+                        break;
+                    case 'KeyM':
+                        document.getElementById('btn-mode').click();
+                        break;
+                    case 'KeyF':
+                        document.getElementById('btn-fullscreen').click();
+                        break;
+                    case 'ArrowRight':
+                        audio.audioElement.currentTime = Math.min(
+                            audio.audioElement.currentTime + 5,
+                            audio.audioElement.duration
+                        );
+                        break;
+                    case 'ArrowLeft':
+                        audio.audioElement.currentTime = Math.max(
+                            audio.audioElement.currentTime - 5,
+                            0
+                        );
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        const volUp = document.getElementById('vol-slider');
+                        volUp.value = Math.min(parseFloat(volUp.value) + 0.1, 1.5);
+                        audio.updateSettings();
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        const volDown = document.getElementById('vol-slider');
+                        volDown.value = Math.max(parseFloat(volDown.value) - 0.1, 0);
+                        audio.updateSettings();
+                        break;
+                    case 'Escape':
+                        this.toggleSettings(false);
+                        Exporter.hideModal();
+                        break;
+                }
+            });
+        },
+
+        setupSettings() {
+            const linkSetting = (id, configKey, type = 'float') => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                
+                el.onchange = el.oninput = (e) => {
+                    let val = e.target.value;
+                    if (type === 'float') val = parseFloat(val);
+                    else if (type === 'int') val = parseInt(val);
+                    else if (type === 'bool') val = e.target.checked;
+                    CONFIG[configKey] = val;
+                    audio.updateSettings();
+                };
+            };
+
+            linkSetting('set-fft', 'fftSize', 'int');
+            linkSetting('set-smoothing', 'smoothing', 'float');
+            linkSetting('set-sensitivity', 'sensitivity', 'float');
+            linkSetting('set-bloom', 'bloomIntensity', 'float');
+            linkSetting('set-beat-thresh', 'beatThreshold', 'float');
+            linkSetting('set-palette', 'palette', 'string');
+            linkSetting('set-beat-enabled', 'beatEnabled', 'bool');
+            linkSetting('set-mirror', 'mirror', 'bool');
+
+            document.getElementById('set-hc').onchange = (e) => {
+                CONFIG.highContrast = e.target.checked;
+                document.body.classList.toggle('high-contrast', CONFIG.highContrast);
+            };
+
+            document.getElementById('set-show-fps').onchange = (e) => {
+                CONFIG.showFps = e.target.checked;
+                document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
+            };
+
+            document.getElementById('btn-export-preset').onclick = () => {
+                const preset = { ...CONFIG, mode: APP_STATE.mode };
+                const blob = new Blob([JSON.stringify(preset, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `waveforge_preset_${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                this.showToast('Preset exported!', 'success');
+            };
+
+            document.getElementById('btn-screenshot').onclick = () => {
+                const a = document.createElement('a');
+                a.href = document.getElementById('viz-canvas').toDataURL('image/png');
+                a.download = `waveforge_screenshot_${Date.now()}.png`;
+                a.click();
+                this.showToast('Screenshot saved!', 'success');
+            };
+        },
+
+        handleFile(file) {
+            if (!file) return;
+
+            if (file.type.includes('json') || file.name.endsWith('.json')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const preset = JSON.parse(e.target.result);
+                        Object.assign(CONFIG, preset);
+                        if (preset.mode !== undefined) APP_STATE.mode = preset.mode;
+                        
+                        // Update UI elements
+                        document.getElementById('set-smoothing').value = CONFIG.smoothing;
+                        document.getElementById('set-sensitivity').value = CONFIG.sensitivity;
+                        document.getElementById('set-fft').value = CONFIG.fftSize;
+                        document.getElementById('set-palette').value = CONFIG.palette;
+                        document.getElementById('set-beat-thresh').value = CONFIG.beatThreshold;
+                        document.getElementById('set-beat-enabled').checked = CONFIG.beatEnabled;
+                        
+                        audio.updateSettings();
+                        this.updateModeDisplay();
+                        this.showToast('Preset loaded!', 'success');
+                    } catch (err) {
+                        this.showToast('Invalid preset file', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            } else if (file.type.includes('audio') || file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac|webm)$/i)) {
+                audio.playFile(URL.createObjectURL(file));
+                document.getElementById('status-text').textContent = file.name.substring(0, 20) + (file.name.length > 20 ? '...' : '');
+            } else {
+                this.showToast('Unsupported file type', 'error');
+            }
+        },
+
+        toggleSettings(show) {
+            this.settingsOpen = show;
+            this.els.settingsModal.classList.toggle('open', show);
+        },
+
+        updatePlayButton() {
+            this.els.playIcon.textContent = APP_STATE.isPlaying ? '⏸' : '▶';
+            this.els.playBtn.classList.toggle('active', APP_STATE.isPlaying);
+            document.getElementById('status-text').textContent = APP_STATE.isPlaying ? 'Playing' : 'Paused';
+        },
+
+        updateProgressBar() {
+            const el = audio.audioElement;
+            if (!el.duration || isNaN(el.duration)) return;
+            
+            const pct = (el.currentTime / el.duration) * 100;
+            this.els.seek.value = pct;
+            
+            const formatTime = (s) => {
+                if (isNaN(s)) return '0:00';
+                const m = Math.floor(s / 60);
+                const sec = Math.floor(s % 60);
+                return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+            };
+            
+            document.getElementById('time-current').textContent = formatTime(el.currentTime);
+            document.getElementById('time-total').textContent = formatTime(el.duration);
+        },
+
+        updateModeDisplay() {
+            this.els.modeName.textContent = APP_STATE.modeNames[APP_STATE.mode];
+        },
+
+        showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            this.els.toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    };
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    
+    let audio, viz;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        audio = new AudioEngine();
+        viz = new VisualizerEngine();
+        
+        UI.init();
+        Exporter.init();
+        
+        viz.loop();
+        
+        // Initial state
+        UI.updateModeDisplay();
+        
+        console.log('%c🎵 WaveForge v2.0.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
+        console.log('%cProfessional Music Visualizer', 'color: #ff0099; font-size: 12px;');
+    });
+
+    // Handle visibility change to pause/resume
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && APP_STATE.isPlaying && !APP_STATE.isRecording) {
+            // Optionally pause when tab is hidden
+        }
+    });
+
+    // Service Worker Registration (for PWA/offline support)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            // navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+    }
+    </script>
+</body>
+</html>
