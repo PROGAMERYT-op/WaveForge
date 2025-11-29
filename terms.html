@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Terms of Service | WaveForge - Music Visualizer</title>
+    <meta name="description" content="WaveForge Terms of Service. Read our terms and conditions for using the WaveForge music visualizer application.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://waveforge.app/terms.html">
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #030308;
+            --bg-secondary: #0a0a12;
+            --accent-primary: #00f2ff;
+            --accent-secondary: #ff0099;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --gradient-primary: linear-gradient(135deg, #00f2ff 0%, #ff0099 100%);
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --warning-color: #fbbf24;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .last-updated {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 3rem;
+        }
+
+        .intro-text {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .content-section {
+            margin-bottom: 3rem;
+        }
+
+        .content-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .content-section h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .content-section p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .content-section ul, 
+        .content-section ol {
+            color: var(--text-secondary);
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .content-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 0 10px 10px 0;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .highlight-box.danger {
+            border-left-color: var(--danger-color);
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
+        }
+
+        .highlight-box strong {
+            color: var(--text-primary);
+        }
+
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .toc h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .toc ol {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+
+        .toc li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc a {
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Acceptance Banner */
+        .acceptance-banner {
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.1) 0%, rgba(255, 0, 153, 0.1) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .acceptance-banner p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .acceptance-banner strong {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .content-section h2 {
+                font-size: 1.3rem;
+            }
+
+            .footer-links {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🎵</div>
+                <span class="logo-text">WaveForge</span>
+            </a>
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">Terms of Service</h1>
+        <p class="last-updated">Last updated: December 1, 2024</p>
+
+        <div class="acceptance-banner">
+            <p>
+                <strong>By using WaveForge, you agree to these Terms of Service.</strong><br>
+                Please read them carefully before using our application.
+            </p>
+        </div>
+
+        <p class="intro-text">
+            Welcome to WaveForge! These Terms of Service ("Terms") govern your access to and use of the WaveForge music visualizer application ("Service"), operated by WaveForge ("we," "us," or "our"). By accessing or using our Service, you agree to be bound by these Terms.
+        </p>
+
+        <!-- Table of Contents -->
+        <nav class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ol>
+                <li><a href="#acceptance">Acceptance of Terms</a></li>
+                <li><a href="#description">Description of Service</a></li>
+                <li><a href="#eligibility">Eligibility</a></li>
+                <li><a href="#user-content">User Content & Responsibilities</a></li>
+                <li><a href="#intellectual-property">Intellectual Property</a></li>
+                <li><a href="#prohibited">Prohibited Uses</a></li>
+                <li><a href="#disclaimers">Disclaimers</a></li>
+                <li><a href="#limitation">Limitation of Liability</a></li>
+                <li><a href="#indemnification">Indemnification</a></li>
+                <li><a href="#modifications">Modifications to Service</a></li>
+                <li><a href="#termination">Termination</a></li>
+                <li><a href="#governing-law">Governing Law</a></li>
+                <li><a href="#contact">Contact Information</a></li>
+            </ol>
+        </nav>
+
+        <!-- Section 1 -->
+        <div class="content-section" id="acceptance">
+            <h2><span class="section-number">1</span> Acceptance of Terms</h2>
+            <p>
+                By accessing or using WaveForge, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service and our <a href="privacy.html">Privacy Policy</a>. If you do not agree to these Terms, you must not access or use the Service.
+            </p>
+            <p>
+                We reserve the right to update or modify these Terms at any time without prior notice. Your continued use of the Service after any such changes constitutes your acceptance of the new Terms. We encourage you to review these Terms periodically.
+            </p>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="content-section" id="description">
+            <h2><span class="section-number">2</span> Description of Service</h2>
+            <p>
+                WaveForge is a free, browser-based music visualization application that allows users to:
+            </p>
+            <ul>
+                <li>Upload and visualize audio files locally in their web browser</li>
+                <li>Create real-time audio-reactive visual animations</li>
+                <li>Choose from multiple visualization modes and color palettes</li>
+                <li>Export visualizations as video files with audio</li>
+                <li>Use microphone input for live audio visualization</li>
+                <li>Customize visualization settings and save presets</li>
+            </ul>
+            <div class="highlight-box">
+                <p><strong>Important:</strong> All audio processing occurs locally in your browser. Your audio files are never uploaded to our servers, ensuring your content remains private and secure.</p>
+            </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="content-section" id="eligibility">
+            <h2><span class="section-number">3</span> Eligibility</h2>
+            <p>
+                You must be at least 13 years of age to use WaveForge. By using the Service, you represent and warrant that:
+            </p>
+            <ul>
+                <li>You are at least 13 years of age</li>
+                <li>You have the legal capacity to enter into these Terms</li>
+                <li>You are not prohibited from using the Service under applicable laws</li>
+                <li>If you are under 18, you have obtained parental or guardian consent</li>
+            </ul>
+            <p>
+                If you are using WaveForge on behalf of an organization, you represent that you have the authority to bind that organization to these Terms.
+            </p>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="content-section" id="user-content">
+            <h2><span class="section-number">4</span> User Content & Responsibilities</h2>
+            
+            <h3>4.1 Your Content</h3>
+            <p>
+                You retain all ownership rights to the audio files and other content you load into WaveForge ("User Content"). We do not claim any ownership over your User Content.
+            </p>
+
+            <h3>4.2 Content Responsibility</h3>
+            <p>
+                You are solely responsible for ensuring that you have the necessary rights, licenses, and permissions to use any audio content with WaveForge, including but not limited to:
+            </p>
+            <ul>
+                <li>Copyright ownership or valid license to use the music</li>
+                <li>Rights to create derivative works (visualizations)</li>
+                <li>Rights to distribute or publicly display the resulting videos</li>
+                <li>Compliance with music licensing requirements (ASCAP, BMI, etc.)</li>
+            </ul>
+
+            <div class="highlight-box warning">
+                <p><strong>⚠️ Copyright Notice:</strong> Using copyrighted music without proper authorization may violate copyright laws. WaveForge is a tool; how you use it is your responsibility. We are not liable for any copyright infringement resulting from your use of the Service.</p>
+            </div>
+
+            <h3>4.3 Exported Videos</h3>
+            <p>
+                Videos you create and export using WaveForge are yours to use as you see fit, subject to:
+            </p>
+            <ul>
+                <li>Your ownership or licensing of the underlying audio content</li>
+                <li>Applicable copyright and intellectual property laws</li>
+                <li>Platform-specific terms where you may upload or share your videos</li>
+            </ul>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="content-section" id="intellectual-property">
+            <h2><span class="section-number">5</span> Intellectual Property</h2>
+            
+            <h3>5.1 WaveForge Ownership</h3>
+            <p>
+                The WaveForge application, including its original content, features, functionality, design, graphics, and source code, is owned by WaveForge and is protected by international copyright, trademark, and other intellectual property laws.
+            </p>
+
+            <h3>5.2 License to Use</h3>
+            <p>
+                We grant you a limited, non-exclusive, non-transferable, revocable license to use WaveForge for personal and commercial purposes, subject to these Terms. This license does not include the right to:
+            </p>
+            <ul>
+                <li>Modify, copy, or create derivative works of the WaveForge application itself</li>
+                <li>Reverse engineer, decompile, or disassemble the application</li>
+                <li>Remove any copyright, trademark, or proprietary notices</li>
+                <li>Use the Service to compete with WaveForge</li>
+                <li>Sublicense, sell, or redistribute the application</li>
+            </ul>
+
+            <h3>5.3 Trademarks</h3>
+            <p>
+                "WaveForge," the WaveForge logo, and related marks are trademarks of WaveForge. You may not use these trademarks without our prior written consent.
+            </p>
+
+            <h3>5.4 Feedback</h3>
+            <p>
+                If you provide us with feedback, suggestions, or ideas regarding WaveForge, you grant us a perpetual, irrevocable, royalty-free license to use and incorporate such feedback without compensation or attribution to you.
+            </p>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="content-section" id="prohibited">
+            <h2><span class="section-number">6</span> Prohibited Uses</h2>
+            <p>
+                You agree not to use WaveForge to:
+            </p>
+            <ul>
+                <li>Violate any applicable laws, regulations, or third-party rights</li>
+                <li>Infringe on intellectual property rights of others</li>
+                <li>Create, distribute, or display illegal, harmful, or offensive content</li>
+                <li>Attempt to interfere with, compromise, or disrupt the Service</li>
+                <li>Use automated systems (bots, scrapers) to access the Service</li>
+                <li>Circumvent any security features or access restrictions</li>
+                <li>Impersonate any person or entity</li>
+                <li>Collect information about other users without consent</li>
+                <li>Use the Service for any commercial purpose that competes with WaveForge</li>
+                <li>Transmit viruses, malware, or other harmful code</li>
+            </ul>
+            <div class="highlight-box danger">
+                <p><strong>🚫 Violation of these prohibitions may result in immediate termination of your access to WaveForge and potential legal action.</strong></p>
+            </div>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="content-section" id="disclaimers">
+            <h2><span class="section-number">7</span> Disclaimers</h2>
+            
+            <h3>7.1 "As Is" Basis</h3>
+            <p>
+                WAVEFORGE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR COURSE OF PERFORMANCE.
+            </p>
+
+            <h3>7.2 No Guarantees</h3>
+            <p>
+                We do not warrant that:
+            </p>
+            <ul>
+                <li>The Service will be uninterrupted, secure, or error-free</li>
+                <li>The results obtained from using the Service will be accurate or reliable</li>
+                <li>The quality of any visualizations or exports will meet your expectations</li>
+                <li>Any errors in the Service will be corrected</li>
+                <li>The Service will be compatible with all devices or browsers</li>
+            </ul>
+
+            <h3>7.3 Third-Party Content</h3>
+            <p>
+                WaveForge may contain links to third-party websites or services. We are not responsible for the content, privacy policies, or practices of any third-party sites or services.
+            </p>
+
+            <h3>7.4 Browser Compatibility</h3>
+            <p>
+                WaveForge relies on modern web technologies (Web Audio API, Canvas, MediaRecorder). Functionality may vary depending on your browser, device, and operating system. We do not guarantee compatibility with all browsers or devices.
+            </p>
+        </div>
+
+        <!-- Section 8 -->
+        <div class="content-section" id="limitation">
+            <h2><span class="section-number">8</span> Limitation of Liability</h2>
+            <p>
+                TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL WAVEFORGE, ITS DIRECTORS, EMPLOYEES, PARTNERS, AGENTS, SUPPLIERS, OR AFFILIATES BE LIABLE FOR:
+            </p>
+            <ul>
+                <li>Any indirect, incidental, special, consequential, or punitive damages</li>
+                <li>Any loss of profits, revenue, data, or business opportunities</li>
+                <li>Any damages resulting from your use or inability to use the Service</li>
+                <li>Any damages resulting from unauthorized access to or alteration of your content</li>
+                <li>Any damages arising from third-party conduct or content</li>
+            </ul>
+            <p>
+                IN NO EVENT SHALL OUR TOTAL LIABILITY TO YOU EXCEED THE AMOUNT YOU PAID US IN THE TWELVE (12) MONTHS PRIOR TO THE CLAIM, OR ONE HUNDRED DOLLARS ($100), WHICHEVER IS GREATER.
+            </p>
+            <div class="highlight-box">
+                <p><strong>Note:</strong> Some jurisdictions do not allow the exclusion of certain warranties or limitation of liability. In such jurisdictions, our liability shall be limited to the maximum extent permitted by law.</p>
+            </div>
+        </div>
+
+        <!-- Section 9 -->
+        <div class="content-section" id="indemnification">
+            <h2><span class="section-number">9</span> Indemnification</h2>
+            <p>
+                You agree to indemnify, defend, and hold harmless WaveForge and its officers, directors, employees, agents, and affiliates from and against any and all claims, damages, obligations, losses, liabilities, costs, and expenses (including attorney's fees) arising from:
+            </p>
+            <ul>
+                <li>Your use of the Service</li>
+                <li>Your violation of these Terms</li>
+                <li>Your violation of any third-party rights, including intellectual property rights</li>
+                <li>Your User Content or any content you create using the Service</li>
+                <li>Any claim that your User Content caused damage to a third party</li>
+            </ul>
+        </div>
+
+        <!-- Section 10 -->
+        <div class="content-section" id="modifications">
+            <h2><span class="section-number">10</span> Modifications to Service</h2>
+            <p>
+                We reserve the right to modify, suspend, or discontinue WaveForge (or any part thereof) at any time, with or without notice. We shall not be liable to you or any third party for any modification, suspension, or discontinuation of the Service.
+            </p>
+            <p>
+                We may also update, modify, or remove features from WaveForge at any time. While we strive to maintain backward compatibility, we cannot guarantee that your presets or settings will work with future versions.
+            </p>
+        </div>
+
+        <!-- Section 11 -->
+        <div class="content-section" id="termination">
+            <h2><span class="section-number">11</span> Termination</h2>
+            <p>
+                These Terms remain in effect while you use WaveForge. We may terminate or suspend your access to the Service immediately, without prior notice or liability, for any reason, including:
+            </p>
+            <ul>
+                <li>Breach of these Terms</li>
+                <li>Conduct that we believe is harmful to other users or to WaveForge</li>
+                <li>Upon request by law enforcement or government agencies</li>
+                <li>Discontinuation or material modification of the Service</li>
+                <li>Technical or security issues</li>
+            </ul>
+            <p>
+                Upon termination, your right to use the Service will immediately cease. All provisions of these Terms that should survive termination shall survive, including ownership provisions, warranty disclaimers, indemnification, and limitations of liability.
+            </p>
+        </div>
+
+        <!-- Section 12 -->
+        <div class="content-section" id="governing-law">
+            <h2><span class="section-number">12</span> Governing Law & Dispute Resolution</h2>
+            
+            <h3>12.1 Governing Law</h3>
+            <p>
+                These Terms shall be governed by and construed in accordance with the laws of the State of Delaware, United States, without regard to its conflict of law provisions.
+            </p>
+
+            <h3>12.2 Dispute Resolution</h3>
+            <p>
+                Any dispute arising from or relating to these Terms or the Service shall be resolved through the following process:
+            </p>
+            <ol>
+                <li><strong>Informal Resolution:</strong> We encourage you to contact us first to resolve any dispute informally.</li>
+                <li><strong>Mediation:</strong> If informal resolution fails, disputes shall be submitted to mediation.</li>
+                <li><strong>Arbitration:</strong> Any unresolved disputes shall be settled by binding arbitration in accordance with the rules of the American Arbitration Association.</li>
+            </ol>
+
+            <h3>12.3 Class Action Waiver</h3>
+            <p>
+                YOU AGREE THAT ANY CLAIMS MUST BE BROUGHT IN YOUR INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING.
+            </p>
+
+            <h3>12.4 Time Limitation</h3>
+            <p>
+                Any cause of action or claim you may have arising out of or relating to these Terms or the Service must be commenced within one (1) year after the cause of action accrues; otherwise, such cause of action or claim is permanently barred.
+            </p>
+        </div>
+
+        <!-- Section 13 -->
+        <div class="content-section" id="contact">
+            <h2><span class="section-number">13</span> Contact Information</h2>
+            <p>
+                If you have any questions about these Terms of Service, please contact us:
+            </p>
+            <ul>
+                <li><strong>Email:</strong> legal@waveforge.app</li>
+                <li><strong>Website:</strong> <a href="https://waveforge.app">https://waveforge.app</a></li>
+            </ul>
+            <p>
+                For general inquiries or support, please email: support@waveforge.app
+            </p>
+        </div>
+
+        <!-- Additional Sections -->
+        <div class="content-section">
+            <h2>Additional Terms</h2>
+            
+            <h3>Severability</h3>
+            <p>
+                If any provision of these Terms is held to be unenforceable or invalid, such provision will be changed and interpreted to accomplish the objectives of such provision to the greatest extent possible under applicable law, and the remaining provisions will continue in full force and effect.
+            </p>
+
+            <h3>Waiver</h3>
+            <p>
+                Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. The waiver of any such right or provision will be effective only if in writing and signed by a duly authorized representative of WaveForge.
+            </p>
+
+            <h3>Entire Agreement</h3>
+            <p>
+                These Terms, together with our Privacy Policy, constitute the entire agreement between you and WaveForge regarding your use of the Service and supersede all prior and contemporaneous understandings, agreements, representations, and warranties.
+            </p>
+
+            <h3>Assignment</h3>
+            <p>
+                You may not assign or transfer these Terms, by operation of law or otherwise, without our prior written consent. We may assign these Terms without restriction. Any attempted assignment in violation of this section shall be null and void.
+            </p>
+
+            <h3>Force Majeure</h3>
+            <p>
+                We shall not be liable for any failure or delay in performance resulting from causes beyond our reasonable control, including but not limited to acts of God, natural disasters, war, terrorism, riots, embargoes, acts of civil or military authorities, fire, floods, accidents, strikes, or shortages of transportation, facilities, fuel, energy, labor, or materials.
+            </p>
+        </div>
+
+        <div class="highlight-box">
+            <p>
+                <strong>Thank you for using WaveForge!</strong><br>
+                We're committed to providing you with the best music visualization experience. If you have any questions or concerns about these Terms, please don't hesitate to reach out to us.
+            </p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 WaveForge. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+            <a href="visualizer.html">Launch App</a>
+        </div>
+    </footer>
+
+    <!-- Smooth scroll for anchor links -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
