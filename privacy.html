@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Privacy Policy | WaveForge - Music Visualizer</title>
+    <meta name="description" content="WaveForge Privacy Policy. Learn how we protect your data and respect your privacy while using our music visualizer.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://waveforge.app/privacy.html">
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #030308;
+            --bg-secondary: #0a0a12;
+            --accent-primary: #00f2ff;
+            --accent-secondary: #ff0099;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #52525b;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --gradient-primary: linear-gradient(135deg, #00f2ff 0%, #ff0099 100%);
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .last-updated {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 3rem;
+        }
+
+        .content-section {
+            margin-bottom: 3rem;
+        }
+
+        .content-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .content-section h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .content-section p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .content-section ul {
+            color: var(--text-secondary);
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .content-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 0 10px 10px 0;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
+        }
+
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🎵</div>
+                <span class="logo-text">WaveForge</span>
+            </a>
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">Privacy Policy</h1>
+        <p class="last-updated">Last updated: December 1, 2024</p>
+
+        <div class="content-section">
+            <h2>Introduction</h2>
+            <p>
+                Welcome to WaveForge ("we," "our," or "us"). We are committed to protecting your privacy and ensuring you have a positive experience using our music visualizer application. This Privacy Policy explains how we collect, use, and safeguard your information when you use our service.
+            </p>
+            <div class="highlight-box">
+                <p><strong>Key Point:</strong> WaveForge processes all audio files locally in your browser. Your music files are never uploaded to our servers, ensuring your audio content remains completely private.</p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Information We Collect</h2>
+            
+            <h3>Information You Provide</h3>
+            <p>WaveForge is designed to work without requiring any personal information. We do not require:</p>
+            <ul>
+                <li>Account registration</li>
+                <li>Email addresses</li>
+                <li>Personal identification</li>
+                <li>Payment information</li>
+            </ul>
+
+            <h3>Automatically Collected Information</h3>
+            <p>When you use WaveForge, we may automatically collect certain information through analytics services:</p>
+            <ul>
+                <li><strong>Usage Data:</strong> Pages visited, features used, time spent on the application</li>
+                <li><strong>Device Information:</strong> Browser type, operating system, screen resolution</li>
+                <li><strong>Geographic Data:</strong> General location based on IP address (country/region level only)</li>
+            </ul>
+
+            <h3>Audio Files</h3>
+            <p>
+                Audio files you load into WaveForge are processed entirely within your web browser using the Web Audio API. Your audio files are:
+            </p>
+            <ul>
+                <li>Never uploaded to our servers</li>
+                <li>Never stored by us</li>
+                <li>Never shared with third parties</li>
+                <li>Automatically cleared when you close or refresh the page</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>How We Use Your Information</h2>
+            <p>The limited information we collect is used to:</p>
+            <ul>
+                <li>Improve and optimize the WaveForge application</li>
+                <li>Understand how users interact with our features</li>
+                <li>Identify and fix technical issues</li>
+                <li>Analyze usage trends to guide future development</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Analytics and Cookies</h2>
+            <p>
+                We use Google Analytics to understand how visitors interact with WaveForge. Google Analytics collects information such as:
+            </p>
+            <ul>
+                <li>How often you visit our site</li>
+                <li>What pages you view</li>
+                <li>What other sites you visited before coming to our site</li>
+            </ul>
+            <p>
+                We use this information only to improve WaveForge. Google Analytics plants a permanent cookie on your web browser to identify you as a unique user the next time you visit. This cookie cannot be used by anyone but Google.
+            </p>
+            <p>
+                You can opt out of Google Analytics by installing the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics Opt-out Browser Add-on</a>.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2>Local Storage</h2>
+            <p>
+                WaveForge may use your browser's local storage to save your preferences, such as:
+            </p>
+            <ul>
+                <li>Visualization mode preferences</li>
+                <li>Color palette selections</li>
+                <li>Audio settings (sensitivity, smoothing)</li>
+                <li>Custom presets you create</li>
+            </ul>
+            <p>
+                This data is stored locally on your device and is never transmitted to our servers. You can clear this data at any time through your browser settings.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2>Third-Party Services</h2>
+            <p>WaveForge uses the following third-party services:</p>
+            <ul>
+                <li><strong>Google Analytics:</strong> For usage analytics (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>)</li>
+                <li><strong>Google Fonts:</strong> For typography (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>)</li>
+            </ul>
+            <p>
+                These services may collect information sent by your browser as part of standard web operations.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2>Data Security</h2>
+            <p>
+                We implement appropriate technical and organizational measures to protect any information we process. However, no electronic transmission or storage method is 100% secure. Since WaveForge processes audio locally and collects minimal data, the risk to your privacy is significantly reduced.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2>Children's Privacy</h2>
+            <p>
+                WaveForge is not directed to children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2>Your Rights</h2>
+            <p>Depending on your location, you may have certain rights regarding your personal information:</p>
+            <ul>
+                <li><strong>Access:</strong> Request information about data we hold about you</li>
+                <li><strong>Deletion:</strong> Request deletion of your personal data</li>
+                <li><strong>Opt-out:</strong> Opt out of analytics tracking</li>
+                <li><strong>Portability:</strong> Request your data in a portable format</li>
+            </ul>
+            <p>
+                Since WaveForge collects minimal personal data, most of these rights can be exercised by clearing your browser cookies and local storage.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2>International Users</h2>
+            <p>
+                WaveForge is operated from the United States. If you are accessing our service from outside the United States, please be aware that information may be transferred to, stored, and processed in the United States or other countries where our service providers are located.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2>Changes to This Policy</h2>
+            <p>
+                We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date. You are advised to review this Privacy Policy periodically for any changes.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2>Contact Us</h2>
+            <p>
+                If you have any questions about this Privacy Policy or our privacy practices, please contact us at:
+            </p>
+            <ul>
+                <li>Email: </li>
+                <li>Website: <a href="progameryt-op.github.io/WaveForge/">progameryt-op.github.io/WaveForge/</a></li>
+            </ul>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 WaveForge. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+            <a href="visualizer.html">Launch App</a>
+        </div>
+    </footer>
+</body>
+</html>
