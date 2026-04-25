@@ -1,7 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <!-- Google tag (gtag.js) -->
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('wf-theme');
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+            } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+        })();
+    </script>
+
+    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DG4Q2KJ2JD"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -9,252 +19,235 @@
         gtag('js', new Date());
         gtag('config', 'G-DG4Q2KJ2JD');
     </script>
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Privacy Policy | WaveForge - Music Visualizer</title>
-    <meta name="description" content="WaveForge Privacy Policy. Learn how we protect your data and respect your privacy while using our music visualizer.">
+    <meta name="color-scheme" content="light dark">
+
+    <title>Privacy Policy — WaveForge</title>
+    <meta name="description" content="WaveForge Privacy Policy. Learn how we protect your data and respect your privacy while using our free music visualizer.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://waveforge.app/privacy.html">
-    
+    <link rel="canonical" href="https://progameryt-op.github.io/WaveForge/privacy.html">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)">
+
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/privacy.html">
+    <meta property="og:title" content="Privacy Policy — WaveForge">
+    <meta property="og:description" content="How WaveForge handles your data and protects your privacy.">
+    <meta property="og:site_name" content="WaveForge">
+
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-primary: #030308;
-            --bg-secondary: #0a0a12;
-            --accent-primary: #00f2ff;
-            --accent-secondary: #ff0099;
-            --text-primary: #ffffff;
-            --text-secondary: #a1a1aa;
-            --text-muted: #52525b;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --gradient-primary: linear-gradient(135deg, #00f2ff 0%, #ff0099 100%);
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-display: 'Space Grotesk', sans-serif;
+            --bg:#ffffff; --bg-alt:#f8fafc; --surface:#ffffff; --surface-2:#f1f5f9;
+            --border:#e2e8f0; --border-strong:#cbd5e1;
+            --text:#0f172a; --text-muted:#475569; --text-subtle:#64748b;
+            --accent:#4f46e5; --accent-hover:#4338ca; --accent-soft:#eef2ff; --accent-2:#9333ea;
+            --shadow-sm:0 1px 2px rgba(15,23,42,.04);
+            --shadow:0 4px 12px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.04);
+            --gradient:linear-gradient(135deg,#4f46e5 0%,#9333ea 100%);
+            --radius:14px;
+            --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+            --font-display:'Space Grotesk','Inter',sans-serif;
+            --transition:0.2s cubic-bezier(.4,0,.2,1);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        [data-theme="dark"] {
+            --bg:#0b1020; --bg-alt:#0f172a; --surface:#111827; --surface-2:#1e293b;
+            --border:#1f2937; --border-strong:#334155;
+            --text:#f8fafc; --text-muted:#cbd5e1; --text-subtle:#94a3b8;
+            --accent:#818cf8; --accent-hover:#a5b4fc; --accent-soft:rgba(129,140,248,.12); --accent-2:#c084fc;
+            --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+            --shadow:0 4px 12px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.2);
+            --gradient:linear-gradient(135deg,#818cf8 0%,#c084fc 100%);
         }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
         body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.8;
+            font-family:var(--font);
+            background:var(--bg);
+            color:var(--text);
+            line-height:1.7;
+            -webkit-font-smoothing:antialiased;
+            transition:background-color var(--transition),color var(--transition);
         }
+        a { color:var(--accent); text-decoration:none; }
+        a:hover { color:var(--accent-hover); text-decoration:underline; }
 
-        /* Header */
-        .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        .navbar {
+            position:sticky; top:0; z-index:100;
+            background:color-mix(in srgb,var(--bg) 88%,transparent);
+            -webkit-backdrop-filter:saturate(180%) blur(14px);
+            backdrop-filter:saturate(180%) blur(14px);
+            border-bottom:1px solid var(--border);
         }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .nav-inner {
+            max-width:1100px; margin:0 auto;
+            padding:0.85rem 1.5rem;
+            display:flex; justify-content:space-between; align-items:center;
+            gap:1rem;
         }
-
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            text-decoration: none;
+            display:flex; align-items:center; gap:0.6rem;
+            font-weight:700; font-family:var(--font-display);
+            color:var(--text); text-decoration:none;
         }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--gradient-primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
+        .logo:hover { text-decoration:none; }
+        .logo-mark {
+            width:34px; height:34px; border-radius:9px;
+            background:var(--gradient); color:#fff;
+            display:grid; place-items:center; font-size:1rem;
+            box-shadow:var(--shadow);
         }
-
-        .logo-text {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
-            font-weight: 700;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .nav-actions { display:flex; align-items:center; gap:0.5rem; }
+        .icon-btn {
+            width:38px; height:38px; border-radius:9px;
+            border:1px solid var(--border); background:var(--surface);
+            color:var(--text-muted); cursor:pointer;
+            display:grid; place-items:center;
+            transition:all var(--transition);
         }
-
+        .icon-btn:hover { color:var(--text); background:var(--surface-2); border-color:var(--border-strong); }
+        .icon-btn svg { width:18px; height:18px; }
+        .theme-toggle .sun { display:none; }
+        .theme-toggle .moon { display:block; }
+        [data-theme="dark"] .theme-toggle .sun { display:block; }
+        [data-theme="dark"] .theme-toggle .moon { display:none; }
         .back-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.3s ease;
+            color:var(--text-muted);
+            font-size:0.92rem;
+            font-weight:500;
+            text-decoration:none;
+            display:inline-flex; align-items:center; gap:0.4rem;
+        }
+        .back-link:hover { color:var(--text); text-decoration:none; }
+
+        .page-hero {
+            text-align:center;
+            padding:4rem 1.5rem 2.5rem;
+            background:radial-gradient(ellipse 60% 50% at 50% 0%,var(--accent-soft) 0%,transparent 70%);
+        }
+        .page-hero h1 {
+            font-family:var(--font-display);
+            font-size:clamp(2rem,4vw,2.75rem);
+            line-height:1.15;
+            letter-spacing:-0.02em;
+            margin-bottom:0.75rem;
+        }
+        .page-hero .meta {
+            color:var(--text-subtle);
+            font-size:0.9rem;
         }
 
-        .back-link:hover {
-            color: var(--accent-primary);
+        main {
+            max-width:780px;
+            margin:0 auto;
+            padding:2rem 1.5rem 4rem;
         }
-
-        /* Main Content */
-        .main-content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 4rem 2rem;
+        .section {
+            margin-bottom:2.5rem;
         }
-
-        .page-title {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .section h2 {
+            font-family:var(--font-display);
+            font-size:1.4rem;
+            margin-bottom:0.85rem;
+            color:var(--text);
+            letter-spacing:-0.01em;
         }
-
-        .last-updated {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 3rem;
+        .section h3 {
+            font-family:var(--font-display);
+            font-size:1.08rem;
+            margin:1.25rem 0 0.55rem;
+            color:var(--text);
         }
-
-        .content-section {
-            margin-bottom: 3rem;
+        .section p {
+            color:var(--text-muted);
+            margin-bottom:0.85rem;
         }
-
-        .content-section h2 {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
+        .section ul {
+            color:var(--text-muted);
+            padding-left:1.5rem;
+            margin-bottom:0.85rem;
         }
+        .section ul li { margin-bottom:0.4rem; }
+        .section ul li strong { color:var(--text); }
 
-        .content-section h3 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin: 1.5rem 0 0.75rem;
-            color: var(--text-primary);
+        .callout {
+            background:var(--accent-soft);
+            border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);
+            border-left:4px solid var(--accent);
+            border-radius:var(--radius);
+            padding:1.1rem 1.25rem;
+            margin:1.25rem 0;
         }
+        .callout p { color:var(--text); margin:0; }
 
-        .content-section p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .content-section ul {
-            color: var(--text-secondary);
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .content-section li {
-            margin-bottom: 0.5rem;
-        }
-
-        .highlight-box {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-left: 4px solid var(--accent-primary);
-            padding: 1.5rem;
-            border-radius: 0 10px 10px 0;
-            margin: 1.5rem 0;
-        }
-
-        .highlight-box p {
-            margin-bottom: 0;
-        }
-
-        a {
-            color: var(--accent-primary);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Footer */
         .footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
-            padding: 2rem;
-            text-align: center;
+            border-top:1px solid var(--border);
+            background:var(--bg-alt);
+            padding:2rem 1.5rem;
+            text-align:center;
+            color:var(--text-subtle);
+            font-size:0.9rem;
         }
-
-        .footer p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
         .footer-links {
-            margin-top: 1rem;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
+            display:flex; gap:1.5rem;
+            justify-content:center;
+            margin-top:0.75rem;
+            flex-wrap:wrap;
         }
-
         .footer-links a {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+            color:var(--text-muted);
+            text-decoration:none;
+            font-weight:500;
         }
+        .footer-links a:hover { color:var(--accent); text-decoration:none; }
 
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 2rem 1.5rem;
-            }
-
-            .page-title {
-                font-size: 2rem;
-            }
+        @media (max-width:560px) {
+            .page-hero h1 { font-size:1.75rem; }
+            .section h2 { font-size:1.2rem; }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-container">
+    <nav class="navbar" aria-label="Primary">
+        <div class="nav-inner">
             <a href="index.html" class="logo">
-                <div class="logo-icon">🎵</div>
-                <span class="logo-text">WaveForge</span>
+                <span class="logo-mark">🎵</span>
+                <span>WaveForge</span>
             </a>
-            <a href="index.html" class="back-link">← Back to Home</a>
-        </div>
-    </header>
-
-    <main class="main-content">
-        <h1 class="page-title">Privacy Policy</h1>
-        <p class="last-updated">Last updated: December 1, 2024</p>
-
-        <div class="content-section">
-            <h2>Introduction</h2>
-            <p>
-                Welcome to WaveForge ("we," "our," or "us"). We are committed to protecting your privacy and ensuring you have a positive experience using our music visualizer application. This Privacy Policy explains how we collect, use, and safeguard your information when you use our service.
-            </p>
-            <div class="highlight-box">
-                <p><strong>Key Point:</strong> WaveForge processes all audio files locally in your browser. Your music files are never uploaded to our servers, ensuring your audio content remains completely private.</p>
+            <div class="nav-actions">
+                <a href="index.html" class="back-link">← Back to home</a>
+                <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme" title="Toggle theme">
+                    <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                </button>
             </div>
         </div>
+    </nav>
 
-        <div class="content-section">
-            <h2>Information We Collect</h2>
-            
-            <h3>Information You Provide</h3>
-            <p>WaveForge is designed to work without requiring any personal information. We do not require:</p>
+    <header class="page-hero">
+        <h1>Privacy Policy</h1>
+        <p class="meta">Last updated: December 1, 2024</p>
+    </header>
+
+    <main>
+        <section class="section">
+            <h2>Introduction</h2>
+            <p>Welcome to WaveForge ("we," "our," or "us"). We are committed to protecting your privacy and ensuring you have a positive experience using our music visualizer. This Privacy Policy explains how we collect, use, and safeguard your information when you use our service.</p>
+            <div class="callout"><p><strong>Key point:</strong> WaveForge processes all audio files locally in your browser. Your music files are never uploaded to our servers — your audio content remains completely private.</p></div>
+        </section>
+
+        <section class="section">
+            <h2>Information we collect</h2>
+
+            <h3>Information you provide</h3>
+            <p>WaveForge is designed to work without any personal information. We do not require:</p>
             <ul>
                 <li>Account registration</li>
                 <li>Email addresses</li>
@@ -262,28 +255,26 @@
                 <li>Payment information</li>
             </ul>
 
-            <h3>Automatically Collected Information</h3>
+            <h3>Automatically collected information</h3>
             <p>When you use WaveForge, we may automatically collect certain information through analytics services:</p>
             <ul>
-                <li><strong>Usage Data:</strong> Pages visited, features used, time spent on the application</li>
-                <li><strong>Device Information:</strong> Browser type, operating system, screen resolution</li>
-                <li><strong>Geographic Data:</strong> General location based on IP address (country/region level only)</li>
+                <li><strong>Usage data:</strong> Pages visited, features used, time spent on the application</li>
+                <li><strong>Device information:</strong> Browser type, operating system, screen resolution</li>
+                <li><strong>Geographic data:</strong> General location based on IP address (country/region level only)</li>
             </ul>
 
-            <h3>Audio Files</h3>
-            <p>
-                Audio files you load into WaveForge are processed entirely within your web browser using the Web Audio API. Your audio files are:
-            </p>
+            <h3>Audio files</h3>
+            <p>Audio files you load into WaveForge are processed entirely within your web browser using the Web Audio API. Your audio files are:</p>
             <ul>
                 <li>Never uploaded to our servers</li>
                 <li>Never stored by us</li>
                 <li>Never shared with third parties</li>
                 <li>Automatically cleared when you close or refresh the page</li>
             </ul>
-        </div>
+        </section>
 
-        <div class="content-section">
-            <h2>How We Use Your Information</h2>
+        <section class="section">
+            <h2>How we use your information</h2>
             <p>The limited information we collect is used to:</p>
             <ul>
                 <li>Improve and optimize the WaveForge application</li>
@@ -291,70 +282,55 @@
                 <li>Identify and fix technical issues</li>
                 <li>Analyze usage trends to guide future development</li>
             </ul>
-        </div>
+        </section>
 
-        <div class="content-section">
-            <h2>Analytics and Cookies</h2>
-            <p>
-                We use Google Analytics to understand how visitors interact with WaveForge. Google Analytics collects information such as:
-            </p>
+        <section class="section">
+            <h2>Analytics and cookies</h2>
+            <p>We use Google Analytics to understand how visitors interact with WaveForge. Google Analytics collects information such as:</p>
             <ul>
                 <li>How often you visit our site</li>
                 <li>What pages you view</li>
                 <li>What other sites you visited before coming to our site</li>
             </ul>
-            <p>
-                We use this information only to improve WaveForge. Google Analytics plants a permanent cookie on your web browser to identify you as a unique user the next time you visit. This cookie cannot be used by anyone but Google.
-            </p>
-            <p>
-                You can opt out of Google Analytics by installing the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics Opt-out Browser Add-on</a>.
-            </p>
-        </div>
+            <p>We use this information only to improve WaveForge. Google Analytics plants a permanent cookie on your web browser to identify you as a unique user the next time you visit. This cookie cannot be used by anyone but Google.</p>
+            <p>You can opt out of Google Analytics by installing the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics opt-out browser add-on</a>.</p>
+        </section>
 
-        <div class="content-section">
-            <h2>Local Storage</h2>
-            <p>
-                WaveForge may use your browser's local storage to save your preferences, such as:
-            </p>
+        <section class="section">
+            <h2>Local storage</h2>
+            <p>WaveForge may use your browser's local storage to save your preferences, such as:</p>
             <ul>
                 <li>Visualization mode preferences</li>
                 <li>Color palette selections</li>
                 <li>Audio settings (sensitivity, smoothing)</li>
+                <li>Theme preference (light or dark mode)</li>
                 <li>Custom presets you create</li>
             </ul>
-            <p>
-                This data is stored locally on your device and is never transmitted to our servers. You can clear this data at any time through your browser settings.
-            </p>
-        </div>
+            <p>This data is stored locally on your device and is never transmitted to our servers. You can clear this data at any time through your browser settings.</p>
+        </section>
 
-        <div class="content-section">
-            <h2>Third-Party Services</h2>
+        <section class="section">
+            <h2>Third-party services</h2>
             <p>WaveForge uses the following third-party services:</p>
             <ul>
-                <li><strong>Google Analytics:</strong> For usage analytics (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>)</li>
-                <li><strong>Google Fonts:</strong> For typography (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a>)</li>
+                <li><strong>Google Analytics:</strong> For usage analytics (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">privacy policy</a>)</li>
+                <li><strong>Google Fonts:</strong> For typography (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">privacy policy</a>)</li>
             </ul>
-            <p>
-                These services may collect information sent by your browser as part of standard web operations.
-            </p>
-        </div>
+            <p>These services may collect information sent by your browser as part of standard web operations.</p>
+        </section>
 
-        <div class="content-section">
-            <h2>Data Security</h2>
-            <p>
-                We implement appropriate technical and organizational measures to protect any information we process. However, no electronic transmission or storage method is 100% secure. Since WaveForge processes audio locally and collects minimal data, the risk to your privacy is significantly reduced.
-            </p>
-        </div>
+        <section class="section">
+            <h2>Data security</h2>
+            <p>We implement appropriate technical and organizational measures to protect any information we process. However, no electronic transmission or storage method is 100% secure. Since WaveForge processes audio locally and collects minimal data, the risk to your privacy is significantly reduced.</p>
+        </section>
 
-        <div class="content-section">
-            <h2>Children's Privacy</h2>
-            <p>
-                WaveForge is not directed to children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
-            </p>
-        </div>
+        <section class="section">
+            <h2>Children's privacy</h2>
+            <p>WaveForge is not directed to children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.</p>
+        </section>
 
-        <div class="content-section">
-            <h2>Your Rights</h2>
+        <section class="section">
+            <h2>Your rights</h2>
             <p>Depending on your location, you may have certain rights regarding your personal information:</p>
             <ul>
                 <li><strong>Access:</strong> Request information about data we hold about you</li>
@@ -362,45 +338,46 @@
                 <li><strong>Opt-out:</strong> Opt out of analytics tracking</li>
                 <li><strong>Portability:</strong> Request your data in a portable format</li>
             </ul>
-            <p>
-                Since WaveForge collects minimal personal data, most of these rights can be exercised by clearing your browser cookies and local storage.
-            </p>
-        </div>
+            <p>Since WaveForge collects minimal personal data, most of these rights can be exercised by clearing your browser cookies and local storage.</p>
+        </section>
 
-        <div class="content-section">
-            <h2>International Users</h2>
-            <p>
-                WaveForge is operated from the United States. If you are accessing our service from outside the United States, please be aware that information may be transferred to, stored, and processed in the United States or other countries where our service providers are located.
-            </p>
-        </div>
+        <section class="section">
+            <h2>International users</h2>
+            <p>WaveForge is operated from the United States. If you are accessing our service from outside the United States, please be aware that information may be transferred to, stored, and processed in the United States or other countries where our service providers are located.</p>
+        </section>
 
-        <div class="content-section">
-            <h2>Changes to This Policy</h2>
-            <p>
-                We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date. You are advised to review this Privacy Policy periodically for any changes.
-            </p>
-        </div>
+        <section class="section">
+            <h2>Changes to this policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date. You are advised to review this Privacy Policy periodically for any changes.</p>
+        </section>
 
-        <div class="content-section">
-            <h2>Contact Us</h2>
-            <p>
-                If you have any questions about this Privacy Policy or our privacy practices, please contact us at:
-            </p>
+        <section class="section">
+            <h2>Contact us</h2>
+            <p>If you have any questions about this Privacy Policy or our privacy practices, please contact us at:</p>
             <ul>
-                <li>Email: </li>
-                <li>Website: <a href="progameryt-op.github.io/WaveForge/">progameryt-op.github.io/WaveForge/</a></li>
+                <li><strong>Website:</strong> <a href="https://progameryt-op.github.io/WaveForge/">progameryt-op.github.io/WaveForge</a></li>
             </ul>
-        </div>
+        </section>
     </main>
 
     <footer class="footer">
-        <p>© 2025 WaveForge. All rights reserved.</p>
+        <p>© <span id="year">2026</span> WaveForge. All rights reserved.</p>
         <div class="footer-links">
             <a href="index.html">Home</a>
             <a href="privacy.html">Privacy Policy</a>
             <a href="terms.html">Terms of Service</a>
-            <a href="visualizer.html">Launch App</a>
+            <a href="visualizer.html">Launch app</a>
         </div>
     </footer>
+
+    <script>
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const cur = document.documentElement.getAttribute('data-theme') || 'light';
+            const nxt = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', nxt);
+            try { localStorage.setItem('wf-theme', nxt); } catch (e) {}
+        });
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
