@@ -1,7 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <!-- Google tag (gtag.js) -->
+    <!-- Theme bootstrap (run before paint to avoid flash) -->
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('wf-theme');
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var theme = stored || (prefersDark ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+
+    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DG4Q2KJ2JD"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -9,1751 +23,1241 @@
         gtag('js', new Date());
         gtag('config', 'G-DG4Q2KJ2JD');
     </script>
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <meta name="color-scheme" content="light dark">
+
     <!-- PRIMARY SEO -->
-    <title>WaveForge | Free Online Music Visualizer - Transform Audio Into Stunning Visuals</title>
-    <meta name="description" content="WaveForge is the ultimate free online music visualizer. Create breathtaking audio visualizations with 8 stunning modes, real-time beat detection, and video export. No signup required!">
-    <meta name="keywords" content="music visualizer, free music visualizer, online audio visualizer, spectrum analyzer, audio waveform, beat detector, mp3 visualizer, music video maker, audio spectrum, visualization generator">
+    <title>WaveForge — Free Online Music Visualizer | Turn Audio Into Stunning Visuals</title>
+    <meta name="description" content="WaveForge is a free, browser-based music visualizer. Create stunning audio-reactive animations with 8 modes, real-time beat detection, and 4K video export — no signup, no downloads.">
+    <meta name="keywords" content="music visualizer, free music visualizer, online audio visualizer, spectrum analyzer, audio waveform, beat detector, mp3 visualizer, music video maker, audio spectrum, visualization generator, web audio api, browser visualizer">
     <meta name="author" content="WaveForge">
-    <meta name="theme-color" content="#00f2ff">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://waveforge.app/">
-    
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://progameryt-op.github.io/WaveForge/">
+
+    <!-- Hreflang -->
+    <link rel="alternate" hreflang="en" href="https://progameryt-op.github.io/WaveForge/">
+    <link rel="alternate" hreflang="x-default" href="https://progameryt-op.github.io/WaveForge/">
+
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://waveforge.app/">
-    <meta property="og:title" content="WaveForge - Free Online Music Visualizer">
-    <meta property="og:description" content="Transform your music into stunning visual art. 8 visualization modes, beat detection, and video export. 100% free!">
-    <meta property="og:image" content="https://waveforge.app/og-image.png">
+    <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/">
+    <meta property="og:title" content="WaveForge — Free Online Music Visualizer">
+    <meta property="og:description" content="Transform your music into stunning visual art. 8 visualization modes, real-time beat detection, and 4K video export. 100% free.">
+    <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="WaveForge music visualizer interface">
     <meta property="og:site_name" content="WaveForge">
-    
+    <meta property="og:locale" content="en_US">
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="WaveForge - Free Music Visualizer">
-    <meta name="twitter:description" content="Create stunning music visualizations instantly. Free online tool with video export!">
-    <meta name="twitter:image" content="https://waveforge.app/twitter-card.png">
-    
+    <meta name="twitter:title" content="WaveForge — Free Music Visualizer">
+    <meta name="twitter:description" content="Create stunning music visualizations instantly. Free online tool with 4K video export.">
+    <meta name="twitter:image" content="https://progameryt-op.github.io/WaveForge/twitter-card.png">
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    
-    <!-- Preconnect -->
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "WaveForge",
-        "url": "https://waveforge.app",
-        "description": "Free online music visualizer with 8 visualization modes, beat detection, and video export.",
+        "url": "https://progameryt-op.github.io/WaveForge/",
+        "description": "Free online music visualizer with 8 visualization modes, real-time beat detection, and 4K video export.",
         "applicationCategory": "MultimediaApplication",
-        "operatingSystem": "Any",
+        "applicationSubCategory": "Music Visualization",
+        "operatingSystem": "Any modern browser",
+        "browserRequirements": "Requires JavaScript and the Web Audio API.",
+        "isAccessibleForFree": true,
         "offers": {
             "@type": "Offer",
             "price": "0",
-            "priceCurrency": "USD"
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
         },
         "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "4.8",
             "ratingCount": "2450"
-        }
+        },
+        "featureList": [
+            "8 visualization modes",
+            "Real-time beat detection",
+            "4K video export with audio",
+            "Microphone input",
+            "8 color palettes",
+            "Local audio processing — files never leave your device"
+        ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {"@type":"Question","name":"Is WaveForge really free?","acceptedAnswer":{"@type":"Answer","text":"Yes. WaveForge is 100% free with no hidden costs, no premium tiers, and no watermarks on your exports."}},
+            {"@type":"Question","name":"Do I need to create an account?","acceptedAnswer":{"@type":"Answer","text":"No account is required. Audio files are processed locally in your browser and are never uploaded to any server."}},
+            {"@type":"Question","name":"What audio formats are supported?","acceptedAnswer":{"@type":"Answer","text":"WaveForge supports MP3, WAV, OGG, FLAC, AAC, M4A, and WebM. If your browser can play it, WaveForge can visualize it."}},
+            {"@type":"Question","name":"Can I use the videos commercially?","acceptedAnswer":{"@type":"Answer","text":"Yes. Videos you create are yours to use however you like, provided you have the rights to the music you visualize."}},
+            {"@type":"Question","name":"Does it work on mobile devices?","acceptedAnswer":{"@type":"Answer","text":"Yes. WaveForge is fully responsive. For the best experience and video export, a desktop browser is recommended."}},
+            {"@type":"Question","name":"What video formats can I export?","acceptedAnswer":{"@type":"Answer","text":"Videos are exported as WebM with VP9/VP8 codec. You can convert to MP4 with any free tool if needed."}}
+        ]
     }
     </script>
 
     <style>
+        /* ----------  Design tokens  ---------- */
         :root {
-            --bg-primary: #030308;
-            --bg-secondary: #0a0a12;
-            --bg-tertiary: #12121f;
-            --accent-primary: #00f2ff;
-            --accent-secondary: #ff0099;
-            --accent-tertiary: #7c3aed;
-            --text-primary: #ffffff;
-            --text-secondary: #a1a1aa;
-            --text-muted: #52525b;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --gradient-primary: linear-gradient(135deg, #00f2ff 0%, #ff0099 50%, #7c3aed 100%);
-            --gradient-glow: linear-gradient(135deg, rgba(0, 242, 255, 0.15) 0%, rgba(255, 0, 153, 0.15) 100%);
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-display: 'Space Grotesk', sans-serif;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --shadow-glow: 0 0 60px rgba(0, 242, 255, 0.3);
+            --bg:           #ffffff;
+            --bg-alt:       #f8fafc;
+            --surface:      #ffffff;
+            --surface-2:    #f1f5f9;
+            --border:       #e2e8f0;
+            --border-strong:#cbd5e1;
+            --text:         #0f172a;
+            --text-muted:   #475569;
+            --text-subtle:  #64748b;
+            --accent:       #4f46e5;
+            --accent-hover: #4338ca;
+            --accent-soft:  #eef2ff;
+            --accent-2:     #9333ea;
+            --shadow-sm:    0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow:       0 4px 12px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+            --shadow-lg:    0 20px 40px -12px rgba(15, 23, 42, 0.12), 0 8px 16px -8px rgba(15, 23, 42, 0.08);
+            --gradient:     linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+            --radius:       14px;
+            --radius-sm:    10px;
+            --radius-lg:    20px;
+            --font:         'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-display: 'Space Grotesk', 'Inter', sans-serif;
+            --transition:   0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        [data-theme="dark"] {
+            --bg:           #0b1020;
+            --bg-alt:       #0f172a;
+            --surface:      #111827;
+            --surface-2:    #1e293b;
+            --border:       #1f2937;
+            --border-strong:#334155;
+            --text:         #f8fafc;
+            --text-muted:   #cbd5e1;
+            --text-subtle:  #94a3b8;
+            --accent:       #818cf8;
+            --accent-hover: #a5b4fc;
+            --accent-soft:  rgba(129, 140, 248, 0.12);
+            --accent-2:     #c084fc;
+            --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow:       0 4px 12px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.2);
+            --shadow-lg:    0 20px 40px -12px rgba(0, 0, 0, 0.5), 0 8px 16px -8px rgba(0, 0, 0, 0.35);
+            --gradient:     linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: var(--font-primary);
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
-            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color var(--transition), color var(--transition);
         }
 
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
+        a { color: inherit; text-decoration: none; }
 
-        .bg-gradient {
-            position: absolute;
-            width: 150%;
-            height: 150%;
-            top: -25%;
-            left: -25%;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(0, 242, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(255, 0, 153, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(124, 58, 237, 0.05) 0%, transparent 60%);
-            animation: bgFloat 20s ease-in-out infinite;
-        }
+        ::selection { background: var(--accent); color: #fff; }
 
-        @keyframes bgFloat {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(2%, 2%) rotate(1deg); }
-            66% { transform: translate(-2%, 1%) rotate(-1deg); }
-        }
-
-        .grid-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 60px 60px;
-            mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
-        }
-
-        /* Navigation */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 1rem 2rem;
-            transition: var(--transition);
-        }
-
-        .navbar.scrolled {
-            background: rgba(3, 3, 8, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .nav-container {
-            max-width: 1400px;
+        /* ---------- Container & layout ---------- */
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 0 1.5rem;
         }
 
+        /* ---------- Navigation ---------- */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: color-mix(in srgb, var(--bg) 88%, transparent);
+            -webkit-backdrop-filter: saturate(180%) blur(14px);
+            backdrop-filter: saturate(180%) blur(14px);
+            border-bottom: 1px solid var(--border);
+            transition: background-color var(--transition), border-color var(--transition);
+        }
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 45px;
-            height: 45px;
-            background: var(--gradient-primary);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 242, 255, 0.3);
-        }
-
-        .logo-text {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
+            gap: 0.6rem;
             font-weight: 700;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: var(--font-display);
+            font-size: 1.15rem;
         }
-
+        .logo-mark {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            background: var(--gradient);
+            color: #fff;
+            display: grid; place-items: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow);
+        }
         .nav-links {
             display: flex;
-            align-items: center;
             gap: 2rem;
             list-style: none;
         }
-
         .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
+            color: var(--text-muted);
             font-weight: 500;
             font-size: 0.95rem;
-            transition: var(--transition);
-            position: relative;
+            transition: color var(--transition);
+        }
+        .nav-links a:hover { color: var(--text); }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .nav-links a:hover {
-            color: var(--text-primary);
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gradient-primary);
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .nav-cta {
-            padding: 0.7rem 1.5rem;
-            background: var(--gradient-primary);
-            border: none;
-            border-radius: 50px;
-            color: #000;
-            font-weight: 600;
-            font-size: 0.9rem;
+        .icon-btn {
+            width: 38px; height: 38px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
             cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
+            display: grid;
+            place-items: center;
+            transition: all var(--transition);
         }
-
-        .nav-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.4);
+        .icon-btn:hover {
+            color: var(--text);
+            border-color: var(--border-strong);
+            background: var(--surface-2);
         }
+        .icon-btn svg { width: 18px; height: 18px; }
+        .theme-toggle .sun  { display: none; }
+        .theme-toggle .moon { display: block; }
+        [data-theme="dark"] .theme-toggle .sun  { display: block; }
+        [data-theme="dark"] .theme-toggle .moon { display: none; }
 
         .mobile-toggle {
             display: none;
-            flex-direction: column;
-            gap: 5px;
+            width: 38px; height: 38px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--surface);
             cursor: pointer;
-            padding: 10px;
-        }
-
-        .mobile-toggle span {
-            width: 25px;
-            height: 2px;
-            background: var(--text-primary);
-            transition: var(--transition);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8rem 2rem 4rem;
             position: relative;
         }
-
-        .hero-content {
-            max-width: 900px;
-            text-align: center;
-            animation: fadeInUp 1s ease-out;
+        .mobile-toggle span {
+            position: absolute;
+            left: 9px; right: 9px;
+            height: 2px;
+            background: var(--text);
+            border-radius: 1px;
+            transition: transform var(--transition), opacity var(--transition);
         }
+        .mobile-toggle span:nth-child(1) { top: 12px; }
+        .mobile-toggle span:nth-child(2) { top: 18px; }
+        .mobile-toggle span:nth-child(3) { top: 24px; }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--gradient-glow);
-            border: 1px solid var(--border-color);
-            border-radius: 50px;
-            font-size: 0.85rem;
-            color: var(--accent-primary);
-            margin-bottom: 2rem;
-            animation: fadeInUp 1s ease-out 0.1s backwards;
-        }
-
-        .hero-badge::before {
-            content: '✨';
-        }
-
-        .hero-title {
-            font-family: var(--font-display);
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            animation: fadeInUp 1s ease-out 0.2s backwards;
-        }
-
-        .hero-title .highlight {
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-description {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            max-width: 650px;
-            margin: 0 auto 2.5rem;
-            animation: fadeInUp 1s ease-out 0.3s backwards;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 3rem;
-            animation: fadeInUp 1s ease-out 0.4s backwards;
-        }
-
+        /* ---------- Buttons ---------- */
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1rem;
-            text-decoration: none;
-            transition: var(--transition);
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
-            color: #000;
-            box-shadow: 0 4px 30px rgba(0, 242, 255, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 40px rgba(0, 242, 255, 0.5);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-primary);
-            border: 2px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--accent-primary);
-            background: rgba(0, 242, 255, 0.05);
-        }
-
-        .hero-stats {
-            display: flex;
             justify-content: center;
-            gap: 3rem;
-            flex-wrap: wrap;
-            animation: fadeInUp 1s ease-out 0.5s backwards;
+            gap: 0.5rem;
+            padding: 0.75rem 1.4rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all var(--transition);
+            white-space: nowrap;
         }
-
-        .stat-item {
-            text-align: center;
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: var(--shadow-sm);
         }
-
-        .stat-value {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            font-weight: 700;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
         }
-
-        .stat-label {
-            font-size: 0.9rem;
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border-color: var(--border-strong);
+        }
+        .btn-secondary:hover {
+            background: var(--surface-2);
+            border-color: var(--text-subtle);
+        }
+        .btn-ghost {
+            background: transparent;
             color: var(--text-muted);
         }
+        .btn-ghost:hover { color: var(--text); }
 
-        /* Visualizer Preview */
-        .preview-section {
-            padding: 4rem 2rem;
+        .btn-lg { padding: 0.95rem 1.7rem; font-size: 1rem; }
+
+        /* ---------- Hero ---------- */
+        .hero {
             position: relative;
-        }
-
-        .preview-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .preview-window {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--shadow-glow);
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .preview-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 1rem 1.5rem;
-            background: var(--bg-tertiary);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .preview-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .preview-dot.red { background: #ff5f57; }
-        .preview-dot.yellow { background: #ffbd2e; }
-        .preview-dot.green { background: #28c840; }
-
-        .preview-canvas {
-            width: 100%;
-            height: 500px;
-            background: var(--bg-primary);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .preview-bars {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: flex-end;
-            gap: 4px;
-            height: 100%;
-            padding: 2rem;
-        }
-
-        .preview-bar {
-            width: 8px;
-            background: var(--gradient-primary);
-            border-radius: 4px 4px 0 0;
-            animation: barPulse 1s ease-in-out infinite;
-        }
-
-        @keyframes barPulse {
-            0%, 100% { height: var(--min-height); }
-            50% { height: var(--max-height); }
-        }
-
-        /* Features Section */
-        .features-section {
-            padding: 8rem 2rem;
-            position: relative;
-        }
-
-        .section-header {
+            padding: 5rem 0 4rem;
             text-align: center;
-            max-width: 700px;
-            margin: 0 auto 4rem;
-        }
-
-        .section-label {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: var(--gradient-glow);
-            border: 1px solid var(--border-color);
-            border-radius: 50px;
-            font-size: 0.85rem;
-            color: var(--accent-primary);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .section-description {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .feature-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: var(--transition);
-            position: relative;
             overflow: hidden;
         }
-
-        .feature-card::before {
+        .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-glow);
-            opacity: 0;
-            transition: var(--transition);
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 0%, var(--accent-soft) 0%, transparent 70%);
+            pointer-events: none;
         }
+        .hero-inner { position: relative; z-index: 1; }
 
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(0, 242, 255, 0.3);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--gradient-primary);
-            border-radius: 16px;
-            display: flex;
+        .badge {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .feature-title {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
+            gap: 0.5rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.82rem;
             font-weight: 600;
-            margin-bottom: 0.75rem;
-            position: relative;
-            z-index: 1;
+            border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+            margin-bottom: 1.5rem;
+        }
+        .badge-dot {
+            width: 6px; height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
         }
 
-        .feature-description {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            position: relative;
-            z-index: 1;
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.25rem, 5vw, 3.75rem);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            font-weight: 700;
+            max-width: 850px;
+            margin: 0 auto 1.25rem;
         }
-
-        /* Visualization Modes */
-        .modes-section {
-            padding: 8rem 2rem;
-            background: var(--bg-secondary);
+        .hero h1 .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        .modes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            max-width: 1200px;
-            margin: 0 auto;
+        .hero p.lead {
+            font-size: clamp(1rem, 1.5vw, 1.18rem);
+            color: var(--text-muted);
+            max-width: 640px;
+            margin: 0 auto 2rem;
         }
-
-        .mode-card {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: var(--transition);
-            cursor: pointer;
+        .hero-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
         }
-
-        .mode-card:hover {
-            transform: scale(1.03);
-            border-color: var(--accent-primary);
-            box-shadow: 0 10px 40px rgba(0, 242, 255, 0.2);
-        }
-
-        .mode-preview {
-            width: 100%;
-            height: 120px;
-            background: var(--bg-primary);
-            border-radius: 12px;
-            margin-bottom: 1rem;
+        .hero-meta {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            gap: 1.25rem;
+            color: var(--text-subtle);
+            font-size: 0.88rem;
+            flex-wrap: wrap;
+        }
+        .hero-meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .hero-meta-item svg {
+            width: 16px; height: 16px;
+            color: var(--accent);
+        }
+
+        /* ---------- Preview window ---------- */
+        .preview-section { padding: 2rem 0 5rem; }
+        .preview-window {
+            max-width: 1080px;
+            margin: 0 auto;
+            border-radius: var(--radius-lg);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
         }
-
-        .mode-name {
-            font-family: var(--font-display);
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .mode-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        /* How It Works */
-        .how-section {
-            padding: 8rem 2rem;
-        }
-
-        .steps-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            gap: 3rem;
-        }
-
-        .step {
-            display: flex;
-            gap: 2rem;
-            align-items: flex-start;
-        }
-
-        .step:nth-child(even) {
-            flex-direction: row-reverse;
-            text-align: right;
-        }
-
-        .step-number {
-            flex-shrink: 0;
-            width: 80px;
-            height: 80px;
-            background: var(--gradient-primary);
-            border-radius: 50%;
+        .preview-bar {
             display: flex;
             align-items: center;
+            gap: 0.45rem;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-2);
+        }
+        .preview-bar .dot {
+            width: 11px; height: 11px;
+            border-radius: 50%;
+            background: var(--border-strong);
+        }
+        .preview-bar .dot.r { background: #f87171; }
+        .preview-bar .dot.y { background: #fbbf24; }
+        .preview-bar .dot.g { background: #34d399; }
+        .preview-bar .label {
+            margin-left: auto;
+            font-size: 0.78rem;
+            color: var(--text-subtle);
+            font-family: var(--font-display);
+        }
+        .preview-canvas {
+            position: relative;
+            height: 380px;
+            background:
+                radial-gradient(ellipse at 50% 100%, var(--accent-soft), transparent 60%),
+                var(--bg-alt);
+            display: flex;
+            align-items: flex-end;
             justify-content: center;
-            font-family: var(--font-display);
-            font-size: 2rem;
-            font-weight: 700;
-            color: #000;
+            gap: 4px;
+            padding: 2rem;
+            overflow: hidden;
+        }
+        @media (max-width: 640px) { .preview-canvas { height: 240px; padding: 1rem; gap: 3px; } }
+        .preview-bars { display: flex; align-items: flex-end; gap: 4px; height: 100%; }
+        .pbar {
+            width: 8px;
+            background: var(--gradient);
+            border-radius: 4px 4px 0 0;
+            animation: barPulse 1.2s ease-in-out infinite;
+            opacity: 0.85;
+        }
+        @keyframes barPulse {
+            0%, 100% { height: var(--min); }
+            50% { height: var(--max); }
         }
 
-        .step-content {
-            flex: 1;
-        }
+        /* ---------- Section primitives ---------- */
+        section.block { padding: 5rem 0; }
+        section.block.alt { background: var(--bg-alt); }
 
-        .step-title {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
+        .section-head {
+            text-align: center;
+            max-width: 720px;
+            margin: 0 auto 3rem;
+        }
+        .eyebrow {
+            color: var(--accent);
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            display: inline-block;
         }
-
-        .step-description {
-            color: var(--text-secondary);
+        .section-head h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 3vw, 2.4rem);
+            line-height: 1.2;
+            letter-spacing: -0.015em;
+            margin-bottom: 0.85rem;
+        }
+        .section-head p {
+            color: var(--text-muted);
             font-size: 1.05rem;
         }
 
-        /* Testimonials */
-        .testimonials-section {
-            padding: 8rem 2rem;
-            background: var(--bg-secondary);
-        }
-
-        .testimonials-grid {
+        /* ---------- Stats ---------- */
+        .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .testimonial-card {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2rem;
-        }
-
-        .testimonial-stars {
-            color: #fbbf24;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-
-        .testimonial-text {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            font-style: italic;
-        }
-
-        .testimonial-author {
-            display: flex;
-            align-items: center;
+            grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
-        }
-
-        .author-avatar {
-            width: 50px;
-            height: 50px;
-            background: var(--gradient-primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: #000;
-        }
-
-        .author-info h4 {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .author-info p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        /* CTA Section */
-        .cta-section {
-            padding: 8rem 2rem;
-            text-align: center;
-            position: relative;
-        }
-
-        .cta-container {
-            max-width: 800px;
+            max-width: 880px;
             margin: 0 auto;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 30px;
-            padding: 4rem;
-            position: relative;
-            overflow: hidden;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            background: var(--surface);
+            box-shadow: var(--shadow-sm);
         }
-
-        .cta-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: var(--gradient-glow);
-            animation: rotate 10s linear infinite;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .cta-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-title {
+        @media (max-width: 720px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+        .stat { text-align: center; padding: 0.5rem; }
+        .stat-num {
             font-family: var(--font-display);
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-size: 1.85rem;
             font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 0.35rem;
+        }
+        .stat-label {
+            color: var(--text-subtle);
+            font-size: 0.85rem;
+        }
+
+        /* ---------- Feature grid ---------- */
+        .grid {
+            display: grid;
+            gap: 1.25rem;
+        }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 960px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 560px) { .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.6rem;
+            transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--border-strong);
+        }
+        .card-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: grid; place-items: center;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        .card h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ---------- Mode tiles ---------- */
+        .mode-tile {
+            text-align: center;
+            padding: 1.5rem 1rem;
+        }
+        .mode-tile .card-icon {
+            margin: 0 auto 0.85rem;
+            width: 52px; height: 52px;
+            font-size: 1.5rem;
+        }
+        .mode-tile h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+        .mode-tile p { font-size: 0.85rem; color: var(--text-subtle); }
+
+        /* ---------- Steps ---------- */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+            position: relative;
+        }
+        @media (max-width: 960px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
+        .step {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+        }
+        .step-num {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            background: var(--gradient);
+            color: #fff;
+            display: grid; place-items: center;
+            font-weight: 700;
+            font-family: var(--font-display);
             margin-bottom: 1rem;
         }
+        .step h3 {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            margin-bottom: 0.4rem;
+        }
+        .step p { color: var(--text-muted); font-size: 0.93rem; }
 
-        .cta-description {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
+        /* ---------- Testimonials ---------- */
+        .testimonial {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.75rem;
+        }
+        .testimonial .stars {
+            color: #f59e0b;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.1em;
+        }
+        .testimonial blockquote {
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+        .author {
+            display: flex; align-items: center; gap: 0.75rem;
+        }
+        .author-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: #fff;
+            display: grid; place-items: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .author-info strong {
+            display: block;
+            color: var(--text);
+            font-size: 0.92rem;
+        }
+        .author-info span {
+            color: var(--text-subtle);
+            font-size: 0.82rem;
         }
 
-        /* FAQ Section */
-        .faq-section {
-            padding: 8rem 2rem;
-        }
-
-        .faq-container {
-            max-width: 800px;
+        /* ---------- FAQ ---------- */
+        .faq-list {
+            max-width: 760px;
             margin: 0 auto;
-        }
-
-        .faq-item {
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .faq-question {
-            width: 100%;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 0;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 1.1rem;
-            font-weight: 500;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+        .faq-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: border-color var(--transition);
+        }
+        .faq-item.open { border-color: var(--accent); }
+        .faq-q {
+            width: 100%;
+            background: transparent;
+            border: 0;
+            padding: 1.1rem 1.3rem;
+            font: inherit;
+            font-weight: 600;
+            color: var(--text);
             text-align: left;
             cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .faq-question:hover {
-            color: var(--accent-primary);
-        }
-
-        .faq-icon {
-            font-size: 1.5rem;
-            transition: var(--transition);
-        }
-
-        .faq-item.active .faq-icon {
-            transform: rotate(45deg);
-        }
-
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .faq-item.active .faq-answer {
-            max-height: 300px;
-        }
-
-        .faq-answer p {
-            padding-bottom: 1.5rem;
-            color: var(--text-secondary);
-            line-height: 1.8;
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
-            padding: 4rem 2rem 2rem;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr repeat(3, 1fr);
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer-brand {
-            max-width: 300px;
-        }
-
-        .footer-brand .logo {
-            margin-bottom: 1rem;
-        }
-
-        .footer-brand p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .social-link {
-            width: 40px;
-            height: 40px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .social-link:hover {
-            background: var(--gradient-primary);
-            color: #000;
-            border-color: transparent;
-        }
-
-        .footer-column h4 {
-            font-family: var(--font-display);
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-        }
-
-        .footer-column ul {
-            list-style: none;
-        }
-
-        .footer-column li {
-            margin-bottom: 0.75rem;
-        }
-
-        .footer-column a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: var(--transition);
-        }
-
-        .footer-column a:hover {
-            color: var(--accent-primary);
-        }
-
-        .footer-bottom {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
-            flex-wrap: wrap;
             gap: 1rem;
         }
-
-        .footer-bottom p {
+        .faq-q .chev {
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            background: var(--surface-2);
             color: var(--text-muted);
-            font-size: 0.9rem;
+            display: grid; place-items: center;
+            font-size: 1.1rem;
+            transition: transform var(--transition), background var(--transition), color var(--transition);
+            flex-shrink: 0;
+        }
+        .faq-item.open .faq-q .chev {
+            transform: rotate(45deg);
+            background: var(--accent);
+            color: #fff;
+        }
+        .faq-a {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        .faq-item.open .faq-a {
+            max-height: 320px;
+            padding: 0 1.3rem 1.2rem;
+        }
+        .faq-a p {
+            color: var(--text-muted);
+            line-height: 1.65;
         }
 
-        .footer-legal {
+        /* ---------- CTA ---------- */
+        .cta {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-radius: var(--radius-lg);
+            background: var(--gradient);
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            margin-bottom: 0.85rem;
+            color: #fff;
+        }
+        .cta p {
+            color: rgba(255,255,255,0.92);
+            max-width: 560px;
+            margin: 0 auto 1.75rem;
+            font-size: 1.05rem;
+        }
+        .cta .btn-primary {
+            background: #fff;
+            color: var(--accent);
+        }
+        .cta .btn-primary:hover { background: #f8fafc; color: var(--accent-hover); }
+
+        /* ---------- Footer ---------- */
+        .footer {
+            border-top: 1px solid var(--border);
+            background: var(--bg-alt);
+            padding: 3.5rem 0 2rem;
+            margin-top: 5rem;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.6fr repeat(3, 1fr);
+            gap: 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+        @media (max-width: 800px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.93rem;
+            margin: 0.85rem 0 1.1rem;
+            max-width: 320px;
+        }
+        .socials { display: flex; gap: 0.5rem; }
+        .socials a {
+            width: 34px; height: 34px;
+            border-radius: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: grid; place-items: center;
+            color: var(--text-muted);
+            transition: all var(--transition);
+        }
+        .socials a:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+        .footer-col h4 {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-subtle);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+        .footer-col a {
+            color: var(--text-muted);
+            font-size: 0.93rem;
+            transition: color var(--transition);
+        }
+        .footer-col a:hover { color: var(--accent); }
+        .footer-bottom {
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
             display: flex;
-            gap: 2rem;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            color: var(--text-subtle);
+            font-size: 0.88rem;
         }
+        .footer-bottom-links { display: flex; gap: 1.5rem; }
+        .footer-bottom-links a { color: var(--text-subtle); }
+        .footer-bottom-links a:hover { color: var(--accent); }
 
-        .footer-legal a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-
-        .footer-legal a:hover {
-            color: var(--accent-primary);
-        }
-
-        /* Mobile Menu */
+        /* ---------- Mobile menu ---------- */
         .mobile-menu {
+            display: none;
             position: fixed;
-            top: 0;
-            right: -100%;
-            width: 80%;
-            max-width: 400px;
-            height: 100vh;
-            background: var(--bg-secondary);
-            border-left: 1px solid var(--border-color);
-            padding: 6rem 2rem 2rem;
-            transition: var(--transition);
-            z-index: 999;
+            inset: 64px 0 0 0;
+            background: var(--bg);
+            z-index: 99;
+            padding: 2rem 1.5rem;
+            border-top: 1px solid var(--border);
         }
-
-        .mobile-menu.active {
-            right: 0;
-        }
-
-        .mobile-menu-links {
+        .mobile-menu.open { display: block; }
+        .mobile-menu ul {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 0.25rem;
         }
-
-        .mobile-menu-links a {
-            color: var(--text-primary);
-            text-decoration: none;
-            font-size: 1.2rem;
+        .mobile-menu a {
+            display: block;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            color: var(--text);
             font-weight: 500;
+            transition: background var(--transition);
+        }
+        .mobile-menu a:hover { background: var(--surface-2); }
+        .mobile-menu .btn { margin-top: 1rem; width: 100%; }
+
+        /* ---------- Responsive nav ---------- */
+        @media (max-width: 860px) {
+            .nav-links { display: none; }
+            .nav-actions .btn-primary { display: none; }
+            .mobile-toggle { display: block; }
         }
 
-        .mobile-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+        /* ---------- Reveal animation ---------- */
+        .reveal {
             opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-            z-index: 998;
+            transform: translateY(10px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
         }
+        .reveal.visible { opacity: 1; transform: none; }
+        .no-js .reveal { opacity: 1; transform: none; }
 
-        .mobile-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .footer-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .mobile-toggle {
-                display: flex;
-            }
-
-            .hero {
-                padding: 6rem 1.5rem 3rem;
-            }
-
-            .hero-stats {
-                gap: 2rem;
-            }
-
-            .step {
-                flex-direction: column !important;
-                text-align: left !important;
-            }
-
-            .step-number {
-                width: 60px;
-                height: 60px;
-                font-size: 1.5rem;
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .footer-brand {
-                max-width: 100%;
-            }
-
-            .social-links {
-                justify-content: center;
-            }
-
-            .footer-bottom {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .preview-canvas {
-                height: 300px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-buttons {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        /* Scroll animations */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Loading animation */
-        .page-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-
-        .page-loader.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .loader-content {
-            text-align: center;
-        }
-
-        .loader-icon {
-            font-size: 4rem;
-            animation: bounce 1s ease infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+            .reveal { opacity: 1; transform: none; }
         }
     </style>
 </head>
 <body>
-    <!-- Page Loader -->
-    <div class="page-loader" id="pageLoader">
-        <div class="loader-content">
-            <div class="loader-icon">🎵</div>
-            <p style="margin-top: 1rem; color: var(--text-secondary);">Loading WaveForge...</p>
-        </div>
-    </div>
-
-    <!-- Background Animation -->
-    <div class="bg-animation">
-        <div class="bg-gradient"></div>
-        <div class="grid-overlay"></div>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="/" class="logo">
-                <div class="logo-icon">🎵</div>
-                <span class="logo-text">WaveForge</span>
+    <!-- NAV -->
+    <nav class="navbar" aria-label="Primary">
+        <div class="nav-inner">
+            <a href="/" class="logo" aria-label="WaveForge home">
+                <span class="logo-mark">🎵</span>
+                <span>WaveForge</span>
             </a>
-            
+
             <ul class="nav-links">
                 <li><a href="#features">Features</a></li>
                 <li><a href="#modes">Modes</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#how">How it works</a></li>
                 <li><a href="#faq">FAQ</a></li>
             </ul>
-            
-            <a href="visualizer.html" class="nav-cta">Launch App →</a>
-            
-            <div class="mobile-toggle" id="mobileToggle">
-                <span></span>
-                <span></span>
-                <span></span>
+
+            <div class="nav-actions">
+                <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme" title="Toggle theme">
+                    <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                </button>
+                <a href="visualizer.html" class="btn btn-primary">Launch app →</a>
+                <button class="mobile-toggle" id="mobileToggle" type="button" aria-label="Open menu" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-overlay" id="mobileOverlay"></div>
-    <div class="mobile-menu" id="mobileMenu">
-        <ul class="mobile-menu-links">
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+        <ul>
             <li><a href="#features">Features</a></li>
             <li><a href="#modes">Modes</a></li>
-            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#how">How it works</a></li>
             <li><a href="#faq">FAQ</a></li>
-            <li><a href="visualizer.html" class="nav-cta" style="display: inline-block; margin-top: 1rem;">Launch App →</a></li>
         </ul>
+        <a href="visualizer.html" class="btn btn-primary">Launch app →</a>
     </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-badge">New: Video Export with Audio</div>
-            
-            <h1 class="hero-title">
-                Transform Your Music Into
-                <span class="highlight">Stunning Visuals</span>
-            </h1>
-            
-            <p class="hero-description">
-                Experience the ultimate free online music visualizer. Create breathtaking audio-reactive animations with 8 unique modes, real-time beat detection, and export your creations as videos.
-            </p>
-            
-            <div class="hero-buttons">
-                <a href="visualizer.html" class="btn btn-primary">
-                    🚀 Launch Visualizer
-                </a>
-                <a href="#features" class="btn btn-secondary">
-                    Learn More
-                </a>
+    <!-- HERO -->
+    <header class="hero">
+        <div class="container hero-inner">
+            <span class="badge"><span class="badge-dot"></span> New · 4K video export with audio</span>
+            <h1>Turn your music into <span class="gradient-text">stunning visuals</span></h1>
+            <p class="lead">A free, browser-based music visualizer with 8 unique modes, real-time beat detection, and 4K video export. No signup. No uploads. Just creativity.</p>
+            <div class="hero-actions">
+                <a href="visualizer.html" class="btn btn-primary btn-lg">Launch visualizer</a>
+                <a href="#features" class="btn btn-secondary btn-lg">See features</a>
             </div>
-            
-            <div class="hero-stats">
-                <div class="stat-item">
-                    <div class="stat-value">100K+</div>
-                    <div class="stat-label">Visualizations Created</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">8</div>
-                    <div class="stat-label">Unique Modes</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">4K</div>
-                    <div class="stat-label">Video Export</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">100%</div>
-                    <div class="stat-label">Free Forever</div>
-                </div>
+            <div class="hero-meta">
+                <span class="hero-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 100% free</span>
+                <span class="hero-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> No signup required</span>
+                <span class="hero-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Files stay on your device</span>
             </div>
         </div>
-    </section>
+    </header>
 
-    <!-- Preview Section -->
+    <!-- PREVIEW -->
     <section class="preview-section">
-        <div class="preview-container fade-in">
-            <div class="preview-window">
-                <div class="preview-header">
-                    <div class="preview-dot red"></div>
-                    <div class="preview-dot yellow"></div>
-                    <div class="preview-dot green"></div>
-                    <span style="margin-left: 1rem; color: var(--text-muted); font-size: 0.9rem;">WaveForge Visualizer</span>
+        <div class="container">
+            <div class="preview-window reveal">
+                <div class="preview-bar">
+                    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+                    <span class="label">WaveForge Visualizer</span>
                 </div>
-                <div class="preview-canvas" id="previewCanvas">
-                    <div class="preview-bars" id="previewBars"></div>
+                <div class="preview-canvas">
+                    <div class="preview-bars" id="previewBars" aria-hidden="true"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features-section" id="features">
-        <div class="section-header fade-in">
-            <span class="section-label">Features</span>
-            <h2 class="section-title">Everything You Need to Visualize Music</h2>
-            <p class="section-description">
-                Professional-grade audio visualization tools, completely free and running directly in your browser.
-            </p>
-        </div>
-        
-        <div class="features-grid">
-            <div class="feature-card fade-in">
-                <div class="feature-icon">🎬</div>
-                <h3 class="feature-title">Video Export</h3>
-                <p class="feature-description">
-                    Export your visualizations as high-quality videos up to 4K resolution with your music included. Perfect for social media and content creation.
-                </p>
-            </div>
-            
-            <div class="feature-card fade-in">
-                <div class="feature-icon">💓</div>
-                <h3 class="feature-title">Beat Detection</h3>
-                <p class="feature-description">
-                    Advanced algorithms detect beats in real-time, creating pulsing effects that sync perfectly with your music's rhythm.
-                </p>
-            </div>
-            
-            <div class="feature-card fade-in">
-                <div class="feature-icon">📊</div>
-                <h3 class="feature-title">Real-time FFT Analysis</h3>
-                <p class="feature-description">
-                    Powered by the Web Audio API with customizable FFT resolution up to 16384 samples for ultra-detailed frequency analysis.
-                </p>
-            </div>
-            
-            <div class="feature-card fade-in">
-                <div class="feature-icon">🎤</div>
-                <h3 class="feature-title">Microphone Input</h3>
-                <p class="feature-description">
-                    Visualize live audio from your microphone. Perfect for live performances, podcasts, or just singing along.
-                </p>
-            </div>
-            
-            <div class="feature-card fade-in">
-                <div class="feature-icon">🎨</div>
-                <h3 class="feature-title">8 Color Palettes</h3>
-                <p class="feature-description">
-                    Choose from Cyberpunk, Inferno, Ocean, Matrix, Rainbow, Gold, Sunset, and Arctic color schemes to match your style.
-                </p>
-            </div>
-            
-            <div class="feature-card fade-in">
-                <div class="feature-icon">⚡</div>
-                <h3 class="feature-title">High Performance</h3>
-                <p class="feature-description">
-                    Optimized rendering engine delivers smooth 60 FPS animations even on modest hardware. Works on desktop and mobile.
-                </p>
+    <!-- STATS -->
+    <section class="block" style="padding-top: 0;">
+        <div class="container">
+            <div class="stats reveal">
+                <div class="stat"><div class="stat-num">100K+</div><div class="stat-label">Visualizations</div></div>
+                <div class="stat"><div class="stat-num">8</div><div class="stat-label">Unique modes</div></div>
+                <div class="stat"><div class="stat-num">4K</div><div class="stat-label">Video export</div></div>
+                <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Free forever</div></div>
             </div>
         </div>
     </section>
 
-    <!-- Visualization Modes -->
-    <section class="modes-section" id="modes">
-        <div class="section-header fade-in">
-            <span class="section-label">Visualization Modes</span>
-            <h2 class="section-title">8 Stunning Ways to See Your Music</h2>
-            <p class="section-description">
-                Each mode offers a unique perspective on your audio, from classic spectrum analyzers to mesmerizing particle systems.
-            </p>
-        </div>
-        
-        <div class="modes-grid">
-            <div class="mode-card fade-in">
-                <div class="mode-preview">📊</div>
-                <h3 class="mode-name">Bar Spectrum</h3>
-                <p class="mode-desc">Classic frequency bars</p>
+    <!-- FEATURES -->
+    <section class="block alt" id="features">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Features</span>
+                <h2>Everything you need to visualize music</h2>
+                <p>Professional-grade audio visualization tools — completely free, running directly in your browser.</p>
             </div>
-            
-            <div class="mode-card fade-in">
-                <div class="mode-preview">〰️</div>
-                <h3 class="mode-name">Waveform</h3>
-                <p class="mode-desc">Oscilloscope style wave</p>
-            </div>
-            
-            <div class="mode-card fade-in">
-                <div class="mode-preview">🔘</div>
-                <h3 class="mode-name">Radial EQ</h3>
-                <p class="mode-desc">Circular equalizer</p>
-            </div>
-            
-            <div class="mode-card fade-in">
-                <div class="mode-preview">✨</div>
-                <h3 class="mode-name">Particles</h3>
-                <p class="mode-desc">Reactive particle system</p>
-            </div>
-            
-            <div class="mode-card fade-in">
-                <div class="mode-preview">🌈</div>
-                <h3 class="mode-name">Spectrogram</h3>
-                <p class="mode-desc">Frequency over time</p>
-            </div>
-            
-            <div class="mode-card fade-in">
-                <div class="mode-preview">📈</div>
-                <h3 class="mode-name">3D Bars</h3>
-                <p class="mode-desc">Isometric perspective</p>
-            </div>
-            
-            <div class="mode-card fade-in">
-                <div class="mode-preview">🧬</div>
-                <h3 class="mode-name">DNA Helix</h3>
-                <p class="mode-desc">Double helix animation</p>
-            </div>
-            
-            <div class="mode-card fade-in">
-                <div class="mode-preview">🌌</div>
-                <h3 class="mode-name">Galaxy</h3>
-                <p class="mode-desc">Spiral galaxy effect</p>
+
+            <div class="grid grid-3">
+                <article class="card reveal">
+                    <div class="card-icon">🎬</div>
+                    <h3>4K video export</h3>
+                    <p>Export your visualizations as high-quality videos with your music included. Perfect for social media and content creation.</p>
+                </article>
+                <article class="card reveal">
+                    <div class="card-icon">💓</div>
+                    <h3>Beat detection</h3>
+                    <p>Advanced algorithms detect beats in real time, creating pulses that sync perfectly with your music's rhythm.</p>
+                </article>
+                <article class="card reveal">
+                    <div class="card-icon">📊</div>
+                    <h3>Real-time FFT</h3>
+                    <p>Powered by the Web Audio API with FFT resolution up to 16,384 samples for ultra-detailed frequency analysis.</p>
+                </article>
+                <article class="card reveal">
+                    <div class="card-icon">🎤</div>
+                    <h3>Microphone input</h3>
+                    <p>Visualize live audio from your microphone — perfect for live performances, podcasts, or singing along.</p>
+                </article>
+                <article class="card reveal">
+                    <div class="card-icon">🎨</div>
+                    <h3>8 color palettes</h3>
+                    <p>Cyberpunk, Inferno, Ocean, Matrix, Rainbow, Gold, Sunset, and Arctic — pick a vibe that matches your music.</p>
+                </article>
+                <article class="card reveal">
+                    <div class="card-icon">⚡</div>
+                    <h3>Smooth 60 FPS</h3>
+                    <p>An optimized rendering engine delivers smooth animations even on modest hardware. Works on desktop and mobile.</p>
+                </article>
             </div>
         </div>
     </section>
 
-    <!-- How It Works -->
-    <section class="how-section" id="how-it-works">
-        <div class="section-header fade-in">
-            <span class="section-label">How It Works</span>
-            <h2 class="section-title">Create Visuals in 4 Simple Steps</h2>
-            <p class="section-description">
-                No signup, no downloads, no complicated setup. Just pure visualization magic.
-            </p>
+    <!-- MODES -->
+    <section class="block" id="modes">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Visualization modes</span>
+                <h2>8 stunning ways to see your music</h2>
+                <p>Each mode offers a unique perspective on your audio, from classic spectrum analyzers to mesmerizing particle systems.</p>
+            </div>
+
+            <div class="grid grid-4">
+                <article class="card mode-tile reveal"><div class="card-icon">📊</div><h3>Bar Spectrum</h3><p>Classic frequency bars</p></article>
+                <article class="card mode-tile reveal"><div class="card-icon">〰️</div><h3>Waveform</h3><p>Oscilloscope-style wave</p></article>
+                <article class="card mode-tile reveal"><div class="card-icon">🔘</div><h3>Radial EQ</h3><p>Circular equalizer</p></article>
+                <article class="card mode-tile reveal"><div class="card-icon">✨</div><h3>Particles</h3><p>Reactive particle system</p></article>
+                <article class="card mode-tile reveal"><div class="card-icon">🌈</div><h3>Spectrogram</h3><p>Frequency over time</p></article>
+                <article class="card mode-tile reveal"><div class="card-icon">📈</div><h3>3D Bars</h3><p>Isometric perspective</p></article>
+                <article class="card mode-tile reveal"><div class="card-icon">🧬</div><h3>DNA Helix</h3><p>Double-helix animation</p></article>
+                <article class="card mode-tile reveal"><div class="card-icon">🌌</div><h3>Galaxy</h3><p>Spiral galaxy effect</p></article>
+            </div>
         </div>
-        
-        <div class="steps-container">
-            <div class="step fade-in">
-                <div class="step-number">1</div>
-                <div class="step-content">
-                    <h3 class="step-title">Upload Your Music</h3>
-                    <p class="step-description">
-                        Drag and drop any audio file (MP3, WAV, OGG, FLAC, M4A) or click to browse. Your files stay private and are never uploaded to any server.
-                    </p>
-                </div>
+    </section>
+
+    <!-- HOW -->
+    <section class="block alt" id="how">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">How it works</span>
+                <h2>Create visuals in 4 simple steps</h2>
+                <p>No signup, no downloads, no complicated setup — just open the app and start creating.</p>
             </div>
-            
-            <div class="step fade-in">
-                <div class="step-number">2</div>
-                <div class="step-content">
-                    <h3 class="step-title">Choose Your Mode</h3>
-                    <p class="step-description">
-                        Cycle through 8 unique visualization modes to find the perfect style for your music. Each mode responds differently to various frequencies.
-                    </p>
+
+            <div class="steps">
+                <div class="step reveal">
+                    <div class="step-num">1</div>
+                    <h3>Upload your music</h3>
+                    <p>Drag and drop any audio file (MP3, WAV, OGG, FLAC, M4A). Files stay private and never leave your device.</p>
                 </div>
-            </div>
-            
-            <div class="step fade-in">
-                <div class="step-number">3</div>
-                <div class="step-content">
-                    <h3 class="step-title">Customize the Look</h3>
-                    <p class="step-description">
-                        Fine-tune colors, sensitivity, beat detection, and visual effects. Save your favorite presets to use again later.
-                    </p>
+                <div class="step reveal">
+                    <div class="step-num">2</div>
+                    <h3>Choose a mode</h3>
+                    <p>Cycle through 8 unique visualization modes to find the perfect style for your music.</p>
                 </div>
-            </div>
-            
-            <div class="step fade-in">
-                <div class="step-number">4</div>
-                <div class="step-content">
-                    <h3 class="step-title">Export & Share</h3>
-                    <p class="step-description">
-                        Record your visualization as a video file with your music included. Export in up to 4K quality and share on YouTube, TikTok, or Instagram.
-                    </p>
+                <div class="step reveal">
+                    <div class="step-num">3</div>
+                    <h3>Customize the look</h3>
+                    <p>Fine-tune colors, sensitivity, and beat detection. Save your favourite presets for next time.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-num">4</div>
+                    <h3>Export &amp; share</h3>
+                    <p>Record your visualization as a video with audio in up to 4K and share it on YouTube, TikTok, or Instagram.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials -->
-    <section class="testimonials-section">
-        <div class="section-header fade-in">
-            <span class="section-label">Testimonials</span>
-            <h2 class="section-title">Loved by Creators Worldwide</h2>
+    <!-- TESTIMONIALS -->
+    <section class="block">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Testimonials</span>
+                <h2>Loved by creators worldwide</h2>
+            </div>
+
+            <div class="grid grid-3">
+                <figure class="testimonial reveal">
+                    <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                    <blockquote>“WaveForge is incredible. I use it for all my music videos now — the export is a game-changer.”</blockquote>
+                    <figcaption class="author">
+                        <div class="author-avatar">JD</div>
+                        <div class="author-info"><strong>Jake Davidson</strong><span>Music producer</span></div>
+                    </figcaption>
+                </figure>
+                <figure class="testimonial reveal">
+                    <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                    <blockquote>“Finally, a visualizer that just works in the browser. The particle mode is mesmerizing — my audience loves it.”</blockquote>
+                    <figcaption class="author">
+                        <div class="author-avatar">SM</div>
+                        <div class="author-info"><strong>Sarah Mitchell</strong><span>Twitch streamer</span></div>
+                    </figcaption>
+                </figure>
+                <figure class="testimonial reveal">
+                    <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                    <blockquote>“Tried dozens of visualizers — WaveForge stands out. The beat detection is dead-on and the 4K export is chef's kiss.”</blockquote>
+                    <figcaption class="author">
+                        <div class="author-avatar">MR</div>
+                        <div class="author-info"><strong>Mike Reynolds</strong><span>Content creator</span></div>
+                    </figcaption>
+                </figure>
+            </div>
         </div>
-        
-        <div class="testimonials-grid">
-            <div class="testimonial-card fade-in">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">
-                    "WaveForge is absolutely incredible! I use it for all my music videos now. The video export feature is a game-changer."
-                </p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">JD</div>
-                    <div class="author-info">
-                        <h4>Jake Davidson</h4>
-                        <p>Music Producer</p>
-                    </div>
-                </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="block alt" id="faq">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">FAQ</span>
+                <h2>Frequently asked questions</h2>
             </div>
-            
-            <div class="testimonial-card fade-in">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">
-                    "Finally, a visualizer that works flawlessly in the browser! The particle mode is mesmerizing. My audience loves it."
-                </p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">SM</div>
-                    <div class="author-info">
-                        <h4>Sarah Mitchell</h4>
-                        <p>Twitch Streamer</p>
-                    </div>
+
+            <div class="faq-list">
+                <div class="faq-item reveal">
+                    <button class="faq-q" type="button" aria-expanded="false">Is WaveForge really free? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>Yes — WaveForge is 100% free with no hidden costs, no premium tiers, and no watermarks on your exports. Every feature is available to everyone.</p></div>
                 </div>
-            </div>
-            
-            <div class="testimonial-card fade-in">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">
-                    "I've tried dozens of visualizers, but WaveForge stands out. The beat detection is incredibly accurate and the 4K export is chef's kiss."
-                </p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">MR</div>
-                    <div class="author-info">
-                        <h4>Mike Reynolds</h4>
-                        <p>Content Creator</p>
-                    </div>
+                <div class="faq-item reveal">
+                    <button class="faq-q" type="button" aria-expanded="false">Do I need to create an account? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>No account required. Open WaveForge and start creating. Your audio files are processed locally in your browser and are never uploaded to any server.</p></div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-q" type="button" aria-expanded="false">What audio formats are supported? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>WaveForge supports all major formats including MP3, WAV, OGG, FLAC, AAC, M4A, and WebM. If your browser can play it, WaveForge can visualize it.</p></div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-q" type="button" aria-expanded="false">Can I use the videos commercially? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>Absolutely. Videos you create are yours to use however you like, including commercial purposes — just make sure you have the rights to the music you're visualizing.</p></div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-q" type="button" aria-expanded="false">Does it work on mobile devices? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>Yes — WaveForge is fully responsive. For the best experience and video export, we recommend a desktop browser.</p></div>
+                </div>
+                <div class="faq-item reveal">
+                    <button class="faq-q" type="button" aria-expanded="false">What video formats can I export? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>Videos are exported as WebM (VP9/VP8) for excellent quality and compatibility. You can convert to MP4 with any free tool if needed.</p></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section class="faq-section" id="faq">
-        <div class="section-header fade-in">
-            <span class="section-label">FAQ</span>
-            <h2 class="section-title">Frequently Asked Questions</h2>
-        </div>
-        
-        <div class="faq-container">
-            <div class="faq-item fade-in">
-                <button class="faq-question">
-                    Is WaveForge really free?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer">
-                    <p>Yes! WaveForge is 100% free with no hidden costs, no premium tiers, and no watermarks on your exports. All features are available to everyone.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item fade-in">
-                <button class="faq-question">
-                    Do I need to create an account?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer">
-                    <p>No account required! Just open WaveForge and start creating. Your audio files are processed locally in your browser and are never uploaded to any server.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item fade-in">
-                <button class="faq-question">
-                    What audio formats are supported?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer">
-                    <p>WaveForge supports all major audio formats including MP3, WAV, OGG, FLAC, AAC, M4A, and WebM. If your browser can play it, WaveForge can visualize it.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item fade-in">
-                <button class="faq-question">
-                    Can I use the videos commercially?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer">
-                    <p>Absolutely! Videos you create with WaveForge are yours to use however you like, including commercial purposes. Just make sure you have the rights to the music you're visualizing.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item fade-in">
-                <button class="faq-question">
-                    Does it work on mobile devices?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer">
-                    <p>Yes! WaveForge is fully responsive and works on smartphones and tablets. For the best experience and video export, we recommend using a desktop browser.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item fade-in">
-                <button class="faq-question">
-                    What video formats can I export?
-                    <span class="faq-icon">+</span>
-                </button>
-                <div class="faq-answer">
-                    <p>Videos are exported in WebM format with VP9/VP8 codec, which offers excellent quality and compatibility. You can easily convert to MP4 using free tools if needed.</p>
-                </div>
+    <!-- CTA -->
+    <section class="block">
+        <div class="container">
+            <div class="cta reveal">
+                <h2>Ready to visualize your music?</h2>
+                <p>Join thousands of creators using WaveForge to bring their sound to life. No signup, no downloads — just pure visualization magic.</p>
+                <a href="visualizer.html" class="btn btn-primary btn-lg">Launch WaveForge now →</a>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="cta-container fade-in">
-            <div class="cta-content">
-                <h2 class="cta-title">Ready to Visualize Your Music?</h2>
-                <p class="cta-description">
-                    Join thousands of creators using WaveForge to bring their music to life. No signup, no downloads, just pure visualization magic.
-                </p>
-                <a href="visualizer.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 1.2rem 2.5rem;">
-                    🚀 Launch WaveForge Now
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
+    <!-- FOOTER -->
     <footer class="footer">
-        <div class="footer-container">
+        <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="/" class="logo">
-                        <div class="logo-icon">🎵</div>
-                        <span class="logo-text">WaveForge</span>
+                        <span class="logo-mark">🎵</span>
+                        <span>WaveForge</span>
                     </a>
-                    <p>The ultimate free online music visualizer. Transform your audio into stunning visual experiences.</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link" aria-label="Twitter">𝕏</a>
-                        <a href="#" class="social-link" aria-label="YouTube">▶</a>
-                        <a href="#" class="social-link" aria-label="Discord">💬</a>
-                        <a href="#" class="social-link" aria-label="GitHub">⌨</a>
+                    <p>The free, browser-based music visualizer. Transform your audio into stunning visual experiences.</p>
+                    <div class="socials">
+                        <a href="#" aria-label="Twitter / X"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+                        <a href="#" aria-label="YouTube"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12z"/></svg></a>
+                        <a href="https://github.com/progameryt-op/WaveForge" aria-label="GitHub"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1-.02-1.97-3.2.69-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.18 1.19a11.05 11.05 0 0 1 5.78 0c2.21-1.5 3.18-1.19 3.18-1.19.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.13 0 1.54-.01 2.78-.01 3.16 0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg></a>
                     </div>
                 </div>
-                
-                <div class="footer-column">
+
+                <div class="footer-col">
                     <h4>Product</h4>
                     <ul>
-                        <li><a href="visualizer.html">Launch App</a></li>
+                        <li><a href="visualizer.html">Launch app</a></li>
                         <li><a href="#features">Features</a></li>
-                        <li><a href="#modes">Visualization Modes</a></li>
+                        <li><a href="#modes">Visualization modes</a></li>
                         <li><a href="#faq">FAQ</a></li>
                     </ul>
                 </div>
-                
-                <div class="footer-column">
+
+                <div class="footer-col">
                     <h4>Resources</h4>
                     <ul>
-                        <li><a href="#how-it-works">How It Works</a></li>
-                        <li><a href="#">Keyboard Shortcuts</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Changelog</a></li>
+                        <li><a href="#how">How it works</a></li>
+                        <li><a href="https://github.com/progameryt-op/WaveForge">Source on GitHub</a></li>
+                        <li><a href="sitemap.xml">Sitemap</a></li>
                     </ul>
                 </div>
-                
-                <div class="footer-column">
-                    <h4>Company</h4>
+
+                <div class="footer-col">
+                    <h4>Legal</h4>
                     <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
-                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy policy</a></li>
+                        <li><a href="terms.html">Terms of service</a></li>
                     </ul>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
-                <p>© 2024 WaveForge. All rights reserved.</p>
-                <div class="footer-legal">
+                <p>© <span id="year">2026</span> WaveForge. All rights reserved.</p>
+                <div class="footer-bottom-links">
                     <a href="privacy.html">Privacy</a>
                     <a href="terms.html">Terms</a>
-                    <a href="#">Cookies</a>
+                    <a href="visualizer.html">Launch</a>
                 </div>
             </div>
         </div>
     </footer>
 
     <script>
-        // Page Loader
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('pageLoader').classList.add('hidden');
-            }, 500);
+        /* ---------- Theme toggle ---------- */
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            try { localStorage.setItem('wf-theme', next); } catch (e) {}
         });
 
-        // Navbar scroll effect
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Mobile menu
+        /* ---------- Mobile menu ---------- */
         const mobileToggle = document.getElementById('mobileToggle');
         const mobileMenu = document.getElementById('mobileMenu');
-        const mobileOverlay = document.getElementById('mobileOverlay');
-
         mobileToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            mobileOverlay.classList.toggle('active');
+            const open = mobileMenu.classList.toggle('open');
+            mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            mobileMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
         });
+        mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+            mobileToggle.setAttribute('aria-expanded', 'false');
+            mobileMenu.setAttribute('aria-hidden', 'true');
+        }));
 
-        mobileOverlay.addEventListener('click', () => {
-            mobileMenu.classList.remove('active');
-            mobileOverlay.classList.remove('active');
-        });
-
-        // Close mobile menu on link click
-        document.querySelectorAll('.mobile-menu-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-                mobileOverlay.classList.remove('active');
-            });
-        });
-
-        // Preview bars animation
-        const previewBars = document.getElementById('previewBars');
-        const barCount = 50;
-
-        for (let i = 0; i < barCount; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'preview-bar';
-            const minHeight = 20 + Math.random() * 30;
-            const maxHeight = 100 + Math.random() * 200;
-            bar.style.setProperty('--min-height', `${minHeight}px`);
-            bar.style.setProperty('--max-height', `${maxHeight}px`);
-            bar.style.animationDelay = `${Math.random() * 1}s`;
-            bar.style.animationDuration = `${0.5 + Math.random() * 0.5}s`;
-            previewBars.appendChild(bar);
+        /* ---------- Animated preview bars ---------- */
+        const bars = document.getElementById('previewBars');
+        const isMobile = window.matchMedia('(max-width: 640px)').matches;
+        const count = isMobile ? 32 : 56;
+        for (let i = 0; i < count; i++) {
+            const b = document.createElement('div');
+            b.className = 'pbar';
+            const min = 12 + Math.random() * 28;
+            const max = 60 + Math.random() * 200;
+            b.style.setProperty('--min', min + 'px');
+            b.style.setProperty('--max', max + 'px');
+            b.style.height = min + 'px';
+            b.style.animationDelay = (Math.random() * 1.2) + 's';
+            b.style.animationDuration = (0.6 + Math.random() * 0.8) + 's';
+            bars.appendChild(b);
         }
 
-        // FAQ accordion
-        document.querySelectorAll('.faq-question').forEach(button => {
-            button.addEventListener('click', () => {
-                const item = button.parentElement;
-                const isActive = item.classList.contains('active');
-                
-                // Close all
-                document.querySelectorAll('.faq-item').forEach(faq => {
-                    faq.classList.remove('active');
-                });
-                
-                // Open clicked if wasn't active
-                if (!isActive) {
-                    item.classList.add('active');
-                }
+        /* ---------- FAQ accordion ---------- */
+        document.querySelectorAll('.faq-q').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const open = item.classList.toggle('open');
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
             });
         });
 
-        // Scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+        /* ---------- Reveal on scroll ---------- */
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    io.unobserve(e.target);
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+        // Safety net: reveal anything still hidden after 500ms
+        setTimeout(() => {
+            document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
+        }, 500);
 
-        document.querySelectorAll('.fade-in').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
+        /* ---------- Footer year ---------- */
+        document.getElementById('year').textContent = new Date().getFullYear();
     </script>
 </body>
 </html>
