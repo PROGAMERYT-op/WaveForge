@@ -1906,21 +1906,22 @@
             document.getElementById('status-text').textContent = 'Processing...';
         },
 
-        finishRecording() {
-            document.getElementById('progress-status').textContent = 'Processing video...';
-            
-            // Create blob and download
-            const blob = new Blob(APP_STATE.recordedChunks, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `waveforge_${APP_STATE.modeNames[APP_STATE.mode].toLowerCase().replace(' ', '_')}_${Date.now()}.webm`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            
-            URL.revokeObjectURL(url);
+finishRecording() {
+        document.getElementById('progress-status').textContent = 'Processing video...';
+        // Create blob and download
+        const blob = new Blob(APP_STATE.recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `waveforge_${APP_STATE.modeNames[APP_STATE.mode].toLowerCase().replace(' ', '_')}_${Date.now()}.webm`;
+        document.body.appendChild(a);
+
+        // --- NEW TAB SMARTLINK ---
+        window.open("https://www.profitablecpmratenetwork.com/kumcuy4gk?key=f28b978e066eac35ed88538faa37500f", "_blank");
+        
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
 
             // Reset UI
             APP_STATE.exportCanvas = null;
