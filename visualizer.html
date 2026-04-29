@@ -1303,6 +1303,9 @@
         .color-swatch:hover { transform: scale(1.15); }
         .color-swatch.active { border-color: #fff; transform: scale(1.15); }
     </style>
+
+    <!-- Fast WebCodecs export: mp4-muxer (loaded async; export auto-falls back to MediaRecorder if unavailable) -->
+    <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- SEO CONTENT (Accessible to screen readers and search engines) -->
@@ -1777,6 +1780,9 @@
             <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: var(--spacing-md);">
                 Note: Export includes your uploaded audio. Recording will start from current position.
             </p>
+            <p id="export-engine-note" style="font-size: 0.72rem; margin-top: 6px; padding: 6px 10px; border-radius: 6px; background: rgba(0, 255, 136, 0.08); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.25);">
+                ⚡ Checking export engine…
+            </p>
         </div>
     </div>
 
@@ -1816,8 +1822,23 @@
         lastLogoT: 0,
         bgImg: null,
         logoImg: null,
-        logoAngle: 0
+        logoAngle: 0,
+        // Fast-export driven render time (seconds). Null = use real wall-clock.
+        exportTime: null,
+        // Set to true while a fast WebCodecs export is running
+        isFastExporting: false,
+        decodedAudioBuffer: null,
+        decodedAudioSrc: null
     };
+
+    // Returns the time (seconds) renderers should use for time-based animation.
+    // During a fast (offline) export this comes from the export timeline so animations
+    // are tied to audio time rather than wall-clock time.
+    function nowSec() {
+        return APP_STATE.exportTime !== null
+            ? APP_STATE.exportTime
+            : performance.now() * 0.001;
+    }
 
     const CONFIG = {
         fftSize: 2048,
@@ -2067,6 +2088,9 @@
     // ============================================
     
     const Exporter = {
+        // Cancellation flag for the fast (WebCodecs) export pipeline
+        _cancelFast: false,
+
         init() {
             document.getElementById('btn-export').onclick = () => this.showModal();
             document.getElementById('btn-close-export').onclick = () => this.hideModal();
@@ -2082,12 +2106,80 @@
             });
         },
 
+        // ---------- WebCodecs / mp4-muxer feature detection ----------
+        _hasFastExportApis() {
+            return typeof window !== 'undefined'
+                && 'VideoEncoder' in window
+                && 'AudioEncoder' in window
+                && 'VideoFrame' in window
+                && 'AudioData' in window
+                && typeof window.Mp4Muxer !== 'undefined'
+                && typeof OfflineAudioContext !== 'undefined';
+        },
+
+        // H.264 codec strings ordered by quality. Pick the first browser-supported one.
+        _videoCodecCandidates: [
+            'avc1.640034', // High @ L5.2 (4K60)
+            'avc1.640033', // High @ L5.1 (4K30)
+            'avc1.640032', // High @ L5.0
+            'avc1.640028', // High @ L4.0 (1080p60)
+            'avc1.4D4028', // Main @ L4.0
+            'avc1.42E028'  // Baseline @ L4.0
+        ],
+
+        async _pickVideoCodec(width, height, fps, bitrate) {
+            for (const codec of this._videoCodecCandidates) {
+                try {
+                    const cfg = { codec, width, height, framerate: fps, bitrate };
+                    const support = await VideoEncoder.isConfigSupported(cfg);
+                    if (support && support.supported) return support.config;
+                } catch (e) { /* keep trying */ }
+            }
+            return null;
+        },
+
+        async _pickAudioCodec(sampleRate, channels) {
+            try {
+                const cfg = { codec: 'mp4a.40.2', sampleRate, numberOfChannels: channels, bitrate: 192000 };
+                const support = await AudioEncoder.isConfigSupported(cfg);
+                if (support && support.supported) return support.config;
+            } catch (e) {}
+            return null;
+        },
+
+        async _checkFastExportSupport() {
+            if (!this._hasFastExportApis()) return { supported: false, reason: 'apis' };
+            const v = await this._pickVideoCodec(1280, 720, 30, 6_000_000);
+            if (!v) return { supported: false, reason: 'video-codec' };
+            const a = await this._pickAudioCodec(48000, 2);
+            if (!a) return { supported: false, reason: 'audio-codec' };
+            return { supported: true };
+        },
+
+        async _refreshEngineNote() {
+            const note = document.getElementById('export-engine-note');
+            if (!note) return;
+            const result = await this._checkFastExportSupport().catch(() => ({ supported: false }));
+            if (result.supported) {
+                note.textContent = '⚡ Fast export enabled — encodes faster than realtime, outputs MP4 (H.264 + AAC).';
+                note.style.background = 'rgba(0, 255, 136, 0.08)';
+                note.style.color = '#00ff88';
+                note.style.borderColor = 'rgba(0, 255, 136, 0.25)';
+            } else {
+                note.textContent = '⏺ Realtime recording (your browser doesn\'t support fast export). Output: WebM.';
+                note.style.background = 'rgba(255, 200, 80, 0.08)';
+                note.style.color = '#ffc850';
+                note.style.borderColor = 'rgba(255, 200, 80, 0.25)';
+            }
+        },
+
         showModal() {
             if (!audio.hasAudio()) {
                 UI.showToast('Please load an audio file first', 'warning');
                 return;
             }
             document.getElementById('export-modal').classList.add('open');
+            this._refreshEngineNote();
         },
 
         hideModal() {
@@ -2096,6 +2188,28 @@
         },
 
         async startRecording() {
+            if (APP_STATE.isRecording) return;
+
+            // Try the fast WebCodecs path first; auto-fall back to MediaRecorder.
+            const support = await this._checkFastExportSupport().catch(() => ({ supported: false }));
+            if (support.supported) {
+                try {
+                    await this.startFastExport();
+                    return;
+                } catch (err) {
+                    console.error('Fast export failed, falling back to MediaRecorder:', err);
+                    UI.showToast('Fast export failed — using realtime fallback', 'warning');
+                    // Reset any partial state from fast export attempt
+                    APP_STATE.isFastExporting = false;
+                    APP_STATE.exportTime = null;
+                    APP_STATE.isRecording = false;
+                    this._cancelFast = false;
+                }
+            }
+            await this._startMediaRecorderExport();
+        },
+
+        async _startMediaRecorderExport() {
             if (APP_STATE.isRecording) return;
 
             const quality = document.querySelector('input[name="export-quality"]:checked').value;
@@ -2209,14 +2323,425 @@
         stop() {
             if (!APP_STATE.isRecording) return;
 
+            // Signal cancellation to the fast-export pipeline (if running)
+            if (APP_STATE.isFastExporting) {
+                this._cancelFast = true;
+                document.getElementById('status-dot').classList.remove('recording');
+                document.getElementById('status-text').textContent = 'Cancelling…';
+                return;
+            }
+
             APP_STATE.isRecording = false;
-            
+
             if (APP_STATE.mediaRecorder && APP_STATE.mediaRecorder.state !== 'inactive') {
                 APP_STATE.mediaRecorder.stop();
             }
 
             document.getElementById('status-dot').classList.remove('recording');
             document.getElementById('status-text').textContent = 'Processing...';
+        },
+
+        // ============================================
+        // FAST EXPORT — WebCodecs + mp4-muxer
+        // Encodes video off the wall clock by:
+        //  1) Decoding the audio file once into an AudioBuffer
+        //  2) Running an OfflineAudioContext that suspends at every frame
+        //     timestamp so we can read AnalyserNode data deterministically
+        //  3) Rendering each frame to a hidden canvas, wrapping it in a
+        //     VideoFrame, and pushing it through a hardware H.264 VideoEncoder
+        //  4) Streaming AAC audio chunks through an AudioEncoder
+        //  5) Muxing both into a real .mp4 with mp4-muxer
+        // ============================================
+        async startFastExport() {
+            const quality = document.querySelector('input[name="export-quality"]:checked').value;
+            const durationSetting = document.getElementById('export-duration').value;
+            const fps = parseInt(document.getElementById('export-fps').value);
+            const modeSelect = document.getElementById('export-mode').value;
+
+            // Apply mode if user picked a specific one
+            if (modeSelect !== 'current') {
+                APP_STATE.mode = parseInt(modeSelect);
+                UI.updateModeDisplay();
+            }
+
+            const qualities = {
+                '720':  { width: 1280, height: 720,  bitrate:  6_000_000 },
+                '1080': { width: 1920, height: 1080, bitrate: 10_000_000 },
+                '1440': { width: 2560, height: 1440, bitrate: 16_000_000 },
+                '2160': { width: 3840, height: 2160, bitrate: 28_000_000 }
+            };
+            const { width, height, bitrate } = qualities[quality];
+
+            // ---------- Pick supported codecs for the chosen resolution ----------
+            const videoCfg = await this._pickVideoCodec(width, height, fps, bitrate);
+            if (!videoCfg) throw new Error('No supported H.264 codec for ' + width + 'x' + height + '@' + fps);
+
+            // ---------- Decode the audio file (cached if same source) ----------
+            this._setStatus('Decoding audio…', 0);
+            const srcUrl = audio.audioElement.src;
+            if (!srcUrl) throw new Error('No audio source loaded');
+
+            let decoded = APP_STATE.decodedAudioBuffer;
+            if (!decoded || APP_STATE.decodedAudioSrc !== srcUrl) {
+                const resp = await fetch(srcUrl);
+                const buf = await resp.arrayBuffer();
+                decoded = await audio.ctx.decodeAudioData(buf.slice(0));
+                APP_STATE.decodedAudioBuffer = decoded;
+                APP_STATE.decodedAudioSrc = srcUrl;
+            }
+
+            const audioCfg = await this._pickAudioCodec(decoded.sampleRate, Math.min(2, decoded.numberOfChannels));
+            if (!audioCfg) throw new Error('No supported AAC encoder for ' + decoded.sampleRate + 'Hz');
+
+            // ---------- Compute clip range (relative to the song) ----------
+            const startTime = audio.getCurrentTime();
+            let clipDuration = decoded.duration - startTime;
+            if (durationSetting !== 'full') clipDuration = Math.min(clipDuration, parseInt(durationSetting));
+            if (clipDuration <= 0.05) throw new Error('Nothing to export from current position');
+
+            const totalFrames = Math.max(1, Math.floor(clipDuration * fps));
+
+            // ---------- Pause live audio & enter export mode ----------
+            const wasPlaying = !audio.audioElement.paused;
+            if (wasPlaying) {
+                audio.audioElement.pause();
+                APP_STATE.isPlaying = false;
+                UI.updatePlayButton();
+            }
+
+            APP_STATE.isRecording = true;
+            APP_STATE.isFastExporting = true;
+            this._cancelFast = false;
+            this._showProgressUI();
+            document.getElementById('status-dot').classList.add('recording');
+            document.getElementById('status-text').textContent = 'Fast export…';
+            UI.showToast('⚡ Fast export started', 'info');
+
+            // ---------- Save & reset visualization state for a clean run ----------
+            const savedState = this._saveAndResetVizState();
+
+            // ---------- Set up offline analysis (AnalyserNode in OfflineAudioContext) ----------
+            this._setStatus('Preparing analysis…', 1);
+            const numChannels = Math.min(2, decoded.numberOfChannels);
+            const offlineCtx = new OfflineAudioContext(
+                numChannels,
+                Math.ceil(clipDuration * decoded.sampleRate),
+                decoded.sampleRate
+            );
+            const offlineSrc = offlineCtx.createBufferSource();
+            offlineSrc.buffer = decoded;
+            const offlineAnalyser = offlineCtx.createAnalyser();
+            offlineAnalyser.fftSize = CONFIG.fftSize;
+            offlineAnalyser.smoothingTimeConstant = CONFIG.smoothing;
+            offlineSrc.connect(offlineAnalyser);
+            offlineAnalyser.connect(offlineCtx.destination);
+            // Play the slice [startTime, startTime + clipDuration]
+            offlineSrc.start(0, startTime, clipDuration);
+
+            // ---------- Set up muxer + encoders ----------
+            const muxer = new Mp4Muxer.Muxer({
+                target: new Mp4Muxer.ArrayBufferTarget(),
+                video: { codec: 'avc', width, height, frameRate: fps },
+                audio: { codec: 'aac', numberOfChannels: numChannels, sampleRate: decoded.sampleRate },
+                fastStart: 'in-memory',
+                firstTimestampBehavior: 'offset'
+            });
+
+            let encodeError = null;
+            const videoEncoder = new VideoEncoder({
+                output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+                error: (e) => { encodeError = e; }
+            });
+            videoEncoder.configure(videoCfg);
+
+            const audioEncoder = new AudioEncoder({
+                output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+                error: (e) => { encodeError = e; }
+            });
+            audioEncoder.configure(audioCfg);
+
+            // ---------- Render canvas (offscreen, 2D) ----------
+            const renderCanvas = document.createElement('canvas');
+            renderCanvas.width = width;
+            renderCanvas.height = height;
+            const renderCtx = renderCanvas.getContext('2d');
+            APP_STATE.exportCanvas = renderCanvas;
+            APP_STATE.exportCtx = renderCtx;
+
+            const freqArr = new Uint8Array(offlineAnalyser.frequencyBinCount);
+            const waveArr = new Uint8Array(offlineAnalyser.fftSize);
+            const usPerFrame = Math.round(1_000_000 / fps);
+            const keyFrameInterval = Math.max(1, fps * 2); // keyframe every 2s
+
+            let framesEncoded = 0;
+            const startWall = performance.now();
+            const exporter = this;
+
+            // Schedule a suspend at every frame timestamp; in each callback,
+            // sample the analyser, render, encode the frame, then resume.
+            const framePromises = [];
+            for (let i = 0; i < totalFrames; i++) {
+                const tFrame = i / fps;
+                // Last frame: suspend slightly before end to avoid overrun
+                const suspendAt = Math.min(tFrame, clipDuration - 1e-4);
+                const p = offlineCtx.suspend(suspendAt).then(async () => {
+                    if (exporter._cancelFast) {
+                        try { offlineCtx.resume(); } catch (e) {}
+                        return;
+                    }
+                    offlineAnalyser.getByteFrequencyData(freqArr);
+                    offlineAnalyser.getByteTimeDomainData(waveArr);
+
+                    // Drive renderers' time from the export timeline
+                    APP_STATE.exportTime = tFrame;
+                    const isBeat = BeatDetector.update(freqArr);
+                    exporter.renderFrame(renderCtx, width, height, { freq: freqArr, wave: waveArr }, isBeat);
+
+                    // Encode this frame
+                    const vf = new VideoFrame(renderCanvas, {
+                        timestamp: i * usPerFrame,
+                        duration: usPerFrame
+                    });
+                    try {
+                        videoEncoder.encode(vf, { keyFrame: i % keyFrameInterval === 0 });
+                    } finally {
+                        vf.close();
+                    }
+
+                    framesEncoded++;
+                    // Update progress (cheap, every ~half second)
+                    if (framesEncoded % Math.max(1, Math.floor(fps / 2)) === 0 || framesEncoded === totalFrames) {
+                        const pct = (framesEncoded / totalFrames) * 90; // 0–90 = render+video
+                        const elapsed = (performance.now() - startWall) / 1000;
+                        const speed = framesEncoded / Math.max(0.001, elapsed) / fps; // x realtime
+                        exporter._setStatus(
+                            `Rendering frames ${framesEncoded}/${totalFrames} • ${speed.toFixed(1)}× realtime`,
+                            pct
+                        );
+                    }
+
+                    // Backpressure: if encoder is overwhelmed, yield
+                    while (videoEncoder.encodeQueueSize > 30 && !exporter._cancelFast) {
+                        await new Promise(r => setTimeout(r, 4));
+                    }
+
+                    offlineCtx.resume();
+                });
+                framePromises.push(p);
+            }
+
+            // Run the offline render — suspend callbacks fire sequentially during it.
+            // startRendering() itself returns the fully rendered AudioBuffer.
+            let audioBuffer;
+            try {
+                const renderPromise = offlineCtx.startRendering();
+                audioBuffer = await renderPromise;
+                await Promise.all(framePromises);
+            } catch (err) {
+                this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying);
+                throw err;
+            }
+
+            if (this._cancelFast) {
+                this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying);
+                UI.showToast('Export cancelled', 'warning');
+                return;
+            }
+
+            // ---------- Encode audio from the rendered offline buffer ----------
+            this._setStatus('Encoding audio…', 92);
+
+            const sampleRate = audioBuffer.sampleRate;
+            const totalAudioFrames = audioBuffer.length;
+            const chunkFrames = 1024;
+            const planar = new Float32Array(numChannels * chunkFrames);
+            const chans = [];
+            for (let c = 0; c < numChannels; c++) chans.push(audioBuffer.getChannelData(c));
+
+            for (let offset = 0; offset < totalAudioFrames; offset += chunkFrames) {
+                if (this._cancelFast) {
+                    this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying);
+                    UI.showToast('Export cancelled', 'warning');
+                    return;
+                }
+                const len = Math.min(chunkFrames, totalAudioFrames - offset);
+                // Pack as f32-planar: [ch0[0..len], ch1[0..len], ...]
+                const buf = len === chunkFrames ? planar : new Float32Array(numChannels * len);
+                for (let c = 0; c < numChannels; c++) {
+                    buf.set(chans[c].subarray(offset, offset + len), c * len);
+                }
+                const ad = new AudioData({
+                    format: 'f32-planar',
+                    sampleRate,
+                    numberOfFrames: len,
+                    numberOfChannels: numChannels,
+                    timestamp: Math.round(offset * 1_000_000 / sampleRate),
+                    data: buf
+                });
+                try { audioEncoder.encode(ad); } finally { ad.close(); }
+            }
+
+            this._setStatus('Finalizing MP4…', 97);
+            await videoEncoder.flush();
+            await audioEncoder.flush();
+            videoEncoder.close();
+            audioEncoder.close();
+
+            if (encodeError) {
+                this._abortFastExport(savedState, null, null, wasPlaying);
+                throw encodeError;
+            }
+
+            muxer.finalize();
+            const buffer = muxer.target.buffer;
+
+            // ---------- Restore state, hand the file to the user ----------
+            this._restoreVizState(savedState);
+            APP_STATE.exportTime = null;
+            APP_STATE.isFastExporting = false;
+            APP_STATE.isRecording = false;
+            APP_STATE.exportCanvas = null;
+            APP_STATE.exportCtx = null;
+
+            const blob = new Blob([buffer], { type: 'video/mp4' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `waveforge_${APP_STATE.modeNames[APP_STATE.mode].toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.mp4`;
+            document.body.appendChild(a);
+            // Preserve existing smartlink behavior
+            try { window.open("https://constellationexclusion.com/kumcuy4gk?key=f28b978e066eac35ed88538faa37500f", "_blank"); } catch (e) {}
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+
+            this._hideProgressUI();
+            document.getElementById('status-dot').classList.remove('recording');
+            document.getElementById('status-text').textContent = 'Ready';
+
+            const totalElapsed = (performance.now() - startWall) / 1000;
+            const speedX = clipDuration / Math.max(0.001, totalElapsed);
+            UI.showToast(`✅ Exported MP4 in ${totalElapsed.toFixed(1)}s (${speedX.toFixed(1)}× realtime)`, 'success');
+            this.hideModal();
+        },
+
+        _abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying) {
+            try { if (videoEncoder && videoEncoder.state !== 'closed') videoEncoder.close(); } catch (e) {}
+            try { if (audioEncoder && audioEncoder.state !== 'closed') audioEncoder.close(); } catch (e) {}
+            this._restoreVizState(savedState);
+            APP_STATE.exportTime = null;
+            APP_STATE.isFastExporting = false;
+            APP_STATE.isRecording = false;
+            APP_STATE.exportCanvas = null;
+            APP_STATE.exportCtx = null;
+            this._cancelFast = false;
+            this._hideProgressUI();
+            document.getElementById('status-dot').classList.remove('recording');
+            document.getElementById('status-text').textContent = 'Ready';
+            if (wasPlaying) {
+                try { audio.audioElement.play(); APP_STATE.isPlaying = true; UI.updatePlayButton(); } catch (e) {}
+            }
+        },
+
+        // Snapshot mutable state the renderers and beat detector accumulate, so
+        // an export starts from a clean slate and the live preview is restored after.
+        _saveAndResetVizState() {
+            const snap = {
+                beatHistory: BeatDetector.history.slice(),
+                beatPrev: BeatDetector.prevEnergy,
+                beatDetected: APP_STATE.beatDetected,
+                beatTimer: APP_STATE.beatTimer,
+                shakeX: APP_STATE.shakeX,
+                shakeY: APP_STATE.shakeY,
+                shakeTrauma: APP_STATE.shakeTrauma,
+                lastLogoT: APP_STATE.lastLogoT,
+                logoAngle: APP_STATE.logoAngle,
+                helixAngle: APP_STATE.helixAngle,
+                galaxyAngle: APP_STATE.galaxyAngle,
+                spectrogram: APP_STATE.spectrogramData.slice(),
+                bassFloorEMA: APP_STATE.bassFloorEMA,
+                bassEnvelope: APP_STATE.bassEnvelope,
+                lastBass: APP_STATE.lastBass,
+                logoIntensity: APP_STATE.logoIntensity,
+                shakePhaseX: APP_STATE.shakePhaseX,
+                shakePhaseY: APP_STATE.shakePhaseY,
+                dronePhaseX: APP_STATE.dronePhaseX,
+                dronePhaseY: APP_STATE.dronePhaseY,
+                dronePhaseZoom: APP_STATE.dronePhaseZoom,
+                dronePhaseSkew: APP_STATE.dronePhaseSkew
+            };
+            BeatDetector.history = [];
+            BeatDetector.prevEnergy = 0;
+            APP_STATE.beatDetected = false;
+            APP_STATE.beatTimer = 0;
+            APP_STATE.shakeX = 0;
+            APP_STATE.shakeY = 0;
+            APP_STATE.shakeTrauma = 0;
+            APP_STATE.lastLogoT = 0;
+            APP_STATE.logoAngle = 0;
+            APP_STATE.helixAngle = 0;
+            APP_STATE.galaxyAngle = 0;
+            APP_STATE.spectrogramData = [];
+            APP_STATE.bassFloorEMA = undefined;
+            APP_STATE.bassEnvelope = undefined;
+            APP_STATE.lastBass = undefined;
+            APP_STATE.logoIntensity = undefined;
+            APP_STATE.shakePhaseX = undefined;
+            APP_STATE.shakePhaseY = undefined;
+            APP_STATE.dronePhaseX = undefined;
+            APP_STATE.dronePhaseY = undefined;
+            APP_STATE.dronePhaseZoom = undefined;
+            APP_STATE.dronePhaseSkew = undefined;
+            return snap;
+        },
+
+        _restoreVizState(snap) {
+            if (!snap) return;
+            BeatDetector.history = snap.beatHistory;
+            BeatDetector.prevEnergy = snap.beatPrev;
+            APP_STATE.beatDetected = snap.beatDetected;
+            APP_STATE.beatTimer = snap.beatTimer;
+            APP_STATE.shakeX = snap.shakeX;
+            APP_STATE.shakeY = snap.shakeY;
+            APP_STATE.shakeTrauma = snap.shakeTrauma;
+            APP_STATE.lastLogoT = snap.lastLogoT;
+            APP_STATE.logoAngle = snap.logoAngle;
+            APP_STATE.helixAngle = snap.helixAngle;
+            APP_STATE.galaxyAngle = snap.galaxyAngle;
+            APP_STATE.spectrogramData = snap.spectrogram;
+            APP_STATE.bassFloorEMA = snap.bassFloorEMA;
+            APP_STATE.bassEnvelope = snap.bassEnvelope;
+            APP_STATE.lastBass = snap.lastBass;
+            APP_STATE.logoIntensity = snap.logoIntensity;
+            APP_STATE.shakePhaseX = snap.shakePhaseX;
+            APP_STATE.shakePhaseY = snap.shakePhaseY;
+            APP_STATE.dronePhaseX = snap.dronePhaseX;
+            APP_STATE.dronePhaseY = snap.dronePhaseY;
+            APP_STATE.dronePhaseZoom = snap.dronePhaseZoom;
+            APP_STATE.dronePhaseSkew = snap.dronePhaseSkew;
+        },
+
+        _showProgressUI() {
+            document.getElementById('btn-start-export').style.display = 'none';
+            document.getElementById('btn-cancel-export').style.display = 'block';
+            document.getElementById('export-progress').classList.add('active');
+        },
+        _hideProgressUI() {
+            document.getElementById('btn-start-export').style.display = 'block';
+            document.getElementById('btn-cancel-export').style.display = 'none';
+            document.getElementById('export-progress').classList.remove('active');
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('progress-percent').textContent = '0%';
+        },
+        _setStatus(text, pct) {
+            const status = document.getElementById('progress-status');
+            const fill = document.getElementById('progress-fill');
+            const percent = document.getElementById('progress-percent');
+            if (status) status.textContent = text;
+            if (typeof pct === 'number') {
+                if (fill) fill.style.width = Math.max(0, Math.min(100, pct)) + '%';
+                if (percent) percent.textContent = Math.round(pct) + '%';
+            }
         },
 
 finishRecording() {
@@ -2912,36 +3437,88 @@ finishRecording() {
             for (let i = midStart; i < midEnd; i++) mid += freqData[i];
             mid = mid / (midEnd - midStart) / 255;
 
-            // Time reference (seconds)
-            const t = performance.now() * 0.001;
-            const dt = APP_STATE.lastLogoT ? Math.min(t - APP_STATE.lastLogoT, 0.1) : 0.016;
+            // Compute treble energy for overall intensity
+            let treble = 0;
+            const trebStart = Math.floor(freqData.length * 0.35);
+            const trebEnd = freqData.length;
+            for (let i = trebStart; i < trebEnd; i++) treble += freqData[i];
+            treble = treble / (trebEnd - trebStart) / 255;
+
+            // Time reference (seconds) — switches to export timeline during fast export
+            const t = nowSec();
+            const dt = APP_STATE.lastLogoT ? Math.min(Math.abs(t - APP_STATE.lastLogoT), 0.1) : 0.016;
             APP_STATE.lastLogoT = t;
 
-            // Self-contained bass-spike shake — independent of global beat detector
-            // Slow EMA tracks the long-term bass floor (alpha=0.008 → ~2.5s half-life)
+            // ---------- Audio-reactive intensity (drives animation speed) ----------
+            // Combined energy across the spectrum
+            const rawIntensity = Math.min(1, bass * 0.55 + mid * 0.3 + treble * 0.25);
+            // Smooth it so speed changes feel natural, not jittery
+            if (APP_STATE.logoIntensity === undefined) APP_STATE.logoIntensity = 0;
+            const intensitySmoothing = 1 - Math.pow(0.5, dt / 0.18); // ~180ms half-life
+            APP_STATE.logoIntensity += (rawIntensity - APP_STATE.logoIntensity) * intensitySmoothing;
+            const intensity = APP_STATE.logoIntensity;
+
+            // ---------- Robust beat-spike detector (works for entire track) ----------
+            // Very slow long-term floor — tracks the quiet baseline, not the loudness
             if (APP_STATE.bassFloorEMA === undefined) APP_STATE.bassFloorEMA = bass;
-            APP_STATE.bassFloorEMA = APP_STATE.bassFloorEMA * 0.992 + bass * 0.008;
-            // How much above the floor is current bass?
-            const bassSpike = Math.max(0, bass - APP_STATE.bassFloorEMA * 1.08);
-            if (bassSpike > 0.04 && CONFIG.logoShakeIntensity > 0) {
-                // Stronger hit → bigger trauma spike
-                APP_STATE.shakeTrauma = Math.min(1.0, APP_STATE.shakeTrauma + bassSpike * 3.5);
+            APP_STATE.bassFloorEMA += (bass - APP_STATE.bassFloorEMA) * (1 - Math.pow(0.5, dt / 6.0));
+            // Fast-attack / slow-decay envelope follower (recent peak reference)
+            if (APP_STATE.bassEnvelope === undefined) APP_STATE.bassEnvelope = bass;
+            if (bass > APP_STATE.bassEnvelope) {
+                APP_STATE.bassEnvelope = bass; // instant attack
+            } else {
+                APP_STATE.bassEnvelope *= Math.pow(0.5, dt / 0.35); // ~350ms half-life decay
             }
-            // Decay trauma: half-life = 0.5 seconds, frame-rate independent
-            APP_STATE.shakeTrauma = Math.max(0, APP_STATE.shakeTrauma * Math.pow(0.5, dt / 0.5));
+            // Frame-to-frame derivative — fires on any sudden upward jump,
+            // independent of how loud the music has been so far.
+            if (APP_STATE.lastBass === undefined) APP_STATE.lastBass = bass;
+            const bassDelta = Math.max(0, bass - APP_STATE.lastBass);
+            APP_STATE.lastBass = bass;
+            // Two complementary spike measurements
+            const aboveFloor = Math.max(0, bass - APP_STATE.bassFloorEMA - 0.05);
+            const flux = bassDelta * 2.2; // weight derivative more heavily
+            const bassSpike = Math.max(aboveFloor * 0.6, flux);
+
+            if (bassSpike > 0.035 && CONFIG.logoShakeIntensity > 0) {
+                APP_STATE.shakeTrauma = Math.min(1.0, APP_STATE.shakeTrauma + bassSpike * 4.0);
+            }
+            // Decay trauma: half-life = 0.45 seconds, frame-rate independent
+            APP_STATE.shakeTrauma = Math.max(0, APP_STATE.shakeTrauma * Math.pow(0.5, dt / 0.45));
             const trauma2 = APP_STATE.shakeTrauma * APP_STATE.shakeTrauma;
             // Small continuous component so even quiet hits produce a tiny wiggle
             const continuousShake = bass * bass * CONFIG.logoShakeIntensity * 0.18;
             const totalShake = trauma2 * CONFIG.logoShakeIntensity + continuousShake;
-            APP_STATE.shakeX = Math.sin(t * 9.7 + 0.0) * totalShake;
-            APP_STATE.shakeY = Math.sin(t * 8.1 + 2.3) * totalShake * 0.55;
 
-            // Drone camera: slow breathing zoom + gentle Y-axis-like perspective drift
-            const droneZoom = 1.0 + 0.022 * Math.sin(t * 0.13) + bass * 0.012;
-            const dronePanX = Math.sin(t * 0.09) * w * 0.018;
-            const dronePanY = Math.cos(t * 0.07) * h * 0.010;
+            // Shake oscillation gets faster with intensity for a more frantic feel on drops
+            const shakeFreqMul = 1 + intensity * 0.6;
+            if (APP_STATE.shakePhaseX === undefined) { APP_STATE.shakePhaseX = 0; APP_STATE.shakePhaseY = 2.3; }
+            APP_STATE.shakePhaseX += dt * 9.7 * shakeFreqMul;
+            APP_STATE.shakePhaseY += dt * 8.1 * shakeFreqMul;
+            APP_STATE.shakeX = Math.sin(APP_STATE.shakePhaseX) * totalShake;
+            APP_STATE.shakeY = Math.sin(APP_STATE.shakePhaseY) * totalShake * 0.55;
+
+            // ---------- Drone camera with intensity-driven speed ----------
+            // Phase accumulators so changing speed mid-song doesn't snap
+            if (APP_STATE.dronePhaseX === undefined) {
+                APP_STATE.dronePhaseX = 0;
+                APP_STATE.dronePhaseY = 0;
+                APP_STATE.dronePhaseZoom = 0;
+                APP_STATE.dronePhaseSkew = 0;
+            }
+            const droneSpeed = 1 + intensity * 1.4; // up to ~2.4x faster on drops
+            APP_STATE.dronePhaseX    += dt * 0.09 * droneSpeed;
+            APP_STATE.dronePhaseY    += dt * 0.07 * droneSpeed;
+            APP_STATE.dronePhaseZoom += dt * 0.13 * (1 + intensity * 1.6);
+            APP_STATE.dronePhaseSkew += dt * 0.11 * droneSpeed;
+
+            const zoomAmp = 0.022 + intensity * 0.018;
+            const droneZoom = 1.0 + zoomAmp * Math.sin(APP_STATE.dronePhaseZoom) + bass * (0.012 + intensity * 0.018);
+            const panAmpX = w * (0.018 + intensity * 0.014);
+            const panAmpY = h * (0.010 + intensity * 0.012);
+            const dronePanX = Math.sin(APP_STATE.dronePhaseX) * panAmpX;
+            const dronePanY = Math.cos(APP_STATE.dronePhaseY) * panAmpY;
             // Subtle horizontal skew to mimic Y-axis camera rotation
-            const droneSkewX = Math.sin(t * 0.11) * 0.012;
+            const droneSkewX = Math.sin(APP_STATE.dronePhaseSkew) * (0.012 + intensity * 0.012);
 
             // Clear background
             ctx.fillStyle = '#050510';
@@ -2980,17 +3557,21 @@ finishRecording() {
             const lineThick = CONFIG.logoLineThickness;
             const glowSize = CONFIG.logoGlowSize;
 
-            // Rotating offset for ring animation
+            // Rotating offset for ring animation — speeds up with intensity
             if (CONFIG.logoRotateRing) {
-                APP_STATE.logoAngle += isBeat ? 0.04 : 0.006;
+                const ringSpeed = (isBeat ? 0.04 : 0.006) * (1 + intensity * 3.5);
+                APP_STATE.logoAngle += ringSpeed;
             }
+
+            // Particle motion multiplier — both bass kicks AND overall intensity
+            const particleSpeed = 1 + bass * 4 + intensity * 2.5;
 
             // Draw particles beneath
             if (CONFIG.logoParticles) {
                 ctx.globalCompositeOperation = 'lighter';
                 this.particles.forEach((p, idx) => {
-                    p.x += p.vx * (1 + bass * 4);
-                    p.y += p.vy * (1 + bass * 4);
+                    p.x += p.vx * particleSpeed;
+                    p.y += p.vy * particleSpeed;
                     if (p.x < 0) p.x = w;
                     if (p.x > w) p.x = 0;
                     if (p.y < 0) p.y = h;
@@ -3003,7 +3584,7 @@ finishRecording() {
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
                     ctx.fillStyle = waveColor;
-                    ctx.globalAlpha = 0.15 + freqVal * 0.45;
+                    ctx.globalAlpha = 0.15 + freqVal * 0.45 + intensity * 0.15;
                     ctx.fill();
                 });
                 ctx.globalAlpha = 1;
@@ -3023,7 +3604,7 @@ finishRecording() {
                 return `${r},${g},${b}`;
             };
             const rgb = hexToRgb(waveColor.length === 7 ? waveColor : '#00ff88');
-            glowGrad.addColorStop(0, `rgba(${rgb},${0.15 + bass * 0.2})`);
+            glowGrad.addColorStop(0, `rgba(${rgb},${0.15 + bass * 0.2 + intensity * 0.18})`);
             glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = glowGrad;
             ctx.beginPath();
