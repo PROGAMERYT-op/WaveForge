@@ -1133,6 +1133,175 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* MODE SELECTOR MODAL */
+        #mode-selector-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 8, 22, 0.88);
+            backdrop-filter: blur(12px);
+            z-index: var(--z-modal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-normal);
+        }
+        #mode-selector-modal.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .mode-selector-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-panel);
+            padding: 28px;
+            width: 92vw;
+            max-width: 780px;
+            max-height: 86vh;
+            overflow-y: auto;
+        }
+        .mode-selector-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+        .mode-selector-header h2 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            color: var(--text-main);
+            margin: 0;
+        }
+        .mode-selector-header button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+            transition: color var(--transition-fast), background var(--transition-fast);
+        }
+        .mode-selector-header button:hover { color: var(--text-main); background: rgba(255,255,255,0.07); }
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        .mode-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 18px 14px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .mode-card:hover {
+            background: rgba(255,255,255,0.09);
+            border-color: rgba(var(--accent-rgb), 0.4);
+            transform: translateY(-2px);
+        }
+        .mode-card.active {
+            background: rgba(var(--accent-rgb), 0.14);
+            border-color: rgba(var(--accent-rgb), 0.65);
+            box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.15);
+        }
+        .mode-card.active::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .mode-card-icon { font-size: 2rem; }
+        .mode-card-name {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .mode-card-desc {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .mode-card.new-badge::before {
+            content: 'NEW';
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            background: linear-gradient(135deg, #00ff88, #00c4ff);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+        }
+
+        /* UPLOAD BUTTONS FOR LOGO VIZ */
+        .upload-btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .upload-btn {
+            flex: 1;
+            min-width: 110px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.07);
+            border: 1px dashed rgba(255,255,255,0.25);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all var(--transition-fast);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .upload-btn:hover {
+            background: rgba(var(--accent-rgb), 0.12);
+            border-color: rgba(var(--accent-rgb), 0.4);
+            color: var(--text-main);
+        }
+        .upload-btn .upload-icon { font-size: 1.4rem; }
+        .upload-btn.has-file {
+            border-style: solid;
+            border-color: rgba(0, 255, 136, 0.5);
+            color: #00ff88;
+            background: rgba(0, 255, 136, 0.08);
+        }
+        .color-swatch-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform var(--transition-fast), border-color var(--transition-fast);
+        }
+        .color-swatch:hover { transform: scale(1.15); }
+        .color-swatch.active { border-color: #fff; transform: scale(1.15); }
     </style>
 </head>
 <body>
@@ -1199,6 +1368,67 @@
 
     <!-- TOAST NOTIFICATIONS -->
     <div id="toast-container" role="alert" aria-live="polite"></div>
+
+    <!-- MODE SELECTOR MODAL -->
+    <div id="mode-selector-modal" role="dialog" aria-modal="true" aria-label="Choose visualization mode">
+        <div class="mode-selector-panel">
+            <div class="mode-selector-header">
+                <h2>📊 Choose Visualization Mode</h2>
+                <button id="btn-close-mode-selector" aria-label="Close mode selector">✕</button>
+            </div>
+            <div class="mode-grid">
+                <div class="mode-card" data-mode="8" data-new="true">
+                    <span class="mode-card-icon">🎬</span>
+                    <span class="mode-card-name">Logo Visualizer</span>
+                    <span class="mode-card-desc">Upload your logo &amp; background. Beat shake, radial rays, particles.</span>
+                </div>
+                <div class="mode-card" data-mode="0">
+                    <span class="mode-card-icon">📊</span>
+                    <span class="mode-card-name">Bar Spectrum</span>
+                    <span class="mode-card-desc">Classic mirrored frequency bars with glow.</span>
+                </div>
+                <div class="mode-card" data-mode="1">
+                    <span class="mode-card-icon">〰️</span>
+                    <span class="mode-card-name">Waveform</span>
+                    <span class="mode-card-desc">Live oscilloscope waveform display.</span>
+                </div>
+                <div class="mode-card" data-mode="2">
+                    <span class="mode-card-icon">🎯</span>
+                    <span class="mode-card-name">Radial EQ</span>
+                    <span class="mode-card-desc">Circular frequency bars radiating outward.</span>
+                </div>
+                <div class="mode-card" data-mode="3">
+                    <span class="mode-card-icon">✨</span>
+                    <span class="mode-card-name">Particles</span>
+                    <span class="mode-card-desc">Beat-reactive floating particle field.</span>
+                </div>
+                <div class="mode-card" data-mode="4">
+                    <span class="mode-card-icon">🔬</span>
+                    <span class="mode-card-name">Spectrogram</span>
+                    <span class="mode-card-desc">Scrolling frequency over time heatmap.</span>
+                </div>
+                <div class="mode-card" data-mode="5">
+                    <span class="mode-card-icon">🧱</span>
+                    <span class="mode-card-name">3D Bars</span>
+                    <span class="mode-card-desc">Perspective frequency bars with depth.</span>
+                </div>
+                <div class="mode-card" data-mode="6">
+                    <span class="mode-card-icon">🧬</span>
+                    <span class="mode-card-name">DNA Helix</span>
+                    <span class="mode-card-desc">Rotating double helix strand visualization.</span>
+                </div>
+                <div class="mode-card" data-mode="7">
+                    <span class="mode-card-icon">🌌</span>
+                    <span class="mode-card-name">Galaxy</span>
+                    <span class="mode-card-desc">Spiral galaxy arms with star particles.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIDDEN FILE INPUTS FOR LOGO VIZ -->
+    <input type="file" id="logo-bg-input" accept="image/*" class="hidden" aria-hidden="true">
+    <input type="file" id="logo-img-input" accept="image/*" class="hidden" aria-hidden="true">
 
     <!-- UI LAYER -->
     <nav id="ui-layer" role="navigation" aria-label="Visualizer controls">
@@ -1355,6 +1585,64 @@
                 </div>
             </div>
 
+            <div class="settings-group" id="logo-viz-settings">
+                <h3>🎬 Logo Visualizer</h3>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:12px;">Upload images and customize the Logo Viz mode.</p>
+                <div class="upload-btn-group" style="margin-bottom:14px;">
+                    <div class="upload-btn" id="btn-upload-bg">
+                        <span class="upload-icon">🖼️</span>
+                        <span id="bg-label">Upload Background</span>
+                    </div>
+                    <div class="upload-btn" id="btn-upload-logo">
+                        <span class="upload-icon">⭕</span>
+                        <span id="logo-label">Upload Logo</span>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <label>Wave Color</label>
+                    <input type="color" id="set-wave-color" value="#00ff88" style="width:44px;height:32px;padding:2px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;cursor:pointer;">
+                </div>
+                <div class="color-swatch-row" style="margin-bottom:12px;">
+                    <div class="color-swatch active" style="background:#00ff88;" data-color="#00ff88"></div>
+                    <div class="color-swatch" style="background:#00c4ff;" data-color="#00c4ff"></div>
+                    <div class="color-swatch" style="background:#ff0099;" data-color="#ff0099"></div>
+                    <div class="color-swatch" style="background:#ff6600;" data-color="#ff6600"></div>
+                    <div class="color-swatch" style="background:#7b2dff;" data-color="#7b2dff"></div>
+                    <div class="color-swatch" style="background:#ffffff;" data-color="#ffffff"></div>
+                    <div class="color-swatch" style="background:#ffff00;" data-color="#ffff00"></div>
+                </div>
+                <div class="control-row">
+                    <label for="set-shake">Shake Intensity</label>
+                    <input type="range" id="set-shake" min="0" max="40" step="1" value="10">
+                </div>
+                <div class="control-row">
+                    <label for="set-ray-count">Ray Count</label>
+                    <input type="range" id="set-ray-count" min="32" max="256" step="16" value="128">
+                </div>
+                <div class="control-row">
+                    <label for="set-line-thick">Line Thickness</label>
+                    <input type="range" id="set-line-thick" min="1" max="6" step="0.5" value="2">
+                </div>
+                <div class="control-row">
+                    <label for="set-glow-size">Glow Size</label>
+                    <input type="range" id="set-glow-size" min="0" max="80" step="5" value="35">
+                </div>
+                <div class="control-row">
+                    <label for="set-logo-particles">Show Particles</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="set-logo-particles" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label for="set-logo-rotate">Rotating Ring</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="set-logo-rotate">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
             <div class="settings-group">
                 <h3>⚡ System</h3>
                 <div class="button-group">
@@ -1454,6 +1742,7 @@
                     <label for="export-mode">Visualization Mode</label>
                     <select id="export-mode">
                         <option value="current">Current Mode</option>
+                        <option value="8">Logo Visualizer</option>
                         <option value="0">Bar Spectrum</option>
                         <option value="1">Waveform</option>
                         <option value="2">Radial EQ</option>
@@ -1504,9 +1793,9 @@
     
     const APP_STATE = {
         isPlaying: false,
-        mode: 0,
-        modesCount: 8,
-        modeNames: ['Bars', 'Wave', 'Radial', 'Particles', 'Spectrogram', '3D Bars', 'DNA Helix', 'Galaxy'],
+        mode: 8,
+        modesCount: 9,
+        modeNames: ['Bars', 'Wave', 'Radial', 'Particles', 'Spectrogram', '3D Bars', 'DNA Helix', 'Galaxy', 'Logo Viz'],
         lastTime: 0,
         fps: 0,
         frames: 0,
@@ -1520,7 +1809,14 @@
         exportCtx: null,
         spectrogramData: [],
         helixAngle: 0,
-        galaxyAngle: 0
+        galaxyAngle: 0,
+        shakeX: 0,
+        shakeY: 0,
+        shakeTrauma: 0,
+        lastLogoT: 0,
+        bgImg: null,
+        logoImg: null,
+        logoAngle: 0
     };
 
     const CONFIG = {
@@ -1535,7 +1831,14 @@
         palette: 'cyberpunk',
         highContrast: false,
         mirror: false,
-        showFps: true
+        showFps: true,
+        waveColor: '#00ff88',
+        logoShakeIntensity: 10,
+        logoRayCount: 128,
+        logoLineThickness: 2,
+        logoGlowSize: 35,
+        logoParticles: true,
+        logoRotateRing: false
     };
 
     const PALETTES = {
@@ -1557,7 +1860,8 @@
         4: 'Spectrogram',
         5: '3D Bars',
         6: 'DNA Helix',
-        7: 'Galaxy'
+        7: 'Galaxy',
+        8: 'Logo Visualizer'
     };
 
     // ============================================
@@ -1710,6 +2014,7 @@
     
     const BeatDetector = {
         history: [],
+        prevEnergy: 0,
         
         update(freqData) {
             if (!CONFIG.beatEnabled) {
@@ -1725,8 +2030,13 @@
             }
             energy = Math.sqrt(energy / range);
 
+            // Spectral flux: positive energy rise from the previous frame
+            const flux = Math.max(0, energy - this.prevEnergy);
+            this.prevEnergy = energy;
+
+            // Long history (~3 seconds) so the avg can't catch up to sustained bass
             this.history.push(energy);
-            if (this.history.length > 50) this.history.shift();
+            if (this.history.length > 180) this.history.shift();
 
             const avg = this.history.reduce((a, b) => a + b, 0) / this.history.length;
 
@@ -1736,9 +2046,14 @@
                 return false;
             }
 
-            if (energy > avg * CONFIG.beatThreshold && energy > 50) {
+            // Level beat: energy well above long-term average
+            const levelBeat = energy > avg * CONFIG.beatThreshold && energy > 50;
+            // Flux beat: sharp rise this frame, even if avg is high
+            const fluxBeat = flux > avg * 0.35 && energy > avg * 0.85;
+
+            if (levelBeat || fluxBeat) {
                 APP_STATE.beatDetected = true;
-                APP_STATE.beatTimer = 8;
+                APP_STATE.beatTimer = 10;
                 return true;
             }
             
@@ -1943,9 +2258,11 @@ finishRecording() {
         },
 
         renderFrame(ctx, width, height, data, isBeat) {
-            // Clear with fade
-            ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
-            ctx.fillRect(0, 0, width, height);
+            // Clear with fade (Logo Viz handles its own background)
+            if (APP_STATE.mode !== 8) {
+                ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
+                ctx.fillRect(0, 0, width, height);
+            }
 
             const cx = width / 2;
             const cy = height / 2;
@@ -1959,6 +2276,7 @@ finishRecording() {
                 case 5: this.render3DBars(ctx, width, height, cx, cy, data.freq, isBeat); break;
                 case 6: this.renderDNAHelix(ctx, width, height, cx, cy, data.freq, isBeat); break;
                 case 7: this.renderGalaxy(ctx, width, height, cx, cy, data.freq, isBeat); break;
+                case 8: viz.renderLogoVizExport(ctx, width, height, cx, cy, data.freq, isBeat); break;
             }
         },
 
@@ -2135,9 +2453,11 @@ finishRecording() {
         }
 
         render(ctx, w, h, cx, cy, data, isBeat) {
-            // Background fade
-            ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
-            ctx.fillRect(0, 0, w, h);
+            // Background fade (Logo Viz handles its own background)
+            if (APP_STATE.mode !== 8) {
+                ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
+                ctx.fillRect(0, 0, w, h);
+            }
 
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
@@ -2151,6 +2471,7 @@ finishRecording() {
                 case 5: this.render3DBars(ctx, w, h, cx, cy, data.freq, isBeat); break;
                 case 6: this.renderDNAHelix(ctx, w, h, cx, cy, data.freq, isBeat); break;
                 case 7: this.renderGalaxy(ctx, w, h, cx, cy, data.freq, isBeat); break;
+                case 8: this.renderLogoViz(ctx, w, h, cx, cy, data.freq, isBeat); break;
             }
         }
 
@@ -2574,6 +2895,230 @@ finishRecording() {
         renderGalaxyExport(ctx, w, h, cx, cy, freqData, isBeat) {
             this.renderGalaxy(ctx, w, h, w / 2, h / 2, freqData, isBeat);
         }
+
+        renderLogoViz(ctx, w, h, cx, cy, freqData, isBeat) {
+            const waveColor = CONFIG.waveColor || '#00ff88';
+
+            // Compute bass energy
+            let bass = 0;
+            const bassRange = Math.min(24, freqData.length);
+            for (let i = 0; i < bassRange; i++) bass += freqData[i];
+            bass = bass / bassRange / 255;
+
+            // Compute mid energy for particles
+            let mid = 0;
+            const midStart = Math.floor(freqData.length * 0.1);
+            const midEnd = Math.floor(freqData.length * 0.35);
+            for (let i = midStart; i < midEnd; i++) mid += freqData[i];
+            mid = mid / (midEnd - midStart) / 255;
+
+            // Time reference (seconds)
+            const t = performance.now() * 0.001;
+            const dt = APP_STATE.lastLogoT ? Math.min(t - APP_STATE.lastLogoT, 0.1) : 0.016;
+            APP_STATE.lastLogoT = t;
+
+            // Self-contained bass-spike shake — independent of global beat detector
+            // Slow EMA tracks the long-term bass floor (alpha=0.008 → ~2.5s half-life)
+            if (APP_STATE.bassFloorEMA === undefined) APP_STATE.bassFloorEMA = bass;
+            APP_STATE.bassFloorEMA = APP_STATE.bassFloorEMA * 0.992 + bass * 0.008;
+            // How much above the floor is current bass?
+            const bassSpike = Math.max(0, bass - APP_STATE.bassFloorEMA * 1.08);
+            if (bassSpike > 0.04 && CONFIG.logoShakeIntensity > 0) {
+                // Stronger hit → bigger trauma spike
+                APP_STATE.shakeTrauma = Math.min(1.0, APP_STATE.shakeTrauma + bassSpike * 3.5);
+            }
+            // Decay trauma: half-life = 0.5 seconds, frame-rate independent
+            APP_STATE.shakeTrauma = Math.max(0, APP_STATE.shakeTrauma * Math.pow(0.5, dt / 0.5));
+            const trauma2 = APP_STATE.shakeTrauma * APP_STATE.shakeTrauma;
+            // Small continuous component so even quiet hits produce a tiny wiggle
+            const continuousShake = bass * bass * CONFIG.logoShakeIntensity * 0.18;
+            const totalShake = trauma2 * CONFIG.logoShakeIntensity + continuousShake;
+            APP_STATE.shakeX = Math.sin(t * 9.7 + 0.0) * totalShake;
+            APP_STATE.shakeY = Math.sin(t * 8.1 + 2.3) * totalShake * 0.55;
+
+            // Drone camera: slow breathing zoom + gentle Y-axis-like perspective drift
+            const droneZoom = 1.0 + 0.022 * Math.sin(t * 0.13) + bass * 0.012;
+            const dronePanX = Math.sin(t * 0.09) * w * 0.018;
+            const dronePanY = Math.cos(t * 0.07) * h * 0.010;
+            // Subtle horizontal skew to mimic Y-axis camera rotation
+            const droneSkewX = Math.sin(t * 0.11) * 0.012;
+
+            // Clear background
+            ctx.fillStyle = '#050510';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.save();
+            // Apply drone transform first (outermost), then shake on top
+            ctx.translate(cx + dronePanX + APP_STATE.shakeX, cy + dronePanY + APP_STATE.shakeY);
+            ctx.scale(droneZoom, droneZoom);
+            ctx.transform(1, 0, droneSkewX, 1, 0, 0);
+            ctx.translate(-cx, -cy);
+
+            // Draw background image
+            if (APP_STATE.bgImg) {
+                const scaleX = w / APP_STATE.bgImg.width;
+                const scaleY = h / APP_STATE.bgImg.height;
+                const scale = Math.max(scaleX, scaleY);
+                const bw = APP_STATE.bgImg.width * scale;
+                const bh = APP_STATE.bgImg.height * scale;
+                ctx.globalAlpha = 0.75;
+                ctx.drawImage(APP_STATE.bgImg, (w - bw) / 2, (h - bh) / 2, bw, bh);
+                ctx.globalAlpha = 1;
+                // Dark vignette overlay
+                const vignette = ctx.createRadialGradient(cx, cy, w * 0.15, cx, cy, w * 0.7);
+                vignette.addColorStop(0, 'rgba(0,0,0,0.1)');
+                vignette.addColorStop(1, 'rgba(0,0,0,0.72)');
+                ctx.fillStyle = vignette;
+                ctx.fillRect(0, 0, w, h);
+            }
+
+            const logoRadius = Math.min(w, h) * 0.165;
+            const numBars = CONFIG.logoRayCount;
+            const angleStep = (Math.PI * 2) / numBars;
+            const innerRadius = logoRadius + 12;
+            const maxBarLen = logoRadius * 1.4;
+            const lineThick = CONFIG.logoLineThickness;
+            const glowSize = CONFIG.logoGlowSize;
+
+            // Rotating offset for ring animation
+            if (CONFIG.logoRotateRing) {
+                APP_STATE.logoAngle += isBeat ? 0.04 : 0.006;
+            }
+
+            // Draw particles beneath
+            if (CONFIG.logoParticles) {
+                ctx.globalCompositeOperation = 'lighter';
+                this.particles.forEach((p, idx) => {
+                    p.x += p.vx * (1 + bass * 4);
+                    p.y += p.vy * (1 + bass * 4);
+                    if (p.x < 0) p.x = w;
+                    if (p.x > w) p.x = 0;
+                    if (p.y < 0) p.y = h;
+                    if (p.y > h) p.y = 0;
+
+                    const freqIdx = Math.floor((idx / this.particles.length) * freqData.length * 0.5);
+                    const freqVal = freqData[freqIdx] / 255;
+                    const r = Math.max(p.size * (0.4 + freqVal * CONFIG.sensitivity * 1.8), 0.5);
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                    ctx.fillStyle = waveColor;
+                    ctx.globalAlpha = 0.15 + freqVal * 0.45;
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1;
+                ctx.globalCompositeOperation = 'source-over';
+            }
+
+            // Translate to center for radial drawing
+            ctx.save();
+            ctx.translate(cx, cy);
+
+            // Outer diffuse glow ring
+            const glowGrad = ctx.createRadialGradient(0, 0, innerRadius, 0, 0, innerRadius + maxBarLen * 0.7);
+            const hexToRgb = (hex) => {
+                const r = parseInt(hex.slice(1,3),16);
+                const g = parseInt(hex.slice(3,5),16);
+                const b = parseInt(hex.slice(5,7),16);
+                return `${r},${g},${b}`;
+            };
+            const rgb = hexToRgb(waveColor.length === 7 ? waveColor : '#00ff88');
+            glowGrad.addColorStop(0, `rgba(${rgb},${0.15 + bass * 0.2})`);
+            glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = glowGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, innerRadius + maxBarLen * 0.7, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw radial audio bars
+            ctx.shadowBlur = glowSize;
+            ctx.shadowColor = waveColor;
+            ctx.lineCap = 'round';
+
+            for (let i = 0; i < numBars; i++) {
+                const freqIdx = Math.floor((i / numBars) * freqData.length * 0.55);
+                const val = (freqData[freqIdx] / 255) * CONFIG.sensitivity;
+                const barLen = val * maxBarLen;
+                const angle = i * angleStep + APP_STATE.logoAngle - Math.PI / 2;
+
+                const x1 = Math.cos(angle) * innerRadius;
+                const y1 = Math.sin(angle) * innerRadius;
+                const x2 = Math.cos(angle) * (innerRadius + barLen);
+                const y2 = Math.sin(angle) * (innerRadius + barLen);
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = waveColor;
+                ctx.lineWidth = lineThick + (isBeat ? 1.5 : 0);
+                ctx.globalAlpha = 0.55 + val * 0.45;
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+
+            // Pulsing glow ring
+            const beatPulse = isBeat ? 1.06 + bass * 0.08 : 1.0 + bass * 0.04;
+            ctx.beginPath();
+            ctx.arc(0, 0, logoRadius * beatPulse, 0, Math.PI * 2);
+            ctx.strokeStyle = waveColor;
+            ctx.lineWidth = isBeat ? 3.5 : 2;
+            ctx.shadowBlur = isBeat ? glowSize * 1.5 : glowSize * 0.6;
+            ctx.shadowColor = waveColor;
+            ctx.globalAlpha = 0.85;
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+
+            // Second inner ring
+            ctx.beginPath();
+            ctx.arc(0, 0, logoRadius * 0.82, 0, Math.PI * 2);
+            ctx.strokeStyle = waveColor;
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.35 + mid * 0.35;
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+
+            // Clip circle for logo image
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(0, 0, logoRadius - 2, 0, Math.PI * 2);
+            ctx.clip();
+
+            if (APP_STATE.logoImg) {
+                const s = Math.max(
+                    (logoRadius * 2) / APP_STATE.logoImg.width,
+                    (logoRadius * 2) / APP_STATE.logoImg.height
+                );
+                const lw = APP_STATE.logoImg.width * s;
+                const lh = APP_STATE.logoImg.height * s;
+                ctx.drawImage(APP_STATE.logoImg, -lw / 2, -lh / 2, lw, lh);
+            } else {
+                // Default dark circle with "W" placeholder
+                const innerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, logoRadius);
+                innerGrad.addColorStop(0, '#1a1a2e');
+                innerGrad.addColorStop(1, '#06060f');
+                ctx.fillStyle = innerGrad;
+                ctx.fillRect(-logoRadius, -logoRadius, logoRadius * 2, logoRadius * 2);
+
+                ctx.fillStyle = waveColor;
+                ctx.shadowBlur = 18;
+                ctx.shadowColor = waveColor;
+                ctx.font = `bold ${Math.round(logoRadius * 0.62)}px 'Space Grotesk', sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('W', 0, 0);
+                ctx.shadowBlur = 0;
+            }
+            ctx.restore();
+
+            ctx.restore();
+            ctx.restore();
+        }
+
+        renderLogoVizExport(ctx, w, h, cx, cy, freqData, isBeat) {
+            this.renderLogoViz(ctx, w, h, cx, cy, freqData, isBeat);
+        }
     }
 
     // ============================================
@@ -2612,10 +3157,29 @@ finishRecording() {
             document.getElementById('btn-mic').onclick = () => audio.enableMic();
             
             document.getElementById('btn-mode').onclick = () => {
-                APP_STATE.mode = (APP_STATE.mode + 1) % APP_STATE.modesCount;
-                this.updateModeDisplay();
-                this.showToast(APP_STATE.modeNames[APP_STATE.mode], 'info');
+                this.openModeSelector();
             };
+
+            document.getElementById('btn-close-mode-selector').onclick = () => {
+                this.closeModeSelector();
+            };
+
+            document.getElementById('mode-selector-modal').onclick = (e) => {
+                if (e.target.id === 'mode-selector-modal') this.closeModeSelector();
+            };
+
+            document.querySelectorAll('.mode-card').forEach(card => {
+                const modeNum = parseInt(card.dataset.mode);
+                card.onclick = () => {
+                    APP_STATE.mode = modeNum;
+                    this.updateModeDisplay();
+                    this.updateModeCards();
+                    this.showToast(APP_STATE.modeNames[modeNum], 'info');
+                    setTimeout(() => this.closeModeSelector(), 260);
+                };
+            });
+
+            this.updateModeCards();
 
             this.els.seek.oninput = (e) => {
                 if (audio.audioElement.duration) {
@@ -2694,7 +3258,7 @@ finishRecording() {
                         audio.stop();
                         break;
                     case 'KeyM':
-                        document.getElementById('btn-mode').click();
+                        UI.openModeSelector();
                         break;
                     case 'KeyF':
                         document.getElementById('btn-fullscreen').click();
@@ -2726,6 +3290,7 @@ finishRecording() {
                     case 'Escape':
                         this.toggleSettings(false);
                         Exporter.hideModal();
+                        this.closeModeSelector();
                         break;
                 }
             });
@@ -2784,6 +3349,67 @@ finishRecording() {
                 a.click();
                 this.showToast('Screenshot saved!', 'success');
             };
+
+            // Logo Viz settings
+            document.getElementById('btn-upload-bg').onclick = () => document.getElementById('logo-bg-input').click();
+            document.getElementById('btn-upload-logo').onclick = () => document.getElementById('logo-img-input').click();
+
+            document.getElementById('logo-bg-input').onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        APP_STATE.bgImg = img;
+                        document.getElementById('btn-upload-bg').classList.add('has-file');
+                        document.getElementById('bg-label').textContent = 'BG: ' + file.name.substring(0, 14);
+                        this.showToast('Background loaded!', 'success');
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+                e.target.value = '';
+            };
+
+            document.getElementById('logo-img-input').onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        APP_STATE.logoImg = img;
+                        document.getElementById('btn-upload-logo').classList.add('has-file');
+                        document.getElementById('logo-label').textContent = 'Logo: ' + file.name.substring(0, 14);
+                        this.showToast('Logo loaded!', 'success');
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+                e.target.value = '';
+            };
+
+            document.getElementById('set-wave-color').oninput = (e) => {
+                CONFIG.waveColor = e.target.value;
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            };
+
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.onclick = () => {
+                    CONFIG.waveColor = swatch.dataset.color;
+                    document.getElementById('set-wave-color').value = swatch.dataset.color;
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                };
+            });
+
+            document.getElementById('set-shake').oninput = (e) => CONFIG.logoShakeIntensity = parseFloat(e.target.value);
+            document.getElementById('set-ray-count').oninput = (e) => CONFIG.logoRayCount = parseInt(e.target.value);
+            document.getElementById('set-line-thick').oninput = (e) => CONFIG.logoLineThickness = parseFloat(e.target.value);
+            document.getElementById('set-glow-size').oninput = (e) => CONFIG.logoGlowSize = parseFloat(e.target.value);
+            document.getElementById('set-logo-particles').onchange = (e) => CONFIG.logoParticles = e.target.checked;
+            document.getElementById('set-logo-rotate').onchange = (e) => CONFIG.logoRotateRing = e.target.checked;
         },
 
         handleFile(file) {
@@ -2848,6 +3474,25 @@ finishRecording() {
             
             document.getElementById('time-current').textContent = formatTime(el.currentTime);
             document.getElementById('time-total').textContent = formatTime(el.duration);
+        },
+
+        openModeSelector() {
+            document.getElementById('mode-selector-modal').classList.add('open');
+            this.modeSelectorOpen = true;
+            this.updateModeCards();
+        },
+
+        closeModeSelector() {
+            document.getElementById('mode-selector-modal').classList.remove('open');
+            this.modeSelectorOpen = false;
+        },
+
+        updateModeCards() {
+            document.querySelectorAll('.mode-card').forEach(card => {
+                const modeNum = parseInt(card.dataset.mode);
+                card.classList.toggle('active', modeNum === APP_STATE.mode);
+                if (card.dataset.new === 'true') card.classList.add('new-badge');
+            });
         },
 
         updateModeDisplay() {
