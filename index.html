@@ -27,8 +27,8 @@
     <meta name="color-scheme" content="light dark">
 
     <title>WaveForge | Free Online Music Visualizer & Video Maker (4K Export)</title>
-    <meta name="description" content="WaveForge is a free, browser-based music visualizer. Create stunning audio-reactive videos with 8 modes, real-time beat detection, and 4K export with no watermark — no signup required.">
-    <meta name="keywords" content="music visualizer, free music visualizer, online audio visualizer, spectrum analyzer, audio waveform, beat detector, mp3 visualizer, music video maker, audio spectrum, visualization generator, web audio api, browser visualizer">
+    <meta name="description" content="WaveForge is a free, browser-based music visualizer. Create stunning audio-reactive videos with 9 modes including Logo Visualizer, real-time beat detection, and 4K export with no watermark — no signup required.">
+    <meta name="keywords" content="music visualizer, free music visualizer, online audio visualizer, logo visualizer, spectrum analyzer, audio waveform, beat detector, mp3 visualizer, music video maker, audio spectrum, visualization generator, web audio api, browser visualizer">
     <meta name="author" content="WaveForge">
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)">
@@ -42,7 +42,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/">
     <meta property="og:title" content="WaveForge | Free Online Music Visualizer & Video Maker">
-    <meta property="og:description" content="Transform your music into stunning visual art. 8 visualization modes, real-time beat detection, and 4K video export with no watermark. 100% free.">
+    <meta property="og:description" content="Transform your music into stunning visual art. 9 visualization modes including the new Logo Visualizer, real-time beat detection, and 4K video export with no watermark. 100% free.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -79,7 +79,7 @@
         "@type": "WebApplication",
         "name": "WaveForge",
         "url": "https://progameryt-op.github.io/WaveForge/",
-        "description": "Free online music visualizer with 8 visualization modes, real-time beat detection, and 4K video export with no watermark.",
+        "description": "Free online music visualizer with 9 visualization modes including Logo Visualizer, real-time beat detection, and 4K video export with no watermark.",
         "applicationCategory": "MultimediaApplication",
         "applicationSubCategory": "Music Visualization",
         "operatingSystem": "Any modern browser",
@@ -97,7 +97,7 @@
             "ratingCount": "2450"
         },
         "featureList": [
-            "8 visualization modes",
+            "9 visualization modes (incl. Logo Visualizer)",
             "Real-time beat detection",
             "4K video export with audio",
             "No watermarks",
@@ -597,6 +597,20 @@
         }
         .mode-tile h3 { font-size: 1rem; margin-bottom: 0.25rem; }
         .mode-tile p { font-size: 0.85rem; color: var(--text-subtle); }
+        .mode-tile-new { position: relative; }
+        .mode-tile-new::before {
+            content: 'NEW';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #00ff88, #00c4ff);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+        }
 
         /* ---------- Steps ---------- */
         .steps {
@@ -917,9 +931,9 @@
     <!-- HERO -->
     <header class="hero">
         <div class="container hero-inner">
-            <span class="badge"><span class="badge-dot"></span> New · 4K video export with audio</span>
+            <span class="badge"><span class="badge-dot"></span> New · Logo Visualizer mode</span>
             <h1>Turn your music into <span class="gradient-text">stunning visuals</span></h1>
-            <p class="lead">A free, browser-based music visualizer with 8 unique modes, real-time beat detection, and 4K video export. No signup. No uploads. Just creativity.</p>
+            <p class="lead">A free, browser-based music visualizer with 9 unique modes, real-time beat detection, and 4K video export. No signup. No uploads. Just creativity.</p>
             <div class="hero-actions">
                 <a href="visualizer.html" class="btn btn-primary btn-lg">Launch visualizer</a>
                 <a href="#features" class="btn btn-secondary btn-lg">See features</a>
@@ -952,7 +966,7 @@
         <div class="container">
             <div class="stats reveal">
                 <div class="stat"><div class="stat-num">100K+</div><div class="stat-label">Visualizations</div></div>
-                <div class="stat"><div class="stat-num">8</div><div class="stat-label">Unique modes</div></div>
+                <div class="stat"><div class="stat-num">9</div><div class="stat-label">Unique modes</div></div>
                 <div class="stat"><div class="stat-num">4K</div><div class="stat-label">Video export</div></div>
                 <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Free forever</div></div>
             </div>
@@ -1008,11 +1022,12 @@
         <div class="container">
             <div class="section-head reveal">
                 <span class="eyebrow">Visualization modes</span>
-                <h2>8 stunning ways to see your music</h2>
+                <h2>9 stunning ways to see your music</h2>
                 <p>Each mode offers a unique perspective on your audio, from classic spectrum analyzers to mesmerizing particle systems.</p>
             </div>
 
             <div class="grid grid-4">
+                <article class="card mode-tile mode-tile-new reveal"><div class="card-icon">🎬</div><h3>Logo Visualizer</h3><p>Your logo &amp; background, beat-reactive</p></article>
                 <article class="card mode-tile reveal"><div class="card-icon">📊</div><h3>Bar Spectrum</h3><p>Classic frequency bars</p></article>
                 <article class="card mode-tile reveal"><div class="card-icon">〰️</div><h3>Waveform</h3><p>Oscilloscope-style wave</p></article>
                 <article class="card mode-tile reveal"><div class="card-icon">🔘</div><h3>Radial EQ</h3><p>Circular equalizer</p></article>
@@ -1043,7 +1058,7 @@
                 <div class="step reveal">
                     <div class="step-num">2</div>
                     <h3>Choose a mode</h3>
-                    <p>Cycle through 8 unique visualization modes to find the perfect style for your music.</p>
+                    <p>Cycle through 9 unique visualization modes to find the perfect style for your music.</p>
                 </div>
                 <div class="step reveal">
                     <div class="step-num">3</div>
