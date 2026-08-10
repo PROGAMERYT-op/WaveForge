@@ -62,10 +62,15 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-TileColor" content="#00f2ff">
-    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta name="msapplication-config" content="browserconfig.xml">
+
+    <!-- PWA -->
+    <link rel="manifest" href="assets/manifest.json">
 
     <!-- FAVICONS -->
     <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/img/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
     <!-- PRECONNECT FOR PERFORMANCE -->
@@ -353,6 +358,9 @@
                     <span class="icon">⚙️</span>
                     <span class="btn-text">Config</span>
                 </button>
+                <button id="btn-share" aria-label="Share WaveForge" title="Share WaveForge">
+                    <span class="icon">📣</span>
+                </button>
                 <button id="btn-fullscreen" aria-label="Toggle fullscreen" title="Fullscreen mode">
                     <span class="icon">⛶</span>
                 </button>
@@ -549,6 +557,13 @@
                     </label>
                 </div>
                 <div class="control-row">
+                    <label for="set-watermark">Add “Made with WaveForge” badge to exports</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="set-watermark">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="control-row">
                     <label for="set-show-fps">Show FPS Counter</label>
                     <label class="toggle-switch">
                         <input type="checkbox" id="set-show-fps" checked>
@@ -562,6 +577,32 @@
                 <a id="btn-shortcuts" role="button" tabindex="0">Keyboard Shortcuts</a> •
                 <a href="index.html#how">Documentation</a>
             </div>
+        </div>
+    </div>
+
+    <!-- SHARE MODAL -->
+    <div id="share-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="share-title">
+        <div class="modal interactive">
+            <div class="modal-header">
+                <h2 id="share-title">📣 Share WaveForge</h2>
+                <button id="btn-close-share" aria-label="Close share dialog">✕</button>
+            </div>
+            <p class="share-lead">WaveForge is 100% free. Know a creator who could use it? Share the link — it helps us grow!</p>
+            <div class="share-buttons" id="share-buttons">
+                <a class="share-btn share-x" href="#" target="_blank" rel="noopener" data-share-network="x">
+                    <span class="share-icon">𝕏</span><span>Post on X</span>
+                </a>
+                <a class="share-btn share-reddit" href="#" target="_blank" rel="noopener" data-share-network="reddit">
+                    <span class="share-icon">🔺</span><span>Share on Reddit</span>
+                </a>
+                <a class="share-btn share-facebook" href="#" target="_blank" rel="noopener" data-share-network="facebook">
+                    <span class="share-icon">f</span><span>Share on Facebook</span>
+                </a>
+                <button class="share-btn share-copy" id="btn-copy-link" type="button">
+                    <span class="share-icon">🔗</span><span>Copy link</span>
+                </button>
+            </div>
+            <p class="share-note">Tip: export a video with your music and the “Made with WaveForge” badge enabled for easy word-of-mouth.</p>
         </div>
     </div>
 
@@ -698,6 +739,5 @@
 
     <!-- APPLICATION SCRIPT -->
     <script src="assets/js/app.js"></script>
-    <script src="https://constellationexclusion.com/8b/b5/71/8bb5714d83e974564958f3578034c290.js"></script>
 </body>
 </html>

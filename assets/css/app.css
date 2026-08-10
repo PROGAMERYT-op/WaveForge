@@ -458,6 +458,63 @@ input[type="range"]::-moz-range-thumb {
     letter-spacing: -0.01em;
 }
 
+/* SHARE MODAL */
+.share-lead {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin: 0 0 var(--spacing-md);
+}
+
+.share-note {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin-top: var(--spacing-md);
+}
+
+.share-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+}
+
+.share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 10px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--panel-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    font-family: var(--font-family);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.share-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(var(--accent-rgb), 0.45);
+    transform: translateY(-1px);
+}
+
+.share-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.share-x:hover { border-color: #1d9bf0; }
+.share-reddit:hover { border-color: #ff4500; }
+.share-facebook:hover { border-color: #1877f2; }
+.share-copy:hover { border-color: var(--success-color); }
+
+.share-copy {
+    grid-column: 1 / -1;
+}
+
 .settings-group {
     margin-bottom: var(--spacing-lg);
     padding-bottom: var(--spacing-md);

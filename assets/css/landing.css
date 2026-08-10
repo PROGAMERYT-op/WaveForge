@@ -756,3 +756,67 @@
             *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
             .reveal { opacity: 1; transform: none; }
         }
+
+        /* ---------- Ad slots ---------- */
+        .ad-slot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .ad-banner {
+            max-width: 760px;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            padding: 8px;
+        }
+        .ad-label {
+            font-size: 0.62rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-subtle);
+            user-select: none;
+        }
+        .ad-sticky {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 90;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 56px;
+            padding: 4px 48px;
+            background: color-mix(in srgb, var(--bg) 92%, transparent);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+        }
+        .ad-sticky-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ad-sticky-close {
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            width: 26px;
+            height: 26px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: var(--surface-2);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .ad-sticky-close:hover {
+            color: var(--text);
+            border-color: var(--border-strong);
+        }
+        @media (max-width: 640px) {
+            .ad-sticky { padding: 2px 40px; }
+        }

@@ -65,3 +65,11 @@
 
         /* ---------- Footer year ---------- */
         document.getElementById('year').textContent = new Date().getFullYear();
+
+        /* ---------- Sticky ad dismiss ---------- */
+        document.querySelectorAll('[data-ad-dismiss]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const slot = btn.closest('.ad-sticky');
+                if (slot) slot.remove();
+            });
+        });

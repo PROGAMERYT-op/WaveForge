@@ -76,7 +76,8 @@
         logoLineThickness: 2,
         logoGlowSize: 35,
         logoParticles: true,
-        logoRotateRing: false
+        logoRotateRing: false,
+        watermark: false
     };
 
     const PALETTES = {
@@ -252,7 +253,7 @@
             this.analyser.fftSize = CONFIG.fftSize;
             this.analyser.smoothingTimeConstant = CONFIG.smoothing;
             // Clamp gain to 100% — values above 1 clip the audio
-            const vol = Math.min(parseFloat(document.getElementById('vol-slider').value) || 0, 1);
+            const vol = Math.min(parseFloat(document.getElementById('vol-slider').value) || 0.8, 1);
             this.gainNode.gain.value = vol;
 
             if (this.freqData.length !== this.analyser.frequencyBinCount) {
@@ -868,8 +869,6 @@
             a.href = url;
             a.download = `waveforge_${this.downloadBaseName()}_${Date.now()}.mp4`;
             document.body.appendChild(a);
-            // Preserve existing smartlink behavior
-            try { window.open("https://constellationexclusion.com/kumcuy4gk?key=f28b978e066eac35ed88538faa37500f", "_blank"); } catch (e) {}
             a.click();
             document.body.removeChild(a);
             setTimeout(() => URL.revokeObjectURL(url), 60_000);
@@ -1022,8 +1021,6 @@
             a.href = url;
             a.download = `waveforge_${this.downloadBaseName()}_${Date.now()}.webm`;
             document.body.appendChild(a);
-            // --- NEW TAB SMARTLINK ---
-            window.open("https://constellationexclusion.com/kumcuy4gk?key=f28b978e066eac35ed88538faa37500f", "_blank");
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
@@ -1061,6 +1058,20 @@
 
             const renderFn = mod.renderExport || mod.render;
             renderFn(viz, ctx, width, height, width / 2, height / 2, data, isBeat);
+
+            // Optional branding badge drawn only on exports (fast + recorded)
+            if (CONFIG.watermark) {
+                const fs = Math.max(13, Math.round(height * 0.022));
+                ctx.save();
+                ctx.font = `600 ${fs}px Inter, -apple-system, 'Segoe UI', sans-serif`;
+                ctx.textBaseline = 'bottom';
+                ctx.textAlign = 'right';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                ctx.shadowBlur = 6;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+                ctx.fillText('Made with WaveForge', width - Math.max(14, fs * 0.7), height - Math.max(12, fs * 0.6));
+                ctx.restore();
+            }
         }
     };
 
@@ -1211,6 +1222,7 @@
                 dropOverlay: document.getElementById('drop-overlay'),
                 settingsModal: document.getElementById('settings-modal'),
                 exportModal: document.getElementById('export-modal'),
+                shareModal: document.getElementById('share-modal'),
                 modeSelectorModal: document.getElementById('mode-selector-modal'),
                 shortcutsModal: document.getElementById('shortcuts-modal'),
                 uiLayer: document.getElementById('ui-layer'),
@@ -1354,6 +1366,65 @@
                     Exporter.hideModal();
                 }
             };
+
+            this.setupShare();
+        },
+
+        setupShare() {
+            const SHARE_URL = 'https://progameryt-op.github.io/WaveForge/';
+            const SHARE_TITLE = 'WaveForge — free music visualizer with 4K video export';
+            const embed = (str) => encodeURIComponent(str);
+
+            const openShare = () => {
+                if (navigator.share) {
+                    navigator.share({ title: SHARE_TITLE, url: SHARE_URL })
+                        .catch(() => {});
+                    return;
+                }
+                const networks = {
+                    x: `https://twitter.com/intent/tweet?text=${embed(SHARE_TITLE)}&url=${embed(SHARE_URL)}`,
+                    reddit: `https://www.reddit.com/submit?url=${embed(SHARE_URL)}&title=${embed(SHARE_TITLE)}`,
+                    facebook: `https://www.facebook.com/sharer/sharer.php?u=${embed(SHARE_URL)}`
+                };
+                document.querySelectorAll('#share-buttons [data-share-network]').forEach(a => {
+                    a.href = networks[a.dataset.shareNetwork] || '#';
+                });
+                this.els.shareModal.classList.add('open');
+            };
+
+            const closeShare = () => {
+                this.els.shareModal.classList.remove('open');
+            };
+
+            document.getElementById('btn-share').onclick = openShare;
+            document.getElementById('btn-close-share').onclick = closeShare;
+            this.els.shareModal.onclick = (e) => {
+                if (e.target === this.els.shareModal) closeShare();
+            };
+
+            document.getElementById('btn-copy-link').onclick = () => {
+                const done = () => this.showToast('Link copied — thanks for sharing!', 'success');
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(SHARE_URL).then(done).catch(() => {
+                        this._fallbackCopy(SHARE_URL);
+                        done();
+                    });
+                } else {
+                    this._fallbackCopy(SHARE_URL);
+                    done();
+                }
+            };
+        },
+
+        _fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
         },
 
         setupDragDrop() {
@@ -1423,6 +1494,7 @@
                         this.toggleSettings(false);
                         Exporter.hideModal();
                         this.closeModeSelector();
+                        this.els.shareModal.classList.remove('open');
                         this.els.shortcutsModal.classList.remove('open');
                         break;
                 }
@@ -1453,6 +1525,7 @@
             linkSetting('set-palette', 'palette', 'string');
             linkSetting('set-beat-enabled', 'beatEnabled', 'bool');
             linkSetting('set-mirror', 'mirror', 'bool');
+            linkSetting('set-watermark', 'watermark', 'bool');
 
             document.getElementById('set-hc').onchange = (e) => {
                 CONFIG.highContrast = e.target.checked;
@@ -1577,6 +1650,7 @@
             setVal('set-glow-size', CONFIG.logoGlowSize);
             document.getElementById('set-beat-enabled').checked = CONFIG.beatEnabled;
             document.getElementById('set-mirror').checked = CONFIG.mirror;
+            document.getElementById('set-watermark').checked = CONFIG.watermark;
             document.getElementById('set-hc').checked = CONFIG.highContrast;
             document.getElementById('set-show-fps').checked = CONFIG.showFps;
             document.getElementById('set-logo-particles').checked = CONFIG.logoParticles;
