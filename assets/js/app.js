@@ -1288,6 +1288,7 @@
 
         bindEvents() {
             document.getElementById('btn-upload').onclick = () => this.els.fileInput.click();
+            document.getElementById('btn-demo').onclick = () => this.loadDemoTrack();
             this.els.fileInput.onchange = (e) => this.handleFile(e.target.files[0]);
             this.els.playBtn.onclick = () => audio.togglePlay();
             document.getElementById('btn-stop').onclick = () => audio.stop();
@@ -1696,6 +1697,12 @@
             }
         },
 
+        loadDemoTrack() {
+            // Built-in royalty-free demo loop (relative path — works on GitHub Pages subpaths)
+            audio.playFile('assets/audio/demo-track.wav');
+            document.getElementById('status-text').textContent = 'Demo track';
+        },
+
         toggleSettings(show) {
             this.settingsOpen = show;
             this.els.settingsModal.classList.toggle('open', show);
@@ -1788,10 +1795,12 @@
         }
     });
 
-    // Service Worker Registration (for PWA/offline support)
-    if ('serviceWorker' in navigator) {
+    // Service Worker Registration (for PWA/offline support).
+    // Relative path so it works on GitHub Pages project sites (username.github.io/repo/).
+    // Only register over HTTPS or localhost — file:// and http:// LAN IPs are unsupported contexts.
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
         window.addEventListener('load', () => {
-            // navigator.serviceWorker.register('/sw.js').catch(() => {});
+            navigator.serviceWorker.register('sw.js').catch(() => {});
         });
     }
 })();
