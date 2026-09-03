@@ -18,6 +18,15 @@
             const angleStep = (Math.PI * 2) / bars;
             const kick = isBeat ? 1.12 : 1.0;
 
+            // Peak-hold caps: per-bar peaks that hold then fall over time
+            const peaks = engine.state.peaks || (engine.state.peaks = {});
+            if (!peaks.radial || peaks.radial.length !== bars) peaks.radial = new Float32Array(bars);
+            const t = engine.nowSec();
+            if (peaks.radialT === undefined) peaks.radialT = t;
+            const dt = Math.min(0.1, Math.max(0, t - peaks.radialT));
+            peaks.radialT = t;
+            const fall = Math.min(cx, cy) * 0.5 * dt; // px per second
+
             ctx.save();
             ctx.translate(cx, cy);
             ctx.scale(kick, kick);
@@ -48,6 +57,14 @@
                 // Reflection
                 ctx.fillStyle = engine.getColor(i % engine.palette.length) + '22';
                 ctx.fillRect(-2, radius - 5, 4, -barH * 0.15);
+
+                // Peak-hold cap
+                const peak = Math.max(barH, peaks.radial[i] - fall);
+                peaks.radial[i] = peak;
+                if (peak > barH + 4) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+                    ctx.fillRect(-2, radius + peak + 2, 4, 3);
+                }
 
                 ctx.restore();
             }

@@ -15,6 +15,11 @@ WaveForge is a free, browser-based music visualizer. It renders audio-reactive v
 - Dark/light themes and high-contrast mode
 - Built-in demo track (🎵 Demo button) — try it instantly, no audio file needed
 - Installable PWA with offline support (service worker)
+- Logarithmic frequency scale (balanced bass/treble across all modes) with classic linear option
+- Peak-hold caps on Bar Spectrum and Radial EQ (time-based, frame-rate independent)
+- Optional hue-cycling palette animation with adjustable speed
+- 🎲 Randomize button (random mode + palette + sensitivity) and Reset-to-Defaults in settings
+- Live value labels on all settings sliders
 
 ## Getting started
 

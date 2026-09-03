@@ -77,8 +77,56 @@
         logoGlowSize: 35,
         logoParticles: true,
         logoRotateRing: false,
-        watermark: false
+        watermark: false,
+        freqScale: 'log',
+        hueCycle: false,
+        hueCycleSpeed: 15
     };
+
+    // Snapshot for "Reset to Defaults" (captured before localStorage hydration)
+    const DEFAULT_CONFIG = JSON.parse(JSON.stringify(CONFIG));
+
+    // --- Hue-cycling helpers (rotate palette colors in HSL space) ---
+    function hexToHsl(hex) {
+        const r = parseInt(hex.slice(1, 3), 16) / 255;
+        const g = parseInt(hex.slice(3, 5), 16) / 255;
+        const b = parseInt(hex.slice(5, 7), 16) / 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h = 0, s = 0;
+        const l = (max + min) / 2;
+        if (max !== min) {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                default: h = (r - g) / d + 4;
+            }
+            h *= 60;
+        }
+        return [h, s, l];
+    }
+
+    function hslToHex(h, s, l) {
+        h = ((h % 360) + 360) % 360;
+        const c = (1 - Math.abs(2 * l - 1)) * s;
+        const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+        const m = l - c / 2;
+        let r = 0, g = 0, b = 0;
+        if (h < 60) [r, g, b] = [c, x, 0];
+        else if (h < 120) [r, g, b] = [x, c, 0];
+        else if (h < 180) [r, g, b] = [0, c, x];
+        else if (h < 240) [r, g, b] = [0, x, c];
+        else if (h < 300) [r, g, b] = [x, 0, c];
+        else [r, g, b] = [c, 0, x];
+        const to = (v) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+        return '#' + to(r) + to(g) + to(b);
+    }
+
+    function rotateHue(hex, deg) {
+        const [h, s, l] = hexToHsl(hex);
+        return hslToHex(h + deg, s, l);
+    }
 
     const PALETTES = {
         cyberpunk: ['#00f2ff', '#ff0099', '#ffffff', '#7b2dff'],
@@ -1050,6 +1098,9 @@
             const mod = VIS_MODS[APP_STATE.mode];
             if (!mod) return;
 
+            // Keep export analysis in sync with the live view (log scale etc.)
+            if (typeof viz !== 'undefined' && viz) data = viz.processData(data);
+
             // Clear with fade (modes with their own background skip this)
             if (!mod.ownBackground) {
                 ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
@@ -1099,7 +1150,19 @@
         // Exposed to mode renderers
         get config() { return CONFIG; }
         get state() { return APP_STATE; }
-        get palette() { return PALETTES[CONFIG.palette]; }
+        get palette() {
+            const base = PALETTES[CONFIG.palette];
+            if (!CONFIG.hueCycle) return base;
+            // Cache per frame — angle quantized to 0.1° so identical frames
+            // reuse the same mapped array instead of rebuilding it.
+            const deg = Math.round((nowSec() * CONFIG.hueCycleSpeed) % 360 * 10) / 10;
+            const key = CONFIG.palette + '|' + deg;
+            if (this._hueKey !== key) {
+                this._hueKey = key;
+                this._hueCache = base.map((c) => c.startsWith('#') ? rotateHue(c, deg) : c);
+            }
+            return this._hueCache;
+        }
         nowSec() { return nowSec(); }
 
         resize() {
@@ -1126,17 +1189,58 @@
         }
 
         getColor(index) {
-            const p = PALETTES[CONFIG.palette];
+            const p = this.palette;
             return p[index % p.length];
         }
 
         getGradient(ctx, h) {
             const grad = ctx.createLinearGradient(0, h, 0, 0);
-            const p = PALETTES[CONFIG.palette];
+            const p = this.palette;
             p.forEach((color, i) => {
                 grad.addColorStop(i / (p.length - 1), color);
             });
             return grad;
+        }
+
+        // Precompute log-spaced source-bin ranges for the current FFT size.
+        // Spread bands geometrically across the lower 90% of bins (bins near
+        // Nyquist are almost always empty, so they only waste resolution).
+        _buildLogRanges(binCount) {
+            const bands = Math.min(binCount, 256);
+            const usable = Math.floor(binCount * 0.9);
+            const step = Math.pow(usable, 1 / bands);
+            const ranges = new Array(bands);
+            let prev = 0;
+            for (let i = 1; i <= bands; i++) {
+                let cur = Math.round(Math.pow(step, i));
+                if (cur <= prev) cur = prev + 1;
+                ranges[i - 1] = [prev, Math.min(cur, usable)];
+                prev = cur;
+            }
+            this._logRanges = ranges;
+            this._logRangesBinCount = binCount;
+        }
+
+        // Map raw (linear) frequency data to log-spaced bands when enabled.
+        // Called once per render path (live render + export renderFrame) so
+        // the live view and every export format stay perfectly in sync.
+        processData(data) {
+            if (CONFIG.freqScale !== 'log') return data;
+            const src = data.freq;
+            if (!src || !src.length) return data;
+            if (!this._logRanges || this._logRangesBinCount !== src.length) this._buildLogRanges(src.length);
+            if (!this._logBuf || this._logBuf.length !== this._logRanges.length) {
+                this._logBuf = new Uint8Array(this._logRanges.length);
+            }
+            const out = this._logBuf;
+            for (let i = 0; i < this._logRanges.length; i++) {
+                const a = this._logRanges[i][0];
+                const b = this._logRanges[i][1];
+                let sum = 0;
+                for (let j = a; j < b; j++) sum += src[j];
+                out[i] = sum / (b - a);
+            }
+            return { freq: out, wave: data.wave };
         }
 
         loop() {
@@ -1171,6 +1275,7 @@
         }
 
         render(ctx, w, h, cx, cy, data, isBeat) {
+            data = this.processData(data);
             const mod = VIS_MODS[APP_STATE.mode];
             if (!mod) {
                 if (!this._warned) {
@@ -1289,6 +1394,7 @@
         bindEvents() {
             document.getElementById('btn-upload').onclick = () => this.els.fileInput.click();
             document.getElementById('btn-demo').onclick = () => this.loadDemoTrack();
+            document.getElementById('btn-random').onclick = () => this.randomizeVisual();
             this.els.fileInput.onchange = (e) => this.handleFile(e.target.files[0]);
             this.els.playBtn.onclick = () => audio.togglePlay();
             document.getElementById('btn-stop').onclick = () => audio.stop();
@@ -1527,6 +1633,24 @@
             linkSetting('set-beat-enabled', 'beatEnabled', 'bool');
             linkSetting('set-mirror', 'mirror', 'bool');
             linkSetting('set-watermark', 'watermark', 'bool');
+            linkSetting('set-freq-scale', 'freqScale', 'string');
+            linkSetting('set-hue-cycle', 'hueCycle', 'bool');
+            linkSetting('set-hue-speed', 'hueCycleSpeed', 'float');
+
+            // Live value labels for every range slider in the settings modal
+            document.querySelectorAll('#settings-modal input[type="range"]').forEach((input) => {
+                input.addEventListener('input', () => this.updateSliderLabels());
+            });
+
+            document.getElementById('btn-reset-settings').onclick = () => {
+                Object.assign(CONFIG, DEFAULT_CONFIG);
+                audio.updateSettings();
+                document.body.classList.toggle('high-contrast', CONFIG.highContrast);
+                document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
+                this.applyConfigToUI();
+                persistConfig();
+                this.showToast('Settings reset to defaults', 'success');
+            };
 
             document.getElementById('set-hc').onchange = (e) => {
                 CONFIG.highContrast = e.target.checked;
@@ -1642,6 +1766,8 @@
             setVal('set-sensitivity', CONFIG.sensitivity);
             setVal('set-fft', CONFIG.fftSize);
             setVal('set-palette', CONFIG.palette);
+            setVal('set-freq-scale', CONFIG.freqScale);
+            setVal('set-hue-speed', CONFIG.hueCycleSpeed);
             setVal('set-beat-thresh', CONFIG.beatThreshold);
             setVal('set-bloom', CONFIG.bloomIntensity);
             setVal('set-wave-color', CONFIG.waveColor);
@@ -1651,6 +1777,7 @@
             setVal('set-glow-size', CONFIG.logoGlowSize);
             document.getElementById('set-beat-enabled').checked = CONFIG.beatEnabled;
             document.getElementById('set-mirror').checked = CONFIG.mirror;
+            document.getElementById('set-hue-cycle').checked = CONFIG.hueCycle;
             document.getElementById('set-watermark').checked = CONFIG.watermark;
             document.getElementById('set-hc').checked = CONFIG.highContrast;
             document.getElementById('set-show-fps').checked = CONFIG.showFps;
@@ -1755,6 +1882,35 @@
             if (logoSettings) logoSettings.classList.toggle('hidden', APP_STATE.mode !== 8);
         },
 
+        updateSliderLabels() {
+            document.querySelectorAll('#settings-modal input[type="range"]').forEach((input) => {
+                let label = input.parentElement.querySelector('.slider-value');
+                if (!label) {
+                    label = document.createElement('span');
+                    label.className = 'slider-value';
+                    input.insertAdjacentElement('afterend', label);
+                }
+                const v = parseFloat(input.value);
+                label.textContent = Number.isInteger(v) ? String(v) : v.toFixed(2).replace(/0$/, '');
+            });
+        },
+
+        randomizeVisual() {
+            const modeKeys = Object.keys(VIS_MODS).map(Number);
+            if (modeKeys.length) APP_STATE.mode = modeKeys[Math.floor(Math.random() * modeKeys.length)];
+            const paletteKeys = Object.keys(PALETTES);
+            CONFIG.palette = paletteKeys[Math.floor(Math.random() * paletteKeys.length)];
+            CONFIG.sensitivity = Math.round((0.8 + Math.random() * 1.9) * 10) / 10;
+            CONFIG.mirror = Math.random() < 0.5;
+            audio.updateSettings();
+            this.applyConfigToUI();
+            this.updateModeDisplay();
+            this.updateModeCards();
+            persistConfig();
+            const mod = VIS_MODS[APP_STATE.mode];
+            this.showToast('🎲 ' + (mod ? mod.name : 'Randomized') + ' · ' + CONFIG.palette, 'success');
+        },
+
         showToast(message, type = 'info') {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
@@ -1784,7 +1940,7 @@
 
         viz.loop();
 
-        console.log('%c🎵 WaveForge v2.0.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
+        console.log('%c🎵 WaveForge v2.1.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
         console.log('%cProfessional Music Visualizer', 'color: #ff0099; font-size: 12px;');
     });
 

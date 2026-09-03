@@ -549,6 +549,16 @@ input[type="range"]::-moz-range-thumb {
     flex: 1;
 }
 
+.control-row .slider-value {
+    min-width: 42px;
+    text-align: right;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    opacity: 0.85;
+    user-select: none;
+}
+
 .control-row select,
 .control-row input[type="number"] {
     background: rgba(255, 255, 255, 0.04);

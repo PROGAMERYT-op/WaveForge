@@ -33,14 +33,17 @@ window.WaveForgeVisualizers[MODE_NUMBER] = {
 `engine` exposes:
 
 - `engine.config` — the live `CONFIG` (sensitivity, palette, mirror, logo settings…)
-- `engine.state` — the live `APP_STATE` (helixAngle, galaxyAngle, spectrogramData, logo/beat state…)
-- `engine.palette` — the active `PALETTES[CONFIG.palette]` array
-- `engine.getColor(i)` / `engine.getGradient(ctx, h)` — palette helpers
+- `engine.state` — the live `APP_STATE` (helixAngle, galaxyAngle, spectrogramData, logo/beat state…). Also a shared `engine.state.peaks` object you can use for per-mode peak-hold arrays (see `bars.js` / `radial.js`)
+- `engine.palette` — the active `PALETTES[CONFIG.palette]` array (already hue-rotated when Hue Cycling is enabled)
+- `engine.getColor(i)` / `engine.getGradient(ctx, h)` — palette helpers (hue-cycle aware)
 - `engine.particles` — the 200-particle field (shared with Particles & Logo modes)
 - `engine.width` / `engine.height` — live canvas CSS size (for scaling exports)
 - `engine.nowSec()` — animation clock (real time, or export timeline during fast export)
 
 `data` is `{ freq: Uint8Array, wave: Uint8Array }` and `isBeat` is the beat flag.
+When **Frequency Scale** is set to *Logarithmic* (the default), `data.freq` is
+pre-mapped into log-spaced bands by the engine (`processData()`), so bass doesn't
+dominate — modes read it exactly like before and benefit automatically.
 
 ## How to add a new mode
 

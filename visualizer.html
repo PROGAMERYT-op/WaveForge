@@ -408,6 +408,10 @@
                     <span class="btn-text">Mode</span>
                 </button>
 
+                <button id="btn-random" aria-label="Randomize visual style" title="Surprise me — random mode, palette and sensitivity">
+                    <span class="icon">🎲</span>
+                </button>
+
                 <div class="volume-control">
                     <label for="vol-slider">🔊</label>
                     <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="0.8" aria-label="Volume">
@@ -465,6 +469,24 @@
                 <div class="control-row">
                     <label for="set-bloom">Glow Intensity</label>
                     <input type="range" id="set-bloom" min="0" max="100" value="60">
+                </div>
+                <div class="control-row">
+                    <label for="set-freq-scale">Frequency Scale</label>
+                    <select id="set-freq-scale">
+                        <option value="linear">Linear (classic)</option>
+                        <option value="log" selected>Logarithmic (balanced)</option>
+                    </select>
+                </div>
+                <div class="control-row">
+                    <label for="set-hue-cycle">Hue Cycling</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="set-hue-cycle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label for="set-hue-speed">Hue Cycle Speed (°/s)</label>
+                    <input type="range" id="set-hue-speed" min="3" max="60" step="1" value="15">
                 </div>
                 <div class="control-row">
                     <label for="set-mirror">Mirror Effect</label>
@@ -553,6 +575,7 @@
                 <div class="button-group">
                     <button id="btn-export-preset">💾 Export Preset</button>
                     <button id="btn-screenshot">📷 Screenshot</button>
+                    <button id="btn-reset-settings">↺ Reset to Defaults</button>
                 </div>
                 <div class="control-row" style="margin-top: 12px;">
                     <label for="set-hc">High Contrast Mode</label>
@@ -578,7 +601,7 @@
             </div>
 
             <div class="version-info">
-                WaveForge v2.0.0 • Built with Web Audio API & Canvas<br>
+                WaveForge v2.1.0 • Built with Web Audio API & Canvas<br>
                 <a id="btn-shortcuts" role="button" tabindex="0">Keyboard Shortcuts</a> •
                 <a href="index.html#how">Documentation</a>
             </div>
