@@ -1,6 +1,8 @@
 /**
- * WaveForge Music Visualizer v2.0
- * Professional audio visualization with video export.
+ * WaveForge Music Visualizer v3.0
+ * Professional audio visualization studio with 12 modes, 3-band EQ,
+ * social aspect ratios (16:9, 9:16, 1:1, 4:5), on-canvas text overlays,
+ * post-processing FX, shareable URL presets, and fast WebCodecs MP4 export.
  *
  * Rendering code for each mode lives in Visualizers/<mode>.js and registers
  * itself into window.WaveForgeVisualizers (see Visualizers/README.md).
@@ -15,7 +17,7 @@
     const APP_STATE = {
         isPlaying: false,
         mode: 8,
-        modesCount: 9,
+        modesCount: 12,
         lastTime: 0,
         fps: 0,
         frames: 0,
@@ -37,6 +39,7 @@
         bgImg: null,
         logoImg: null,
         logoAngle: 0,
+        shockwaves: [],
         // Fast-export driven render time (seconds). Null = use real wall-clock.
         exportTime: null,
         // Set to true while a fast WebCodecs export is running
@@ -48,9 +51,6 @@
     // Visualization mode registry (populated by Visualizers/*.js)
     const VIS_MODS = window.WaveForgeVisualizers || {};
 
-    // Returns the time (seconds) renderers should use for time-based animation.
-    // During a fast (offline) export this comes from the export timeline so
-    // animations are tied to audio time rather than wall-clock time.
     function nowSec() {
         return APP_STATE.exportTime !== null
             ? APP_STATE.exportTime
@@ -80,7 +80,21 @@
         watermark: false,
         freqScale: 'log',
         hueCycle: false,
-        hueCycleSpeed: 15
+        hueCycleSpeed: 15,
+        // v3.0 — 3-Band Equalizer (dB)
+        eqBass: 0,
+        eqMid: 0,
+        eqTreble: 0,
+        // v3.0 — On-Canvas Text & Artist Overlay
+        overlayTitle: '',
+        overlayArtist: '',
+        overlayPosition: 'bottom-left',
+        overlayBeatPulse: true,
+        // v3.0 — Post-FX & Aspect Ratio
+        fxScanlines: false,
+        fxVignette: false,
+        fxProgressBar: true,
+        aspectRatio: '16:9'
     };
 
     // Snapshot for "Reset to Defaults" (captured before localStorage hydration)
@@ -136,11 +150,15 @@
         rainbow: ['#ff0000', '#ff8800', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#ff00ff'],
         gold: ['#bf953f', '#fcf6ba', '#b38728', '#aa771c'],
         sunset: ['#ff006e', '#fb5607', '#ffbe0b', '#8338ec'],
-        arctic: ['#a8dadc', '#457b9d', '#1d3557', '#f1faee']
+        arctic: ['#a8dadc', '#457b9d', '#1d3557', '#f1faee'],
+        synthwave: ['#ff2a85', '#00f5d4', '#fee440', '#9b5de5'],
+        trapneon: ['#00ff88', '#00c4ff', '#ff0055', '#ffffff'],
+        vaporwave: ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff'],
+        noir: ['#ffffff', '#cbd5e1', '#64748b', '#94a3b8']
     };
 
     // ============================================
-    // SETTINGS PERSISTENCE
+    // SETTINGS PERSISTENCE & URL PRESET HYDRATION
     // ============================================
 
     const CONFIG_KEY = 'wf-config';
@@ -154,11 +172,37 @@
     function hydrateConfig() {
         try {
             const raw = localStorage.getItem(CONFIG_KEY);
-            if (!raw) return;
-            const data = JSON.parse(raw);
-            if (data.config && typeof data.config === 'object') Object.assign(CONFIG, data.config);
-            if (typeof data.mode === 'number' && VIS_MODS[data.mode]) APP_STATE.mode = data.mode;
+            if (raw) {
+                const data = JSON.parse(raw);
+                if (data.config && typeof data.config === 'object') Object.assign(CONFIG, data.config);
+                if (typeof data.mode === 'number' && VIS_MODS[data.mode]) APP_STATE.mode = data.mode;
+            }
         } catch (e) { /* corrupted storage — start fresh */ }
+
+        // Allow URL query parameters to override config (shareable preset links!)
+        try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('mode')) {
+                const m = parseInt(params.get('mode'), 10);
+                if (VIS_MODS[m]) APP_STATE.mode = m;
+            }
+            if (params.has('palette') && PALETTES[params.get('palette')]) {
+                CONFIG.palette = params.get('palette');
+            }
+            if (params.has('sens')) {
+                const s = parseFloat(params.get('sens'));
+                if (!isNaN(s) && s >= 0.5 && s <= 5.0) CONFIG.sensitivity = s;
+            }
+            if (params.has('aspect') && ['16:9', '9:16', '1:1', '4:5'].includes(params.get('aspect'))) {
+                CONFIG.aspectRatio = params.get('aspect');
+            }
+            if (params.has('title')) {
+                CONFIG.overlayTitle = params.get('title').slice(0, 60);
+            }
+            if (params.has('artist')) {
+                CONFIG.overlayArtist = params.get('artist').slice(0, 60);
+            }
+        } catch (e) {}
     }
 
     function setMode(n) {
@@ -169,8 +213,27 @@
         persistConfig();
     }
 
+    // Compute pixel dimensions for any quality tier + aspect ratio
+    function getExportDimensions(qualityTier, aspectRatio) {
+        const baseShort = { '720': 720, '1080': 1080, '1440': 1440, '2160': 2160 }[String(qualityTier)] || 1080;
+        const baseLong = { '720': 1280, '1080': 1920, '1440': 2560, '2160': 3840 }[String(qualityTier)] || 1920;
+        // H.264 requires even dimensions
+        const even = (n) => Math.round(n / 2) * 2;
+        switch (aspectRatio) {
+            case '9:16':
+                return { width: even(baseShort), height: even(baseLong) };
+            case '1:1':
+                return { width: even(baseShort), height: even(baseShort) };
+            case '4:5':
+                return { width: even(baseShort), height: even(baseShort * 1.25) };
+            case '16:9':
+            default:
+                return { width: even(baseLong), height: even(baseShort) };
+        }
+    }
+
     // ============================================
-    // AUDIO ENGINE
+    // AUDIO ENGINE (WITH 3-BAND HARDWARE EQ)
     // ============================================
 
     class AudioEngine {
@@ -181,26 +244,44 @@
             this.gainNode = this.ctx.createGain();
             this.destinationNode = this.ctx.createMediaStreamDestination();
 
+            // 3-Band EQ nodes
+            this.bassFilter = this.ctx.createBiquadFilter();
+            this.bassFilter.type = 'lowshelf';
+            this.bassFilter.frequency.value = 110;
+
+            this.midFilter = this.ctx.createBiquadFilter();
+            this.midFilter.type = 'peaking';
+            this.midFilter.frequency.value = 1000;
+            this.midFilter.Q.value = 1.0;
+
+            this.trebleFilter = this.ctx.createBiquadFilter();
+            this.trebleFilter.type = 'highshelf';
+            this.trebleFilter.frequency.value = 4200;
+
             this.analyser.fftSize = CONFIG.fftSize;
             this.analyser.smoothingTimeConstant = CONFIG.smoothing;
             this.gainNode.gain.value = Math.min(parseFloat(document.getElementById('vol-slider').value) || 0.8, 1);
 
             this.micSource = null;
             this.audioElement = new Audio();
-            this.audioElement.crossOrigin = "anonymous";
+            this.audioElement.crossOrigin = 'anonymous';
 
             this.sourceNode = this.ctx.createMediaElementSource(this.audioElement);
-            this.sourceNode.connect(this.analyser);
+            // Signal chain: source -> bass -> mid -> treble -> analyser -> gain -> speakers
+            this.sourceNode.connect(this.bassFilter);
+            this.bassFilter.connect(this.midFilter);
+            this.midFilter.connect(this.trebleFilter);
+            this.trebleFilter.connect(this.analyser);
             this.analyser.connect(this.gainNode);
             this.gainNode.connect(this.ctx.destination);
-            // Recording stream taps the analyser directly so exports are
-            // always captured at full volume, independent of the speaker gain.
+            // Recording stream taps analyser directly
             this.analyser.connect(this.destinationNode);
 
             this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
             this.waveData = new Uint8Array(this.analyser.fftSize);
 
             this.fileURL = null;
+            this.updateSettings();
 
             this.audioElement.addEventListener('ended', () => {
                 APP_STATE.isPlaying = false;
@@ -241,7 +322,8 @@
 
             if (this.audioElement.paused) {
                 if (!this.audioElement.src) {
-                    UI.showToast('Please load an audio file first', 'warning');
+                    UI.showToast('Loading built-in demo track...', 'info');
+                    UI.loadDemoTrack();
                     return;
                 }
                 this.audioElement.play().catch(() => {});
@@ -262,7 +344,6 @@
         }
 
         async enableMic() {
-            // Toggle: pressing Mic again disables the microphone.
             if (this.micSource) {
                 this.stopMic();
                 APP_STATE.isPlaying = false;
@@ -277,9 +358,7 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
                 this.micSource = this.ctx.createMediaStreamSource(stream);
-                this.micSource.connect(this.analyser);
-                // Route mic through the gain node too so the volume slider works
-                this.micSource.connect(this.gainNode);
+                this.micSource.connect(this.bassFilter);
                 APP_STATE.isPlaying = true;
                 UI.showToast('🎤 Microphone active', 'success');
                 document.getElementById('status-text').textContent = 'Mic Active';
@@ -300,9 +379,13 @@
         updateSettings() {
             this.analyser.fftSize = CONFIG.fftSize;
             this.analyser.smoothingTimeConstant = CONFIG.smoothing;
-            // Clamp gain to 100% — values above 1 clip the audio
             const vol = Math.min(parseFloat(document.getElementById('vol-slider').value) || 0.8, 1);
             this.gainNode.gain.value = vol;
+
+            // Update 3-band EQ
+            this.bassFilter.gain.value = Number(CONFIG.eqBass) || 0;
+            this.midFilter.gain.value = Number(CONFIG.eqMid) || 0;
+            this.trebleFilter.gain.value = Number(CONFIG.eqTreble) || 0;
 
             if (this.freqData.length !== this.analyser.frequencyBinCount) {
                 this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
@@ -355,11 +438,9 @@
             }
             energy = Math.sqrt(energy / range);
 
-            // Spectral flux: positive energy rise from the previous frame
             const flux = Math.max(0, energy - this.prevEnergy);
             this.prevEnergy = energy;
 
-            // Long history (~3 seconds) so the avg can't catch up to sustained bass
             this.history.push(energy);
             if (this.history.length > 180) this.history.shift();
 
@@ -371,9 +452,7 @@
                 return false;
             }
 
-            // Level beat: energy well above long-term average
             const levelBeat = energy > avg * CONFIG.beatThreshold && energy > 50;
-            // Flux beat: sharp rise this frame, even if avg is high
             const fluxBeat = flux > avg * 0.35 && energy > avg * 0.85;
 
             if (levelBeat || fluxBeat) {
@@ -392,7 +471,6 @@
     // ============================================
 
     const Exporter = {
-        // Cancellation flag for the fast (WebCodecs) export pipeline
         _cancelFast: false,
 
         init() {
@@ -401,16 +479,25 @@
             document.getElementById('btn-start-export').onclick = () => this.startRecording();
             document.getElementById('btn-cancel-export').onclick = () => this.stop();
 
-            // Quality option selection styling
             document.querySelectorAll('.export-option').forEach(opt => {
                 opt.addEventListener('click', () => {
                     document.querySelectorAll('.export-option').forEach(o => o.classList.remove('selected'));
                     opt.classList.add('selected');
                 });
             });
+
+            const aspectSelect = document.getElementById('export-aspect');
+            if (aspectSelect) {
+                aspectSelect.value = CONFIG.aspectRatio || '16:9';
+                aspectSelect.addEventListener('change', (e) => {
+                    CONFIG.aspectRatio = e.target.value;
+                    const sAspect = document.getElementById('set-aspect');
+                    if (sAspect) sAspect.value = CONFIG.aspectRatio;
+                    persistConfig();
+                });
+            }
         },
 
-        // ---------- WebCodecs / mp4-muxer feature detection ----------
         _hasFastExportApis() {
             return typeof window !== 'undefined'
                 && 'VideoEncoder' in window
@@ -421,7 +508,6 @@
                 && typeof OfflineAudioContext !== 'undefined';
         },
 
-        // H.264 codec strings ordered by quality. Pick the first browser-supported one.
         _videoCodecCandidates: [
             'avc1.640034', // High @ L5.2 (4K60)
             'avc1.640033', // High @ L5.1 (4K30)
@@ -479,16 +565,24 @@
 
         showModal() {
             if (!audio.hasAudio()) {
-                UI.showToast('Please load an audio file first', 'warning');
+                UI.showToast('Please load an audio file or click Demo first', 'warning');
                 return;
             }
+            const aspectSelect = document.getElementById('export-aspect');
+            if (aspectSelect) aspectSelect.value = CONFIG.aspectRatio || '16:9';
             document.getElementById('export-modal').classList.add('open');
             this._refreshEngineNote();
+            if (window.WaveForgeAds) {
+                window.WaveForgeAds.startModalAdRefresh('export-ad-slot', true);
+            }
         },
 
         hideModal() {
             if (APP_STATE.isRecording) return;
             document.getElementById('export-modal').classList.remove('open');
+            if (window.WaveForgeAds) {
+                window.WaveForgeAds.stopModalAdRefresh();
+            }
         },
 
         downloadBaseName() {
@@ -500,7 +594,12 @@
         async startRecording() {
             if (APP_STATE.isRecording) return;
 
-            // Try the fast WebCodecs path first; auto-fall back to MediaRecorder.
+            const aspectSelect = document.getElementById('export-aspect');
+            if (aspectSelect) {
+                CONFIG.aspectRatio = aspectSelect.value;
+                persistConfig();
+            }
+
             const support = await this._checkFastExportSupport().catch(() => ({ supported: false }));
             if (support.supported) {
                 try {
@@ -508,8 +607,7 @@
                     return;
                 } catch (err) {
                     console.error('Fast export failed, falling back to MediaRecorder:', err);
-                    UI.showToast('Fast export failed — using realtime fallback', 'warning');
-                    // Reset any partial state from fast export attempt
+                    UI.showToast('Fast export fallback — using realtime recording', 'warning');
                     APP_STATE.isFastExporting = false;
                     APP_STATE.exportTime = null;
                     APP_STATE.isRecording = false;
@@ -527,28 +625,17 @@
             const fps = parseInt(document.getElementById('export-fps').value);
             const modeSelect = document.getElementById('export-mode').value;
 
-            // Set export mode
             if (modeSelect !== 'current') {
                 setMode(parseInt(modeSelect));
             }
 
-            // Quality dimensions
-            const qualities = {
-                '720': { width: 1280, height: 720 },
-                '1080': { width: 1920, height: 1080 },
-                '1440': { width: 2560, height: 1440 },
-                '2160': { width: 3840, height: 2160 }
-            };
+            const { width, height } = getExportDimensions(quality, CONFIG.aspectRatio);
 
-            const { width, height } = qualities[quality];
-
-            // Create export canvas
             APP_STATE.exportCanvas = document.createElement('canvas');
             APP_STATE.exportCanvas.width = width;
             APP_STATE.exportCanvas.height = height;
             APP_STATE.exportCtx = APP_STATE.exportCanvas.getContext('2d');
 
-            // Determine duration
             let maxDuration = audio.getDuration() - audio.getCurrentTime();
             if (durationSetting !== 'full') {
                 maxDuration = Math.min(maxDuration, parseInt(durationSetting));
@@ -559,10 +646,7 @@
             APP_STATE.recordingStartTime = audio.getCurrentTime();
             APP_STATE.recordingDuration = maxDuration;
 
-            // Create video stream from canvas
             const canvasStream = APP_STATE.exportCanvas.captureStream(fps);
-
-            // Add audio track
             const audioStream = audio.getAudioStream();
             const audioTracks = audioStream.getAudioTracks();
 
@@ -570,7 +654,6 @@
                 canvasStream.addTrack(audioTracks[0]);
             }
 
-            // Setup MediaRecorder
             const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
                 ? 'video/webm;codecs=vp9,opus'
                 : 'video/webm;codecs=vp8,opus';
@@ -587,18 +670,14 @@
             };
 
             APP_STATE.mediaRecorder.onstop = () => this.finishRecording();
-
-            // Start recording
             APP_STATE.mediaRecorder.start(100);
 
-            // Start audio playback if paused
             if (audio.audioElement.paused) {
                 audio.audioElement.play().catch(() => {});
                 APP_STATE.isPlaying = true;
                 UI.updatePlayButton();
             }
 
-            // Update UI
             document.getElementById('btn-start-export').style.display = 'none';
             document.getElementById('btn-cancel-export').style.display = 'block';
             document.getElementById('export-progress').classList.add('active');
@@ -606,8 +685,6 @@
             document.getElementById('status-text').textContent = 'Recording...';
 
             UI.showToast('Recording started', 'info');
-
-            // Monitor progress
             this.monitorProgress();
         },
 
@@ -632,7 +709,6 @@
         stop() {
             if (!APP_STATE.isRecording) return;
 
-            // Signal cancellation to the fast-export pipeline (if running)
             if (APP_STATE.isFastExporting) {
                 this._cancelFast = true;
                 document.getElementById('status-dot').classList.remove('recording');
@@ -650,41 +726,23 @@
             document.getElementById('status-text').textContent = 'Processing...';
         },
 
-        // ============================================
-        // FAST EXPORT — WebCodecs + mp4-muxer
-        // Encodes video off the wall clock by:
-        //  1) Decoding the audio file once into an AudioBuffer
-        //  2) Running an OfflineAudioContext that suspends at every frame
-        //     timestamp so we can read AnalyserNode data deterministically
-        //  3) Rendering each frame to a hidden canvas, wrapping it in a
-        //     VideoFrame, and pushing it through a hardware H.264 VideoEncoder
-        //  4) Streaming AAC audio chunks through an AudioEncoder
-        //  5) Muxing both into a real .mp4 with mp4-muxer
-        // ============================================
         async startFastExport() {
             const quality = document.querySelector('input[name="export-quality"]:checked').value;
             const durationSetting = document.getElementById('export-duration').value;
             const fps = parseInt(document.getElementById('export-fps').value);
             const modeSelect = document.getElementById('export-mode').value;
 
-            // Apply mode if user picked a specific one
             if (modeSelect !== 'current') {
                 setMode(parseInt(modeSelect));
             }
 
-            const qualities = {
-                '720':  { width: 1280, height: 720,  bitrate:  6_000_000 },
-                '1080': { width: 1920, height: 1080, bitrate: 10_000_000 },
-                '1440': { width: 2560, height: 1440, bitrate: 16_000_000 },
-                '2160': { width: 3840, height: 2160, bitrate: 28_000_000 }
-            };
-            const { width, height, bitrate } = qualities[quality];
+            const bitrates = { '720': 6_000_000, '1080': 10_000_000, '1440': 16_000_000, '2160': 28_000_000 };
+            const bitrate = bitrates[quality] || 10_000_000;
+            const { width, height } = getExportDimensions(quality, CONFIG.aspectRatio);
 
-            // ---------- Pick supported codecs for the chosen resolution ----------
             const videoCfg = await this._pickVideoCodec(width, height, fps, bitrate);
             if (!videoCfg) throw new Error('No supported H.264 codec for ' + width + 'x' + height + '@' + fps);
 
-            // ---------- Decode the audio file (cached if same source) ----------
             this._setStatus('Decoding audio…', 0);
             const srcUrl = audio.audioElement.src;
             if (!srcUrl) throw new Error('No audio source loaded');
@@ -701,7 +759,6 @@
             const audioCfg = await this._pickAudioCodec(decoded.sampleRate, Math.min(2, decoded.numberOfChannels));
             if (!audioCfg) throw new Error('No supported AAC encoder for ' + decoded.sampleRate + 'Hz');
 
-            // ---------- Compute clip range (relative to the song) ----------
             const startTime = audio.getCurrentTime();
             let clipDuration = decoded.duration - startTime;
             if (durationSetting !== 'full') clipDuration = Math.min(clipDuration, parseInt(durationSetting));
@@ -709,7 +766,6 @@
 
             const totalFrames = Math.max(1, Math.floor(clipDuration * fps));
 
-            // ---------- Pause live audio & enter export mode ----------
             const wasPlaying = !audio.audioElement.paused;
             if (wasPlaying) {
                 audio.audioElement.pause();
@@ -723,13 +779,11 @@
             this._showProgressUI();
             document.getElementById('status-dot').classList.add('recording');
             document.getElementById('status-text').textContent = 'Fast export…';
-            UI.showToast('⚡ Fast export started', 'info');
+            UI.showToast('⚡ Fast export started (' + width + '×' + height + ')', 'info');
 
-            // ---------- Save & reset visualization state for a clean run ----------
             const savedState = this._saveAndResetVizState();
 
-            // ---------- Set up offline analysis (AnalyserNode in OfflineAudioContext) ----------
-            this._setStatus('Preparing analysis…', 1);
+            this._setStatus('Preparing analysis & EQ…', 1);
             const numChannels = Math.min(2, decoded.numberOfChannels);
             const offlineCtx = new OfflineAudioContext(
                 numChannels,
@@ -738,15 +792,35 @@
             );
             const offlineSrc = offlineCtx.createBufferSource();
             offlineSrc.buffer = decoded;
+
+            // Replicate 3-band EQ in offline render
+            const offBass = offlineCtx.createBiquadFilter();
+            offBass.type = 'lowshelf';
+            offBass.frequency.value = 110;
+            offBass.gain.value = Number(CONFIG.eqBass) || 0;
+
+            const offMid = offlineCtx.createBiquadFilter();
+            offMid.type = 'peaking';
+            offMid.frequency.value = 1000;
+            offMid.Q.value = 1.0;
+            offMid.gain.value = Number(CONFIG.eqMid) || 0;
+
+            const offTreble = offlineCtx.createBiquadFilter();
+            offTreble.type = 'highshelf';
+            offTreble.frequency.value = 4200;
+            offTreble.gain.value = Number(CONFIG.eqTreble) || 0;
+
             const offlineAnalyser = offlineCtx.createAnalyser();
             offlineAnalyser.fftSize = CONFIG.fftSize;
             offlineAnalyser.smoothingTimeConstant = CONFIG.smoothing;
-            offlineSrc.connect(offlineAnalyser);
+
+            offlineSrc.connect(offBass);
+            offBass.connect(offMid);
+            offMid.connect(offTreble);
+            offTreble.connect(offlineAnalyser);
             offlineAnalyser.connect(offlineCtx.destination);
-            // Play the slice [startTime, startTime + clipDuration]
             offlineSrc.start(0, startTime, clipDuration);
 
-            // ---------- Set up muxer + encoders ----------
             const muxer = new Mp4Muxer.Muxer({
                 target: new Mp4Muxer.ArrayBufferTarget(),
                 video: { codec: 'avc', width, height, frameRate: fps },
@@ -768,7 +842,6 @@
             });
             audioEncoder.configure(audioCfg);
 
-            // ---------- Render canvas (offscreen, 2D) ----------
             const renderCanvas = document.createElement('canvas');
             renderCanvas.width = width;
             renderCanvas.height = height;
@@ -779,18 +852,15 @@
             const freqArr = new Uint8Array(offlineAnalyser.frequencyBinCount);
             const waveArr = new Uint8Array(offlineAnalyser.fftSize);
             const usPerFrame = Math.round(1_000_000 / fps);
-            const keyFrameInterval = Math.max(1, fps * 2); // keyframe every 2s
+            const keyFrameInterval = Math.max(1, fps * 2);
 
             let framesEncoded = 0;
             const startWall = performance.now();
             const exporter = this;
 
-            // Schedule a suspend at every frame timestamp; in each callback,
-            // sample the analyser, render, encode the frame, then resume.
             const framePromises = [];
             for (let i = 0; i < totalFrames; i++) {
                 const tFrame = i / fps;
-                // Last frame: suspend slightly before end to avoid overrun
                 const suspendAt = Math.min(tFrame, clipDuration - 1e-4);
                 const p = offlineCtx.suspend(suspendAt).then(async () => {
                     if (exporter._cancelFast) {
@@ -800,12 +870,10 @@
                     offlineAnalyser.getByteFrequencyData(freqArr);
                     offlineAnalyser.getByteTimeDomainData(waveArr);
 
-                    // Drive renderers' time from the export timeline
                     APP_STATE.exportTime = tFrame;
                     const isBeat = BeatDetector.update(freqArr);
-                    exporter.renderFrame(renderCtx, width, height, { freq: freqArr, wave: waveArr }, isBeat);
+                    exporter.renderFrame(renderCtx, width, height, { freq: freqArr, wave: waveArr }, isBeat, tFrame / clipDuration);
 
-                    // Encode this frame
                     const vf = new VideoFrame(renderCanvas, {
                         timestamp: i * usPerFrame,
                         duration: usPerFrame
@@ -817,18 +885,16 @@
                     }
 
                     framesEncoded++;
-                    // Update progress (cheap, every ~half second)
                     if (framesEncoded % Math.max(1, Math.floor(fps / 2)) === 0 || framesEncoded === totalFrames) {
-                        const pct = (framesEncoded / totalFrames) * 90; // 0–90 = render+video
+                        const pct = (framesEncoded / totalFrames) * 90;
                         const elapsed = (performance.now() - startWall) / 1000;
-                        const speed = framesEncoded / Math.max(0.001, elapsed) / fps; // x realtime
+                        const speed = framesEncoded / Math.max(0.001, elapsed) / fps;
                         exporter._setStatus(
                             `Rendering frames ${framesEncoded}/${totalFrames} • ${speed.toFixed(1)}× realtime`,
                             pct
                         );
                     }
 
-                    // Backpressure: if encoder is overwhelmed, yield
                     while (videoEncoder.encodeQueueSize > 30 && !exporter._cancelFast) {
                         await new Promise(r => setTimeout(r, 4));
                     }
@@ -838,8 +904,6 @@
                 framePromises.push(p);
             }
 
-            // Run the offline render — suspend callbacks fire sequentially during it.
-            // startRendering() itself returns the fully rendered AudioBuffer.
             let audioBuffer;
             try {
                 const renderPromise = offlineCtx.startRendering();
@@ -856,7 +920,6 @@
                 return;
             }
 
-            // ---------- Encode audio from the rendered offline buffer ----------
             this._setStatus('Encoding audio…', 92);
 
             const sampleRate = audioBuffer.sampleRate;
@@ -873,7 +936,6 @@
                     return;
                 }
                 const len = Math.min(chunkFrames, totalAudioFrames - offset);
-                // Pack as f32-planar: [ch0[0..len], ch1[0..len], ...]
                 const buf = len === chunkFrames ? planar : new Float32Array(numChannels * len);
                 for (let c = 0; c < numChannels; c++) {
                     buf.set(chans[c].subarray(offset, offset + len), c * len);
@@ -903,7 +965,6 @@
             muxer.finalize();
             const buffer = muxer.target.buffer;
 
-            // ---------- Restore state, hand the file to the user ----------
             this._restoreVizState(savedState);
             APP_STATE.exportTime = null;
             APP_STATE.isFastExporting = false;
@@ -915,19 +976,18 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `waveforge_${this.downloadBaseName()}_${Date.now()}.mp4`;
+            a.download = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.mp4`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             setTimeout(() => URL.revokeObjectURL(url), 60_000);
 
-            // Resume playback if the track was playing before the export
             if (wasPlaying) {
                 try {
                     audio.audioElement.play();
                     APP_STATE.isPlaying = true;
                     UI.updatePlayButton();
-                } catch (e) { /* autoplay not allowed */ }
+                } catch (e) {}
             }
 
             this._hideProgressUI();
@@ -937,6 +997,9 @@
             const totalElapsed = (performance.now() - startWall) / 1000;
             const speedX = clipDuration / Math.max(0.001, totalElapsed);
             UI.showToast(`✅ Exported MP4 in ${totalElapsed.toFixed(1)}s (${speedX.toFixed(1)}× realtime)`, 'success');
+            if (window.WaveForgeAds) {
+                window.WaveForgeAds.maybeTriggerExportSmartlink();
+            }
             this.hideModal();
         },
 
@@ -958,8 +1021,6 @@
             }
         },
 
-        // Snapshot mutable state the renderers and beat detector accumulate, so
-        // an export starts from a clean slate and the live preview is restored after.
         _saveAndResetVizState() {
             const snap = {
                 beatHistory: BeatDetector.history.slice(),
@@ -974,6 +1035,7 @@
                 helixAngle: APP_STATE.helixAngle,
                 galaxyAngle: APP_STATE.galaxyAngle,
                 spectrogram: APP_STATE.spectrogramData.slice(),
+                shockwaves: (APP_STATE.shockwaves || []).slice(),
                 bassFloorEMA: APP_STATE.bassFloorEMA,
                 bassEnvelope: APP_STATE.bassEnvelope,
                 lastBass: APP_STATE.lastBass,
@@ -997,6 +1059,7 @@
             APP_STATE.helixAngle = 0;
             APP_STATE.galaxyAngle = 0;
             APP_STATE.spectrogramData = [];
+            APP_STATE.shockwaves = [];
             APP_STATE.bassFloorEMA = undefined;
             APP_STATE.bassEnvelope = undefined;
             APP_STATE.lastBass = undefined;
@@ -1024,6 +1087,7 @@
             APP_STATE.helixAngle = snap.helixAngle;
             APP_STATE.galaxyAngle = snap.galaxyAngle;
             APP_STATE.spectrogramData = snap.spectrogram;
+            APP_STATE.shockwaves = snap.shockwaves;
             APP_STATE.bassFloorEMA = snap.bassFloorEMA;
             APP_STATE.bassEnvelope = snap.bassEnvelope;
             APP_STATE.lastBass = snap.lastBass;
@@ -1062,18 +1126,16 @@
 
         finishRecording() {
             document.getElementById('progress-status').textContent = 'Processing video...';
-            // Create blob and download
             const blob = new Blob(APP_STATE.recordedChunks, { type: 'video/webm' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `waveforge_${this.downloadBaseName()}_${Date.now()}.webm`;
+            a.download = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.webm`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            // Reset UI
             APP_STATE.exportCanvas = null;
             APP_STATE.exportCtx = null;
             APP_STATE.recordedChunks = [];
@@ -1085,6 +1147,9 @@
             document.getElementById('status-text').textContent = 'Ready';
 
             UI.showToast('Video exported successfully!', 'success');
+            if (window.WaveForgeAds) {
+                window.WaveForgeAds.maybeTriggerExportSmartlink();
+            }
             this.hideModal();
         },
 
@@ -1094,14 +1159,12 @@
             return `${m}:${s < 10 ? '0' : ''}${s}`;
         },
 
-        renderFrame(ctx, width, height, data, isBeat) {
+        renderFrame(ctx, width, height, data, isBeat, progressRatio) {
             const mod = VIS_MODS[APP_STATE.mode];
             if (!mod) return;
 
-            // Keep export analysis in sync with the live view (log scale etc.)
             if (typeof viz !== 'undefined' && viz) data = viz.processData(data);
 
-            // Clear with fade (modes with their own background skip this)
             if (!mod.ownBackground) {
                 ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
                 ctx.fillRect(0, 0, width, height);
@@ -1110,7 +1173,14 @@
             const renderFn = mod.renderExport || mod.render;
             renderFn(viz, ctx, width, height, width / 2, height / 2, data, isBeat);
 
-            // Optional branding badge drawn only on exports (fast + recorded)
+            // Apply Post-FX, Text Overlay, and Progress Bar on Exports too!
+            if (typeof viz !== 'undefined' && viz) {
+                const prog = typeof progressRatio === 'number'
+                    ? progressRatio
+                    : (audio.getDuration() > 0 ? audio.getCurrentTime() / audio.getDuration() : 0);
+                viz.renderPostOverlays(ctx, width, height, isBeat, prog, true);
+            }
+
             if (CONFIG.watermark) {
                 const fs = Math.max(13, Math.round(height * 0.022));
                 ctx.save();
@@ -1147,14 +1217,11 @@
             });
         }
 
-        // Exposed to mode renderers
         get config() { return CONFIG; }
         get state() { return APP_STATE; }
         get palette() {
-            const base = PALETTES[CONFIG.palette];
+            const base = PALETTES[CONFIG.palette] || PALETTES.cyberpunk;
             if (!CONFIG.hueCycle) return base;
-            // Cache per frame — angle quantized to 0.1° so identical frames
-            // reuse the same mapped array instead of rebuilding it.
             const deg = Math.round((nowSec() * CONFIG.hueCycleSpeed) % 360 * 10) / 10;
             const key = CONFIG.palette + '|' + deg;
             if (this._hueKey !== key) {
@@ -1202,9 +1269,6 @@
             return grad;
         }
 
-        // Precompute log-spaced source-bin ranges for the current FFT size.
-        // Spread bands geometrically across the lower 90% of bins (bins near
-        // Nyquist are almost always empty, so they only waste resolution).
         _buildLogRanges(binCount) {
             const bands = Math.min(binCount, 256);
             const usable = Math.floor(binCount * 0.9);
@@ -1221,9 +1285,6 @@
             this._logRangesBinCount = binCount;
         }
 
-        // Map raw (linear) frequency data to log-spaced bands when enabled.
-        // Called once per render path (live render + export renderFrame) so
-        // the live view and every export format stay perfectly in sync.
         processData(data) {
             if (CONFIG.freqScale !== 'log') return data;
             const src = data.freq;
@@ -1243,10 +1304,118 @@
             return { freq: out, wave: data.wave };
         }
 
+        renderPostOverlays(ctx, w, h, isBeat, progressRatio, isExport) {
+            // 1. Cinema Vignette
+            if (CONFIG.fxVignette) {
+                const vig = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.28, w / 2, h / 2, Math.max(w, h) * 0.72);
+                vig.addColorStop(0, 'rgba(0,0,0,0)');
+                vig.addColorStop(1, 'rgba(0,0,0,0.68)');
+                ctx.fillStyle = vig;
+                ctx.fillRect(0, 0, w, h);
+            }
+
+            // 2. CRT Scanlines
+            if (CONFIG.fxScanlines) {
+                ctx.save();
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+                for (let y = 0; y < h; y += 4) {
+                    ctx.fillRect(0, y, w, 1.5);
+                }
+                ctx.restore();
+            }
+
+            // 3. On-Canvas Track Title & Artist Overlay
+            const title = (CONFIG.overlayTitle || '').trim();
+            const artist = (CONFIG.overlayArtist || '').trim();
+            if (title || artist) {
+                ctx.save();
+                const pulse = (CONFIG.overlayBeatPulse && isBeat) ? 1.05 : 1.0;
+                const baseSize = Math.max(18, Math.round(Math.min(w, h) * 0.042));
+                const subSize = Math.max(12, Math.round(baseSize * 0.56));
+                let tx = w * 0.06;
+                let ty = h * 0.84;
+                let align = 'left';
+
+                if (CONFIG.overlayPosition === 'center') {
+                    tx = w / 2;
+                    ty = h / 2;
+                    align = 'center';
+                } else if (CONFIG.overlayPosition === 'top-center') {
+                    tx = w / 2;
+                    ty = h * 0.14;
+                    align = 'center';
+                } else if (CONFIG.overlayPosition === 'bottom-center') {
+                    tx = w / 2;
+                    ty = h * 0.85;
+                    align = 'center';
+                }
+
+                ctx.translate(tx, ty);
+                ctx.scale(pulse, pulse);
+                ctx.textAlign = align;
+                ctx.textBaseline = 'middle';
+
+                if (title) {
+                    ctx.font = `800 ${baseSize}px 'Space Grotesk', Inter, sans-serif`;
+                    ctx.shadowColor = this.getColor(0);
+                    ctx.shadowBlur = isBeat ? 22 : 12;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(title, 0, 0);
+                }
+                if (artist) {
+                    ctx.font = `600 ${subSize}px Inter, sans-serif`;
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                    ctx.fillStyle = this.getColor(0);
+                    ctx.fillText(artist.toUpperCase(), 0, title ? baseSize * 0.85 : 0);
+                }
+                ctx.restore();
+            }
+
+            // 4. On-Canvas Audio Progress Bar (at bottom edge of export or canvas)
+            if (CONFIG.fxProgressBar && progressRatio > 0) {
+                const barH = Math.max(3, Math.round(h * 0.005));
+                ctx.save();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+                ctx.fillRect(0, h - barH, w, barH);
+                const grad = ctx.createLinearGradient(0, 0, w, 0);
+                grad.addColorStop(0, this.getColor(0));
+                grad.addColorStop(1, this.getColor(1));
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, h - barH, Math.min(1, progressRatio) * w, barH);
+                ctx.restore();
+            }
+
+            // 5. Social Aspect Ratio Frame Guide (live preview only, when non-16:9 is selected)
+            if (!isExport && CONFIG.aspectRatio && CONFIG.aspectRatio !== '16:9') {
+                const ratios = { '9:16': 9 / 16, '1:1': 1, '4:5': 4 / 5 };
+                const targetRatio = ratios[CONFIG.aspectRatio];
+                if (targetRatio) {
+                    let fw = h * 0.82 * targetRatio;
+                    let fh = h * 0.82;
+                    if (fw > w * 0.9) {
+                        fw = w * 0.9;
+                        fh = fw / targetRatio;
+                    }
+                    const fx = (w - fw) / 2;
+                    const fy = (h - fh) / 2;
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(129, 140, 248, 0.45)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([6, 6]);
+                    ctx.strokeRect(fx, fy, fw, fh);
+                    ctx.setLineDash([]);
+                    ctx.font = '600 11px Inter, sans-serif';
+                    ctx.fillStyle = 'rgba(129, 140, 248, 0.85)';
+                    ctx.fillText(`Export Crop Guide (${CONFIG.aspectRatio})`, fx + 8, fy + 16);
+                    ctx.restore();
+                }
+            }
+        }
+
         loop() {
             requestAnimationFrame(() => this.loop());
 
-            // FPS Calculation
             const now = performance.now();
             const delta = now - APP_STATE.lastTime;
             APP_STATE.frames++;
@@ -1263,11 +1432,9 @@
             const data = audio.getAnalysis();
             const isBeat = BeatDetector.update(data.freq);
 
-            // Render to main canvas
             this.render(this.ctx, this.width, this.height, this.cx, this.cy, data, isBeat);
 
-            // Render to export canvas if recording
-            if (APP_STATE.isRecording && APP_STATE.exportCtx) {
+            if (APP_STATE.isRecording && !APP_STATE.isFastExporting && APP_STATE.exportCtx) {
                 const expW = APP_STATE.exportCanvas.width;
                 const expH = APP_STATE.exportCanvas.height;
                 Exporter.renderFrame(APP_STATE.exportCtx, expW, expH, data, isBeat);
@@ -1277,15 +1444,8 @@
         render(ctx, w, h, cx, cy, data, isBeat) {
             data = this.processData(data);
             const mod = VIS_MODS[APP_STATE.mode];
-            if (!mod) {
-                if (!this._warned) {
-                    this._warned = true;
-                    console.warn('Visualizer mode ' + APP_STATE.mode + ' is not registered');
-                }
-                return;
-            }
+            if (!mod) return;
 
-            // Background fade (modes with their own background skip this)
             if (!mod.ownBackground) {
                 ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
                 ctx.fillRect(0, 0, w, h);
@@ -1295,6 +1455,9 @@
             ctx.lineCap = 'round';
 
             mod.render(this, ctx, w, h, cx, cy, data, isBeat);
+
+            const prog = audio.getDuration() > 0 ? audio.getCurrentTime() / audio.getDuration() : 0;
+            this.renderPostOverlays(ctx, w, h, isBeat, prog, false);
         }
     }
 
@@ -1316,6 +1479,7 @@
             this.applyConfigToUI();
             this.updateModeDisplay();
             this.updateModeCards();
+            this.updateSliderLabels();
         },
 
         cacheElements() {
@@ -1431,7 +1595,6 @@
                 }
             };
 
-            // Keyboard shortcuts modal
             document.getElementById('btn-shortcuts').onclick = () => {
                 this.els.shortcutsModal.classList.add('open');
             };
@@ -1444,11 +1607,11 @@
                 }
             };
 
-            // Auto-hide UI while playing — mouse only. Touch devices reveal the
-            // UI on tap and never auto-hide it (previously impossible to restore).
             let hideTimeout;
+            const stickyAd = document.getElementById('app-sticky-ad');
             const revealUI = () => {
                 this.els.uiLayer.style.opacity = '1';
+                if (stickyAd) stickyAd.style.opacity = '1';
                 clearTimeout(hideTimeout);
             };
             document.addEventListener('pointermove', (e) => {
@@ -1457,13 +1620,13 @@
                 hideTimeout = setTimeout(() => {
                     if (APP_STATE.isPlaying && !this.settingsOpen && !APP_STATE.isRecording) {
                         this.els.uiLayer.style.opacity = '0';
+                        if (stickyAd) stickyAd.style.opacity = '0';
                     }
                 }, 3000);
             });
             document.addEventListener('pointerdown', revealUI);
             document.addEventListener('touchstart', revealUI, { passive: true });
 
-            // Click on settings overlay to close
             this.els.settingsModal.onclick = (e) => {
                 if (e.target === this.els.settingsModal) this.toggleSettings(false);
             };
@@ -1477,21 +1640,33 @@
             this.setupShare();
         },
 
+        getShareablePresetUrl() {
+            const base = 'https://progameryt-op.github.io/WaveForge/visualizer.html';
+            const params = new URLSearchParams();
+            params.set('mode', String(APP_STATE.mode));
+            params.set('palette', CONFIG.palette);
+            params.set('sens', String(CONFIG.sensitivity));
+            params.set('aspect', CONFIG.aspectRatio || '16:9');
+            if (CONFIG.overlayTitle) params.set('title', CONFIG.overlayTitle);
+            if (CONFIG.overlayArtist) params.set('artist', CONFIG.overlayArtist);
+            return `${base}?${params.toString()}`;
+        },
+
         setupShare() {
-            const SHARE_URL = 'https://progameryt-op.github.io/WaveForge/';
-            const SHARE_TITLE = 'WaveForge — free music visualizer with 4K video export';
+            const SHARE_TITLE = 'Check out my custom music visualizer preset on WaveForge (Free 4K Export)';
             const embed = (str) => encodeURIComponent(str);
 
             const openShare = () => {
+                const shareUrl = this.getShareablePresetUrl();
                 if (navigator.share) {
-                    navigator.share({ title: SHARE_TITLE, url: SHARE_URL })
+                    navigator.share({ title: SHARE_TITLE, url: shareUrl })
                         .catch(() => {});
                     return;
                 }
                 const networks = {
-                    x: `https://twitter.com/intent/tweet?text=${embed(SHARE_TITLE)}&url=${embed(SHARE_URL)}`,
-                    reddit: `https://www.reddit.com/submit?url=${embed(SHARE_URL)}&title=${embed(SHARE_TITLE)}`,
-                    facebook: `https://www.facebook.com/sharer/sharer.php?u=${embed(SHARE_URL)}`
+                    x: `https://twitter.com/intent/tweet?text=${embed(SHARE_TITLE)}&url=${embed(shareUrl)}`,
+                    reddit: `https://www.reddit.com/submit?url=${embed(shareUrl)}&title=${embed(SHARE_TITLE)}`,
+                    facebook: `https://www.facebook.com/sharer/sharer.php?u=${embed(shareUrl)}`
                 };
                 document.querySelectorAll('#share-buttons [data-share-network]').forEach(a => {
                     a.href = networks[a.dataset.shareNetwork] || '#';
@@ -1510,14 +1685,15 @@
             };
 
             document.getElementById('btn-copy-link').onclick = () => {
-                const done = () => this.showToast('Link copied — thanks for sharing!', 'success');
+                const shareUrl = this.getShareablePresetUrl();
+                const done = () => this.showToast('Shareable preset link copied!', 'success');
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(SHARE_URL).then(done).catch(() => {
-                        this._fallbackCopy(SHARE_URL);
+                    navigator.clipboard.writeText(shareUrl).then(done).catch(() => {
+                        this._fallbackCopy(shareUrl);
                         done();
                     });
                 } else {
-                    this._fallbackCopy(SHARE_URL);
+                    this._fallbackCopy(shareUrl);
                     done();
                 }
             };
@@ -1557,7 +1733,7 @@
 
         setupKeyboard() {
             document.addEventListener('keydown', (e) => {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
 
                 switch (e.code) {
                     case 'Space':
@@ -1573,10 +1749,13 @@
                     case 'KeyF':
                         document.getElementById('btn-fullscreen').click();
                         break;
+                    case 'KeyR':
+                        this.randomizeVisual();
+                        break;
                     case 'ArrowRight':
                         audio.audioElement.currentTime = Math.min(
                             audio.audioElement.currentTime + 5,
-                            audio.audioElement.duration
+                            audio.audioElement.duration || 0
                         );
                         break;
                     case 'ArrowLeft':
@@ -1637,7 +1816,21 @@
             linkSetting('set-hue-cycle', 'hueCycle', 'bool');
             linkSetting('set-hue-speed', 'hueCycleSpeed', 'float');
 
-            // Live value labels for every range slider in the settings modal
+            // v3.0 — 3-Band EQ bindings
+            linkSetting('set-eq-bass', 'eqBass', 'float');
+            linkSetting('set-eq-mid', 'eqMid', 'float');
+            linkSetting('set-eq-treble', 'eqTreble', 'float');
+
+            // v3.0 — Text Overlay & Post-FX bindings
+            linkSetting('set-overlay-title', 'overlayTitle', 'string');
+            linkSetting('set-overlay-artist', 'overlayArtist', 'string');
+            linkSetting('set-overlay-pos', 'overlayPosition', 'string');
+            linkSetting('set-overlay-pulse', 'overlayBeatPulse', 'bool');
+            linkSetting('set-fx-scanlines', 'fxScanlines', 'bool');
+            linkSetting('set-fx-vignette', 'fxVignette', 'bool');
+            linkSetting('set-fx-progress', 'fxProgressBar', 'bool');
+            linkSetting('set-aspect', 'aspectRatio', 'string');
+
             document.querySelectorAll('#settings-modal input[type="range"]').forEach((input) => {
                 input.addEventListener('input', () => this.updateSliderLabels());
             });
@@ -1648,6 +1841,7 @@
                 document.body.classList.toggle('high-contrast', CONFIG.highContrast);
                 document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
                 this.applyConfigToUI();
+                this.updateSliderLabels();
                 persistConfig();
                 this.showToast('Settings reset to defaults', 'success');
             };
@@ -1756,11 +1950,14 @@
             document.getElementById('set-logo-rotate').onchange = (e) => { CONFIG.logoRotateRing = e.target.checked; persistConfig(); };
         },
 
-        // Push hydrated CONFIG values into the settings controls
         applyConfigToUI() {
             const setVal = (id, val) => {
                 const el = document.getElementById(id);
-                if (el) el.value = val;
+                if (el && val !== undefined) el.value = val;
+            };
+            const setChk = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.checked = Boolean(val);
             };
             setVal('set-smoothing', CONFIG.smoothing);
             setVal('set-sensitivity', CONFIG.sensitivity);
@@ -1775,14 +1972,27 @@
             setVal('set-ray-count', CONFIG.logoRayCount);
             setVal('set-line-thick', CONFIG.logoLineThickness);
             setVal('set-glow-size', CONFIG.logoGlowSize);
-            document.getElementById('set-beat-enabled').checked = CONFIG.beatEnabled;
-            document.getElementById('set-mirror').checked = CONFIG.mirror;
-            document.getElementById('set-hue-cycle').checked = CONFIG.hueCycle;
-            document.getElementById('set-watermark').checked = CONFIG.watermark;
-            document.getElementById('set-hc').checked = CONFIG.highContrast;
-            document.getElementById('set-show-fps').checked = CONFIG.showFps;
-            document.getElementById('set-logo-particles').checked = CONFIG.logoParticles;
-            document.getElementById('set-logo-rotate').checked = CONFIG.logoRotateRing;
+            setVal('set-eq-bass', CONFIG.eqBass);
+            setVal('set-eq-mid', CONFIG.eqMid);
+            setVal('set-eq-treble', CONFIG.eqTreble);
+            setVal('set-overlay-title', CONFIG.overlayTitle);
+            setVal('set-overlay-artist', CONFIG.overlayArtist);
+            setVal('set-overlay-pos', CONFIG.overlayPosition);
+            setVal('set-aspect', CONFIG.aspectRatio);
+            setVal('export-aspect', CONFIG.aspectRatio);
+
+            setChk('set-beat-enabled', CONFIG.beatEnabled);
+            setChk('set-mirror', CONFIG.mirror);
+            setChk('set-hue-cycle', CONFIG.hueCycle);
+            setChk('set-watermark', CONFIG.watermark);
+            setChk('set-hc', CONFIG.highContrast);
+            setChk('set-show-fps', CONFIG.showFps);
+            setChk('set-logo-particles', CONFIG.logoParticles);
+            setChk('set-logo-rotate', CONFIG.logoRotateRing);
+            setChk('set-overlay-pulse', CONFIG.overlayBeatPulse);
+            setChk('set-fx-scanlines', CONFIG.fxScanlines);
+            setChk('set-fx-vignette', CONFIG.fxVignette);
+            setChk('set-fx-progress', CONFIG.fxProgressBar);
 
             document.body.classList.toggle('high-contrast', CONFIG.highContrast);
             document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
@@ -1817,6 +2027,11 @@
                 };
                 reader.readAsText(file);
             } else if (file.type.includes('audio') || file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac|webm)$/i)) {
+                const cleanName = file.name.replace(/\.[^.]+$/, '');
+                if (!CONFIG.overlayTitle) {
+                    CONFIG.overlayTitle = cleanName.substring(0, 38);
+                    this.applyConfigToUI();
+                }
                 audio.playFile(URL.createObjectURL(file));
                 document.getElementById('status-text').textContent = file.name.substring(0, 20) + (file.name.length > 20 ? '...' : '');
             } else {
@@ -1825,7 +2040,6 @@
         },
 
         loadDemoTrack() {
-            // Built-in royalty-free demo loop (relative path — works on GitHub Pages subpaths)
             audio.playFile('assets/audio/demo-track.wav');
             document.getElementById('status-text').textContent = 'Demo track';
         },
@@ -1862,6 +2076,13 @@
         openModeSelector() {
             this.els.modeSelectorModal.classList.add('open');
             this.updateModeCards();
+            if (window.WaveForgeAds) {
+                const slot = document.getElementById('mode-selector-ad-slot');
+                if (slot && !slot.dataset.mounted) {
+                    slot.dataset.mounted = '1';
+                    window.WaveForgeAds.mountResponsiveBanner(slot, { compact: true });
+                }
+            }
         },
 
         closeModeSelector() {
@@ -1900,12 +2121,13 @@
             if (modeKeys.length) APP_STATE.mode = modeKeys[Math.floor(Math.random() * modeKeys.length)];
             const paletteKeys = Object.keys(PALETTES);
             CONFIG.palette = paletteKeys[Math.floor(Math.random() * paletteKeys.length)];
-            CONFIG.sensitivity = Math.round((0.8 + Math.random() * 1.9) * 10) / 10;
+            CONFIG.sensitivity = Math.round((0.9 + Math.random() * 1.8) * 10) / 10;
             CONFIG.mirror = Math.random() < 0.5;
             audio.updateSettings();
             this.applyConfigToUI();
             this.updateModeDisplay();
             this.updateModeCards();
+            this.updateSliderLabels();
             persistConfig();
             const mod = VIS_MODS[APP_STATE.mode];
             this.showToast('🎲 ' + (mod ? mod.name : 'Randomized') + ' · ' + CONFIG.palette, 'success');
@@ -1940,20 +2162,14 @@
 
         viz.loop();
 
-        console.log('%c🎵 WaveForge v2.1.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
-        console.log('%cProfessional Music Visualizer', 'color: #ff0099; font-size: 12px;');
-    });
-
-    // Handle visibility change to pause/resume
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden && APP_STATE.isPlaying && !APP_STATE.isRecording) {
-            // Optionally pause when tab is hidden
+        if (window.WaveForgeAds) {
+            window.WaveForgeAds.injectSocialBar(3500);
         }
+
+        console.log('%c🎵 WaveForge v3.0.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
+        console.log('%cProfessional Music Visualizer Studio', 'color: #ff0099; font-size: 12px;');
     });
 
-    // Service Worker Registration (for PWA/offline support).
-    // Relative path so it works on GitHub Pages project sites (username.github.io/repo/).
-    // Only register over HTTPS or localhost — file:// and http:// LAN IPs are unsupported contexts.
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').catch(() => {});

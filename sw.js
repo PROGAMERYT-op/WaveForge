@@ -1,13 +1,8 @@
 /* WaveForge Service Worker — offline support for GitHub Pages hosting.
  *
- * Strategy:
- *  - Navigations (HTML pages): network-first, fall back to cache.
- *  - Same-origin static assets: cache-first, refresh cache in background.
- *  - Cross-origin requests (CDN, analytics, ads): passed through untouched.
- *
  * Bump CACHE_VERSION to invalidate the old cache after a deploy.
  */
-const CACHE_VERSION = 'waveforge-v2.1.0';
+const CACHE_VERSION = 'waveforge-v3.0.0';
 const PRECACHE = [
     './',
     'index.html',
@@ -18,6 +13,7 @@ const PRECACHE = [
     'assets/css/app.css',
     'assets/css/landing.css',
     'assets/css/legal.css',
+    'assets/js/ads.js',
     'assets/js/app.js',
     'assets/js/landing.js',
     'assets/js/legal.js',
@@ -30,6 +26,9 @@ const PRECACHE = [
     'Visualizers/dna.js',
     'Visualizers/galaxy.js',
     'Visualizers/logo.js',
+    'Visualizers/tunnel.js',
+    'Visualizers/trapnation.js',
+    'Visualizers/synthwave.js',
     'assets/audio/demo-track.wav',
     'assets/img/favicon.svg',
     'assets/img/icon-192.png',
@@ -58,13 +57,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const req = event.request;
 
-    // Only handle same-origin GET requests; let everything else pass through untouched.
     if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
-
-    // Media elements issue Range requests — never intercept those.
     if (req.headers.has('range')) return;
 
-    // Navigations: network-first so deploys show up immediately.
     if (req.mode === 'navigate') {
         event.respondWith(
             fetch(req)
@@ -78,7 +73,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Static assets: cache-first with background refresh.
     event.respondWith(
         caches.match(req).then((hit) => {
             const network = fetch(req).then((resp) => {

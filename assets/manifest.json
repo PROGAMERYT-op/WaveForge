@@ -1,7 +1,7 @@
 {
-    "name": "WaveForge — Free Music Visualizer",
+    "name": "WaveForge Studio v3.0 \u2014 Free 4K Music Visualizer",
     "short_name": "WaveForge",
-    "description": "Free browser-based music visualizer. 9 modes, real-time beat detection, and 4K video export with no watermark. No signup required.",
+    "description": "Free browser-based music visualizer with 12 modes, 3-band EQ, track title overlays, and 16:9 / 9:16 4K MP4 export with no watermark.",
     "lang": "en",
     "dir": "ltr",
     "start_url": "../visualizer.html",
@@ -10,7 +10,11 @@
     "orientation": "any",
     "background_color": "#0b1020",
     "theme_color": "#0b1020",
-    "categories": ["music", "multimedia", "photo_and_video"],
+    "categories": [
+        "music",
+        "multimedia",
+        "photo_and_video"
+    ],
     "icons": [
         {
             "src": "../assets/img/icon-192.png",

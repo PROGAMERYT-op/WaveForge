@@ -1138,3 +1138,153 @@ kbd {
 }
 .color-swatch:hover { transform: scale(1.15); }
 .color-swatch.active { border-color: #fff; transform: scale(1.15); }
+
+
+/* ============================================
+   WAVEFORGE v3.0 STUDIO & MONETIZATION STYLES
+   ============================================ */
+
+.pro-pill {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #00ff88, #00c4ff);
+    color: #050816;
+    vertical-align: middle;
+    margin-left: 4px;
+    letter-spacing: 0.4px;
+}
+
+.btn-perk {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.16), rgba(0, 196, 255, 0.16));
+    border: 1px solid rgba(0, 255, 136, 0.45);
+    color: #00ff88;
+    padding: 9px 14px;
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    font-family: var(--font-family);
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(8px);
+    transition: all var(--transition-fast);
+}
+
+.btn-perk:hover {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.28), rgba(0, 196, 255, 0.28));
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 255, 136, 0.22);
+}
+
+.control-row .text-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--panel-border);
+    color: var(--text-main);
+    padding: 8px 12px;
+    border-radius: var(--border-radius-sm);
+    font-family: var(--font-family);
+    font-size: 0.85rem;
+    min-width: 190px;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.control-row .text-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
+}
+
+.modal-ad-box {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-align: center;
+}
+
+.modal-ad-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.ad-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.smartlink-inline-cta {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #00ff88;
+    text-decoration: none;
+    transition: opacity var(--transition-fast);
+}
+
+.smartlink-inline-cta:hover {
+    text-decoration: underline;
+    opacity: 0.9;
+}
+
+.modal-ad-slot {
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.wf-app-sticky-ad {
+    position: fixed;
+    bottom: 132px;
+    right: 16px;
+    z-index: 25;
+    background: rgba(11, 16, 32, 0.88);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 6px 32px 6px 10px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    transition: opacity var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wf-app-sticky-ad .ad-sticky-close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 768px) {
+    .wf-app-sticky-ad {
+        left: 8px;
+        right: 8px;
+        bottom: 148px;
+    }
+    .control-row .text-input {
+        width: 100%;
+    }
+}
