@@ -1,11 +1,5 @@
-/* WaveForge Service Worker v3.1.0 — offline support for GitHub Pages hosting.
- *
- * Strategy:
- *  - Navigations, CSS, and JS: network-first (falls back to cache offline) so
- *    code and style updates always show up immediately without stale cache issues!
- *  - Images & audio: cache-first with background refresh.
- */
-const CACHE_VERSION = 'waveforge-v3.1.0';
+/* WaveForge Service Worker v3.1.2 — offline support for GitHub Pages hosting. */
+const CACHE_VERSION = 'waveforge-v3.1.2';
 const PRECACHE = [
     './',
     'index.html',
@@ -13,25 +7,25 @@ const PRECACHE = [
     'privacy.html',
     'terms.html',
     'assets/manifest.json',
-    'assets/css/app.css?v=3.1',
-    'assets/css/landing.css?v=3.1',
+    'assets/css/app.css?v=3.1.2',
+    'assets/css/landing.css?v=3.1.2',
     'assets/css/legal.css',
-    'assets/js/ads.js?v=3.1',
-    'assets/js/app.js?v=3.1',
-    'assets/js/landing.js?v=3.1',
+    'assets/js/ads.js?v=3.1.2',
+    'assets/js/app.js?v=3.1.2',
+    'assets/js/landing.js?v=3.1.2',
     'assets/js/legal.js',
-    'Visualizers/bars.js?v=3.1',
-    'Visualizers/wave.js?v=3.1',
-    'Visualizers/radial.js?v=3.1',
-    'Visualizers/particles.js?v=3.1',
-    'Visualizers/spectrogram.js?v=3.1',
-    'Visualizers/3dbars.js?v=3.1',
-    'Visualizers/dna.js?v=3.1',
-    'Visualizers/galaxy.js?v=3.1',
-    'Visualizers/logo.js?v=3.1',
-    'Visualizers/tunnel.js?v=3.1',
-    'Visualizers/trapnation.js?v=3.1',
-    'Visualizers/synthwave.js?v=3.1',
+    'Visualizers/bars.js?v=3.1.2',
+    'Visualizers/wave.js?v=3.1.2',
+    'Visualizers/radial.js?v=3.1.2',
+    'Visualizers/particles.js?v=3.1.2',
+    'Visualizers/spectrogram.js?v=3.1.2',
+    'Visualizers/3dbars.js?v=3.1.2',
+    'Visualizers/dna.js?v=3.1.2',
+    'Visualizers/galaxy.js?v=3.1.2',
+    'Visualizers/logo.js?v=3.1.2',
+    'Visualizers/tunnel.js?v=3.1.2',
+    'Visualizers/trapnation.js?v=3.1.2',
+    'Visualizers/synthwave.js?v=3.1.2',
     'assets/audio/demo-track.wav',
     'assets/img/favicon.svg',
     'assets/img/icon-192.png',
@@ -45,7 +39,7 @@ self.addEventListener('install', (event) => {
     self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_VERSION)
-            .then((cache) => Promise.all(PRECACHE.map((url) => cache.add(url).catch(() => {}))))
+            .then((cache) => Promise.all(PRECACHE.map((url) => cache.add(new Request(url, { cache: 'reload' })).catch(() => {}))))
     );
 });
 
@@ -66,9 +60,8 @@ self.addEventListener('fetch', (event) => {
     const isCodeOrHtml = req.mode === 'navigate' || /\.(html|css|js)$/i.test(url.pathname);
 
     if (isCodeOrHtml) {
-        // Network-first for HTML, CSS, and JS so updates appear immediately on deploy!
         event.respondWith(
-            fetch(req)
+            fetch(req, { cache: 'no-cache' })
                 .then((resp) => {
                     if (resp && resp.ok) {
                         const copy = resp.clone();
@@ -81,7 +74,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Cache-first for images, icons, and demo audio
     event.respondWith(
         caches.match(req, { ignoreSearch: true }).then((hit) => {
             const network = fetch(req).then((resp) => {

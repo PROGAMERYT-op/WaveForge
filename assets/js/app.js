@@ -2166,13 +2166,13 @@
             window.WaveForgeAds.injectSocialBar(3500);
         }
 
-        console.log('%c🎵 WaveForge v3.0.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
+        console.log('%c🎵 WaveForge v3.1.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
         console.log('%cProfessional Music Visualizer Studio', 'color: #ff0099; font-size: 12px;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js?v=3.1').then(r => r.update()).catch(() => {});
+            navigator.serviceWorker.register('sw.js').then(r => r.update()).catch(() => {});
         });
     }
 })();
