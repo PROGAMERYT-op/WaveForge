@@ -1,8 +1,11 @@
-/* WaveForge Service Worker — offline support for GitHub Pages hosting.
+/* WaveForge Service Worker v3.1.0 — offline support for GitHub Pages hosting.
  *
- * Bump CACHE_VERSION to invalidate the old cache after a deploy.
+ * Strategy:
+ *  - Navigations, CSS, and JS: network-first (falls back to cache offline) so
+ *    code and style updates always show up immediately without stale cache issues!
+ *  - Images & audio: cache-first with background refresh.
  */
-const CACHE_VERSION = 'waveforge-v3.0.0';
+const CACHE_VERSION = 'waveforge-v3.1.0';
 const PRECACHE = [
     './',
     'index.html',
@@ -10,25 +13,25 @@ const PRECACHE = [
     'privacy.html',
     'terms.html',
     'assets/manifest.json',
-    'assets/css/app.css',
-    'assets/css/landing.css',
+    'assets/css/app.css?v=3.1',
+    'assets/css/landing.css?v=3.1',
     'assets/css/legal.css',
-    'assets/js/ads.js',
-    'assets/js/app.js',
-    'assets/js/landing.js',
+    'assets/js/ads.js?v=3.1',
+    'assets/js/app.js?v=3.1',
+    'assets/js/landing.js?v=3.1',
     'assets/js/legal.js',
-    'Visualizers/bars.js',
-    'Visualizers/wave.js',
-    'Visualizers/radial.js',
-    'Visualizers/particles.js',
-    'Visualizers/spectrogram.js',
-    'Visualizers/3dbars.js',
-    'Visualizers/dna.js',
-    'Visualizers/galaxy.js',
-    'Visualizers/logo.js',
-    'Visualizers/tunnel.js',
-    'Visualizers/trapnation.js',
-    'Visualizers/synthwave.js',
+    'Visualizers/bars.js?v=3.1',
+    'Visualizers/wave.js?v=3.1',
+    'Visualizers/radial.js?v=3.1',
+    'Visualizers/particles.js?v=3.1',
+    'Visualizers/spectrogram.js?v=3.1',
+    'Visualizers/3dbars.js?v=3.1',
+    'Visualizers/dna.js?v=3.1',
+    'Visualizers/galaxy.js?v=3.1',
+    'Visualizers/logo.js?v=3.1',
+    'Visualizers/tunnel.js?v=3.1',
+    'Visualizers/trapnation.js?v=3.1',
+    'Visualizers/synthwave.js?v=3.1',
     'assets/audio/demo-track.wav',
     'assets/img/favicon.svg',
     'assets/img/icon-192.png',
@@ -39,10 +42,10 @@ const PRECACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_VERSION)
             .then((cache) => Promise.all(PRECACHE.map((url) => cache.add(url).catch(() => {}))))
-            .then(() => self.skipWaiting())
     );
 });
 
@@ -56,25 +59,31 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     const req = event.request;
-
     if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
     if (req.headers.has('range')) return;
 
-    if (req.mode === 'navigate') {
+    const url = new URL(req.url);
+    const isCodeOrHtml = req.mode === 'navigate' || /\.(html|css|js)$/i.test(url.pathname);
+
+    if (isCodeOrHtml) {
+        // Network-first for HTML, CSS, and JS so updates appear immediately on deploy!
         event.respondWith(
             fetch(req)
                 .then((resp) => {
-                    const copy = resp.clone();
-                    caches.open(CACHE_VERSION).then((c) => c.put(req, copy));
+                    if (resp && resp.ok) {
+                        const copy = resp.clone();
+                        caches.open(CACHE_VERSION).then((c) => c.put(req, copy));
+                    }
                     return resp;
                 })
-                .catch(() => caches.match(req).then((hit) => hit || caches.match('index.html')))
+                .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('index.html')))
         );
         return;
     }
 
+    // Cache-first for images, icons, and demo audio
     event.respondWith(
-        caches.match(req).then((hit) => {
+        caches.match(req, { ignoreSearch: true }).then((hit) => {
             const network = fetch(req).then((resp) => {
                 if (resp && resp.ok && resp.type === 'basic') {
                     const copy = resp.clone();
