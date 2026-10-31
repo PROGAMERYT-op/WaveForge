@@ -5,7 +5,7 @@
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
-            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
             const next = current === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
             try { localStorage.setItem('wf-theme', next); } catch (e) {}
@@ -28,7 +28,7 @@
         }));
     }
 
-    /* ---------- Interactive HTML5 Canvas Hero Preview ---------- */
+    /* ---------- Interactive 60 FPS Canvas Studio Showcase ---------- */
     const canvas = document.getElementById('heroPreviewCanvas');
     if (canvas) {
         const ctx = canvas.getContext('2d');
@@ -38,8 +38,8 @@
         const PALETTES = {
             cyberpunk: ['#00f2ff', '#ff0099', '#ffffff', '#7b2dff'],
             synthwave: ['#ff2a85', '#00f5d4', '#fee440', '#9b5de5'],
-            fire: ['#ff0000', '#ff6600', '#ffaa00', '#ffff00'],
-            matrix: ['#003300', '#00ff66', '#66ff99', '#ccffdd']
+            fire: ['#ff2200', '#ff7700', '#ffbb00', '#ffff44'],
+            matrix: ['#003311', '#00ff66', '#66ffaa', '#ccffdd']
         };
 
         document.querySelectorAll('[data-p-mode]').forEach((btn) => {
@@ -68,11 +68,11 @@
             const pal = PALETTES[previewPalette] || PALETTES.cyberpunk;
             const beat = Math.pow(Math.max(0, Math.sin(t * 4.2)), 6);
 
-            ctx.fillStyle = 'rgba(6, 9, 22, 0.28)';
+            ctx.fillStyle = 'rgba(6, 9, 20, 0.3)';
             ctx.fillRect(0, 0, w, h);
 
             if (previewMode === 'bars') {
-                const count = 48;
+                const count = 54;
                 const bw = (w / 2) / count - 3;
                 const grad = ctx.createLinearGradient(0, h, 0, 0);
                 grad.addColorStop(0, pal[0]);
@@ -81,25 +81,25 @@
                 ctx.fillStyle = grad;
 
                 for (let i = 0; i < count; i++) {
-                    const n = Math.sin(t * 3.2 + i * 0.32) * 0.5 + 0.5;
-                    const m = Math.cos(t * 5.1 - i * 0.18) * 0.5 + 0.5;
-                    const env = Math.max(0.12, (1 - i / count) * (0.45 + n * 0.55 * m) + beat * 0.28 * (1 - i / count));
-                    const bh = env * h * 0.72;
+                    const n = Math.sin(t * 3.2 + i * 0.3) * 0.5 + 0.5;
+                    const m = Math.cos(t * 5.0 - i * 0.17) * 0.5 + 0.5;
+                    const env = Math.max(0.1, (1 - i / count) * (0.45 + n * 0.55 * m) + beat * 0.28 * (1 - i / count));
+                    const bh = env * h * 0.74;
                     const xOff = i * (bw + 3);
                     ctx.fillRect(cx + xOff, cy - bh / 2, bw, bh);
                     ctx.fillRect(cx - xOff - bw, cy - bh / 2, bw, bh);
                 }
             } else if (previewMode === 'ring') {
-                const baseR = Math.min(cx, cy) * (0.36 + beat * 0.08);
+                const baseR = Math.min(cx, cy) * (0.38 + beat * 0.08);
                 ctx.save();
                 ctx.translate(cx, cy);
-                for (let layer = 0; layer < 2; layer++) {
+                for (let layer = 0; layer < 3; layer++) {
                     ctx.beginPath();
-                    const pts = 96;
+                    const pts = 110;
                     for (let i = 0; i <= pts; i++) {
                         const a = (i / pts) * Math.PI * 2;
                         const wave = Math.sin(a * 8 + t * 4 + layer) * Math.cos(a * 4 - t * 3);
-                        const r = baseR + wave * 34 * (1 + beat * 0.6) + layer * 12;
+                        const r = baseR + wave * 34 * (1 + beat * 0.6) + layer * 10;
                         const px = Math.cos(a) * r;
                         const py = Math.sin(a) * r;
                         if (i === 0) ctx.moveTo(px, py);
@@ -107,7 +107,7 @@
                     }
                     ctx.closePath();
                     ctx.strokeStyle = pal[layer % pal.length];
-                    ctx.lineWidth = 3 - layer;
+                    ctx.lineWidth = 3 - layer * 0.6;
                     ctx.shadowBlur = 16;
                     ctx.shadowColor = pal[layer % pal.length];
                     ctx.stroke();
@@ -117,7 +117,7 @@
             } else if (previewMode === 'tunnel') {
                 ctx.save();
                 ctx.translate(cx, cy);
-                const rings = 14;
+                const rings = 15;
                 const maxR = Math.hypot(cx, cy);
                 for (let i = 0; i < rings; i++) {
                     const depth = ((i / rings) + t * 0.35) % 1;
@@ -150,11 +150,11 @@
                 ctx.arc(cx, horY - sunR * 0.25, sunR, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#060916';
+                ctx.fillStyle = '#060914';
                 ctx.fillRect(0, horY, w, h - horY);
                 ctx.strokeStyle = pal[0];
                 ctx.lineWidth = 1.4;
-                for (let i = -14; i <= 14; i++) {
+                for (let i = -16; i <= 16; i++) {
                     ctx.beginPath();
                     ctx.moveTo(cx + i * 18, horY);
                     ctx.lineTo(cx + i * 120, h);
@@ -195,14 +195,8 @@
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     setTimeout(() => {
         document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
-    }, 500);
+    }, 450);
 
-    /* ---------- Footer year ---------- */
     const yearEl = document.getElementById('year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-    /* ---------- Inject Social Bar cleanly ---------- */
-    if (window.WaveForgeAds) {
-        window.WaveForgeAds.injectSocialBar(2200);
-    }
 })();

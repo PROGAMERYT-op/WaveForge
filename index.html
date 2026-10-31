@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <script>
         (function () {
-            var VER = '3.1.2';
+            var VER = '4.0.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -18,16 +18,8 @@
                         });
                     }
                 }
-            } catch (e) {}
-        })();
-    </script>
-    <script>
-        (function () {
-            try {
                 var stored = localStorage.getItem('wf-theme');
-                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                var theme = stored || (prefersDark ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.setAttribute('data-theme', stored || 'dark');
             } catch (e) {
                 document.documentElement.setAttribute('data-theme', 'dark');
             }
@@ -41,42 +33,37 @@
         gtag('js', new Date());
         gtag('config', 'G-DG4Q2KJ2JD');
     </script>
-    
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light dark">
+    <meta name="color-scheme" content="dark light">
 
-    <title>WaveForge v3.1 | Free Online Music Visualizer &amp; 4K Video Maker (No Watermark)</title>
-    <meta name="description" content="WaveForge is a free browser-based music visualizer and audio spectrum maker. Create audio-reactive videos with 12 modes (Logo Visualizer, Bass Nation, Cyber Tunnel, Synthwave), 3-band EQ, track title overlays, and 16:9 / 9:16 TikTok &amp; YouTube 4K MP4 export with no watermark.">
+    <title>WaveForge — Professional Online Music Visualizer &amp; 4K Video Studio</title>
+    <meta name="description" content="WaveForge is a free, studio-grade browser music visualizer. Craft beat-reactive 4K MP4 videos with 12 modes, 3-band hardware EQ, custom logos, track title overlays, and 16:9 / 9:16 social aspect ratios — no watermark, no signup.">
     <meta name="keywords" content="music visualizer, free music visualizer, online audio visualizer, logo visualizer, tiktok audio visualizer, youtube music video maker, trap nation visualizer, spectrum analyzer, audio waveform, beat detector, mp3 visualizer, spotify canvas maker, web audio api">
     <meta name="author" content="WaveForge">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#060812">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://progameryt-op.github.io/WaveForge/">
 
     <link rel="alternate" hreflang="en" href="https://progameryt-op.github.io/WaveForge/">
-    <link rel="alternate" hreflang="en-us" href="https://progameryt-op.github.io/WaveForge/">
     <link rel="alternate" hreflang="x-default" href="https://progameryt-op.github.io/WaveForge/">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/">
-    <meta property="og:title" content="WaveForge v3.1 | Free Online Music Visualizer &amp; 4K MP4 Video Maker">
-    <meta property="og:description" content="Transform your music into stunning visual art. 12 visualization modes including Logo Visualizer &amp; Bass Nation, 3-band EQ, text overlays, and 16:9 / 9:16 4K MP4 video export with no watermark. 100% free.">
+    <meta property="og:title" content="WaveForge — Professional Online Music Visualizer &amp; 4K Video Studio">
+    <meta property="og:description" content="Transform audio into studio-grade 4K visual art. 12 modes, 3-band EQ, custom text &amp; logo overlays, and 16:9 / 9:16 MP4 export with zero watermarks.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="WaveForge music visualizer studio interface">
     <meta property="og:site_name" content="WaveForge">
-    <meta property="og:locale" content="en_US">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="WaveForge v3.1 | Free Music Visualizer &amp; 4K Video Maker">
-    <meta name="twitter:description" content="Create stunning music visualizations instantly. 12 modes, 3-band EQ, 9:16 TikTok &amp; 16:9 YouTube 4K MP4 video export with no watermarks.">
+    <meta name="twitter:title" content="WaveForge — Free 4K Music Visualizer Studio">
+    <meta name="twitter:description" content="12 audio-reactive modes, 3-band EQ, custom overlays, and hardware-accelerated 4K MP4 export in your browser.">
     <meta name="twitter:image" content="https://progameryt-op.github.io/WaveForge/assets/img/twitter-card.png">
 
     <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
-    <link rel="icon" type="image/png" href="assets/img/logo.png">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/img/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -84,110 +71,67 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "WaveForge",
-        "alternateName": ["Wave Forge", "WaveForge Visualizer", "WaveForge Studio"],
-        "url": "https://progameryt-op.github.io/WaveForge/"
-    }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "WaveForge",
+        "name": "WaveForge Studio",
         "url": "https://progameryt-op.github.io/WaveForge/",
-        "description": "Free online music visualizer with 12 visualization modes including Logo Visualizer, Bass Nation, Cyber Tunnel, and Synthwave Grid, 3-band audio EQ, text overlays, and 4K MP4 video export with no watermark.",
+        "description": "Studio-grade browser music visualizer with 12 modes, 3-band hardware EQ, custom text and logo overlays, and 4K MP4 export with no watermark.",
         "applicationCategory": "MultimediaApplication",
-        "applicationSubCategory": "Music Visualization",
         "operatingSystem": "Any modern browser",
-        "browserRequirements": "Requires JavaScript and the Web Audio API.",
-        "softwareVersion": "3.0.0",
+        "softwareVersion": "4.0.0",
         "isAccessibleForFree": true,
         "offers": {
             "@type": "Offer",
             "price": "0",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
+            "priceCurrency": "USD"
         },
         "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "4.9",
             "ratingCount": "2840"
-        },
-        "featureList": [
-            "12 visualization modes (incl. Logo Visualizer, Bass Nation, Cyber Tunnel, Synthwave Grid)",
-            "3-band Web Audio hardware equalizer (Bass Boost, Mid, Treble)",
-            "16:9 YouTube, 9:16 TikTok/Reels/Shorts, 1:1 Spotify/Instagram, and 4:5 aspect ratios",
-            "On-canvas Track Title and Artist text overlays",
-            "Fast WebCodecs 4K MP4 (H.264 + AAC) and WebM video export with no watermarks",
-            "12 customizable color palettes and CRT/Vignette post-FX",
-            "Local browser audio processing — files never leave your device"
-        ]
+        }
     }
     </script>
 
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {"@type":"Question","name":"Is WaveForge really 100% free with no watermark?","acceptedAnswer":{"@type":"Answer","text":"Yes. WaveForge is 100% free with no hidden paywalls, no account registration, and zero forced watermarks even on 4K 60FPS MP4 video exports."}},
-            {"@type":"Question","name":"Can I export vertical 9:16 videos for TikTok, YouTube Shorts, and Reels?","acceptedAnswer":{"@type":"Answer","text":"Yes! WaveForge v3.1 includes dedicated aspect ratio presets for 16:9 (YouTube), 9:16 (TikTok, Reels, Shorts), 1:1 (Spotify Canvas & Instagram), and 4:5 (Portrait Feed)."}},
-            {"@type":"Question","name":"What video formats does WaveForge export?","acceptedAnswer":{"@type":"Answer","text":"WaveForge uses hardware-accelerated WebCodecs to export directly to MP4 (H.264 video + AAC audio) faster than realtime on modern browsers, with automatic fallback to WebM (VP9/Opus)."}},
-            {"@type":"Question","name":"Can I add my song title, artist name, and logo to the video?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can upload a custom center logo and background image in Logo Visualizer mode, and add beat-reactive Track Title and Artist text overlays across all 12 modes."}},
-            {"@type":"Question","name":"Do my audio files get uploaded to any server?","acceptedAnswer":{"@type":"Answer","text":"Never. All audio analysis, 3-band EQ filtering, and 4K video rendering happen 100% locally inside your browser using the Web Audio API and WebCodecs."}},
-            {"@type":"Question","name":"Can I use exported visualizer videos commercially on YouTube and Spotify?","acceptedAnswer":{"@type":"Answer","text":"Yes. All visualizations you generate with WaveForge are royalty-free for commercial monetization on YouTube, TikTok, Spotify, and Twitch, provided you own the rights to your audio track."}}
-        ]
-    }
-    </script>    
-        <link rel="stylesheet" href="assets/css/landing.css?v=3.1.2">
-    <style>
-        .preview-canvas-wrap { position: relative; background: #060916; display: flex; flex-direction: column; border-radius: 0 0 14px 14px; overflow: hidden; }
-        #heroPreviewCanvas { width: 100%; height: 320px; display: block; background: radial-gradient(circle at 50% 50%, #101935 0%, #050814 100%); }
-        .preview-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; background: var(--surface, #0f172a); border-top: 1px solid var(--border, rgba(148,163,184,0.18)); flex-wrap: wrap; }
-        .preview-pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
-        .preview-pill { background: var(--surface-2, #1e293b); border: 1px solid var(--border, rgba(148,163,184,0.22)); color: var(--text-muted, #94a3b8); font-family: inherit; font-size: 0.76rem; font-weight: 600; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all 0.2s ease; }
-        .preview-pill:hover { color: var(--text, #f8fafc); border-color: var(--accent, #6366f1); }
-        .preview-pill.active { background: var(--accent, #6366f1); color: #ffffff; border-color: var(--accent, #6366f1); }
-        .preview-launch-btn { font-size: 0.8rem; font-weight: 700; color: var(--accent, #818cf8); text-decoration: none; padding: 6px 14px; border-radius: 999px; background: var(--accent-soft, rgba(99,102,241,0.14)); transition: all 0.2s ease; }
-        .preview-launch-btn:hover { background: var(--accent, #6366f1); color: #fff; }
-        .native-sponsor-card { background: var(--surface, #0f172a); border: 1px solid var(--border, rgba(148,163,184,0.18)); border-radius: 16px; padding: 18px 22px; }
-        .native-sponsor-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-        .sponsor-partner-link { font-size: 0.72rem; font-weight: 600; color: var(--text-muted, #94a3b8); text-decoration: none; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border, rgba(148,163,184,0.2)); }
-        .sponsor-partner-link:hover { color: var(--text, #f8fafc); border-color: var(--accent, #6366f1); }
-        @media (max-width: 768px) { #heroPreviewCanvas { height: 220px; } }
-    </style>
-
+    <link rel="stylesheet" href="assets/css/landing.css?v=4.0.0">
 </head>
 <body>
-    <!-- NAV -->
+    <!-- AMBIENT AURORA BACKGROUND -->
+    <div class="ambient-glow glow-1" aria-hidden="true"></div>
+    <div class="ambient-glow glow-2" aria-hidden="true"></div>
+
+    <!-- NAVIGATION -->
     <nav class="navbar" aria-label="Primary">
         <div class="nav-inner">
             <a href="index.html" class="logo" aria-label="WaveForge home">
-                <span class="logo-mark">🎵</span>
-                <span>WaveForge</span>
+                <span class="logo-mark" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+                </span>
+                <span class="logo-text">WaveForge</span>
+                <span class="version-chip">4.0</span>
             </a>
 
             <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
+                <li><a href="#features">Capabilities</a></li>
                 <li><a href="#modes">12 Modes</a></li>
-                <li><a href="#creators">Use Cases</a></li>
+                <li><a href="#workflows">Workflows</a></li>
                 <li><a href="#compare">Compare</a></li>
                 <li><a href="#faq">FAQ</a></li>
             </ul>
 
             <div class="nav-actions">
                 <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme" title="Toggle theme">
-                    <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                    <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                    <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
                 </button>
-                <a href="visualizer.html?v=3.1.2" class="btn btn-primary">Launch Studio →</a>
+                <a href="visualizer.html?v=4.0.0" class="btn btn-primary">
+                    <span>Launch Studio</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </a>
                 <button class="mobile-toggle" id="mobileToggle" type="button" aria-label="Open menu" aria-expanded="false">
                     <span></span><span></span><span></span>
                 </button>
@@ -198,237 +142,364 @@
     <!-- MOBILE MENU -->
     <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
         <ul>
-            <li><a href="#features">Features</a></li>
+            <li><a href="#features">Capabilities</a></li>
             <li><a href="#modes">12 Modes</a></li>
-            <li><a href="#creators">Use Cases</a></li>
+            <li><a href="#workflows">Workflows</a></li>
             <li><a href="#compare">Compare</a></li>
             <li><a href="#faq">FAQ</a></li>
         </ul>
-        <a href="visualizer.html?v=3.1.2" class="btn btn-primary">Launch Studio →</a>
+        <a href="visualizer.html?v=4.0.0" class="btn btn-primary" style="width:100%;justify-content:center;">Launch Studio →</a>
     </div>
 
-    <!-- HERO -->
+    <!-- HERO SECTION -->
     <header class="hero">
         <div class="container hero-inner">
-            <span class="badge"><span class="badge-dot"></span> New in v3.1 · 12 Modes, 3-Band Bass EQ, Text Overlays &amp; 9:16 TikTok Export</span>
-            <h1>Turn your music into <span class="gradient-text">viral 4K visuals</span></h1>
-            <p class="lead">The #1 free browser-based music visualizer studio. Craft beat-reactive videos with 12 modes, custom logos, artist title overlays, 3-band EQ, and fast MP4 export in 16:9, 9:16, or 1:1 — zero watermarks, no signup required.</p>
+            <a href="visualizer.html?v=4.0.0" class="eyebrow-pill">
+                <span class="pulse-dot"></span>
+                <span>WaveForge Studio 4.0 — WebCodecs 4K MP4 Engine &amp; 12 Reactive Modes</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+
+            <h1>Sound engineered into <span class="gradient-text">cinema-grade visuals.</span></h1>
+
+            <p class="lead">
+                A zero-latency, browser-native audio visualization studio. Sculpt your track with a 3-band hardware EQ, layer custom logos and typography, and encode 4K 60fps MP4 videos in 16:9, 9:16, or 1:1 — with zero watermarks and complete local privacy.
+            </p>
+
             <div class="hero-actions">
-                <a href="visualizer.html?v=3.1.2" class="btn btn-primary btn-lg">Launch Studio Free →</a>
-                <a href="visualizer.html?mode=10&palette=synthwave" class="btn btn-secondary btn-lg">🔥 Try Bass Nation Live</a>
+                <a href="visualizer.html?v=4.0.0" class="btn btn-primary btn-lg">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Open Visualizer Studio</span>
+                </a>
+                <a href="visualizer.html?mode=10&amp;palette=synthwave&amp;v=4.0.0" class="btn btn-secondary btn-lg">
+                    <span>Try Bass Nation Preset</span>
+                </a>
             </div>
-            <div class="hero-meta">
-                <span class="hero-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 100% Free &amp; No Watermark</span>
-                <span class="hero-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Fast 4K MP4 (H.264/AAC) Export</span>
-                <span class="hero-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 16:9 YouTube &amp; 9:16 TikTok/Reels</span>
-                <span class="hero-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 100% Private Local Processing</span>
+
+            <div class="hero-trust">
+                <div class="trust-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>No Watermarks Ever</span>
+                </div>
+                <div class="trust-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Hardware H.264 MP4 Export</span>
+                </div>
+                <div class="trust-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>16:9, 9:16 &amp; 1:1 Aspect Ratios</span>
+                </div>
+                <div class="trust-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>100% On-Device Processing</span>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- INTERACTIVE LIVE CANVAS PREVIEW -->
-    <section class="preview-section">
+    <!-- INTERACTIVE STUDIO SHOWCASE -->
+    <section class="showcase-section">
         <div class="container">
-            <div class="preview-window reveal">
-                <div class="preview-bar">
-                    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-                    <span class="label">Interactive Live Preview — Click Modes &amp; Palettes Below</span>
+            <div class="studio-frame reveal">
+                <div class="studio-frame-top">
+                    <div class="window-dots">
+                        <span class="wdot r"></span>
+                        <span class="wdot y"></span>
+                        <span class="wdot g"></span>
+                    </div>
+                    <div class="window-title">
+                        <span class="live-indicator"></span>
+                        <span>waveforge.studio — Real-Time 60 FPS Canvas Engine</span>
+                    </div>
+                    <div class="window-meta">FFT 2048 • Log Scale</div>
                 </div>
-                <div class="preview-canvas-wrap">
-                    <canvas id="heroPreviewCanvas" width="960" height="360" aria-label="Interactive live audio visualizer preview"></canvas>
-                    <div class="preview-controls">
+
+                <div class="studio-canvas-stage">
+                    <canvas id="heroPreviewCanvas" width="1120" height="420" aria-label="Interactive real-time visualizer preview"></canvas>
+                </div>
+
+                <div class="studio-frame-dock">
+                    <div class="dock-group">
+                        <span class="dock-label">Mode</span>
                         <div class="preview-pill-group" role="group" aria-label="Preview mode selector">
-                            <button type="button" class="preview-pill active" data-p-mode="bars">📊 Bars</button>
-                            <button type="button" class="preview-pill" data-p-mode="ring">🔥 Bass Ring</button>
-                            <button type="button" class="preview-pill" data-p-mode="tunnel">🌀 Cyber Tunnel</button>
-                            <button type="button" class="preview-pill" data-p-mode="synth">🌆 Synthwave</button>
+                            <button type="button" class="preview-pill active" data-p-mode="bars">Bar Spectrum</button>
+                            <button type="button" class="preview-pill" data-p-mode="ring">Bass Nation</button>
+                            <button type="button" class="preview-pill" data-p-mode="tunnel">Cyber Tunnel</button>
+                            <button type="button" class="preview-pill" data-p-mode="synth">Synthwave Grid</button>
                         </div>
+                    </div>
+
+                    <div class="dock-group">
+                        <span class="dock-label">Palette</span>
                         <div class="preview-pill-group" role="group" aria-label="Preview palette selector">
                             <button type="button" class="preview-pill active" data-p-pal="cyberpunk">Cyberpunk</button>
                             <button type="button" class="preview-pill" data-p-pal="synthwave">Synthwave</button>
                             <button type="button" class="preview-pill" data-p-pal="fire">Inferno</button>
                             <button type="button" class="preview-pill" data-p-pal="matrix">Matrix</button>
                         </div>
-                        <a href="visualizer.html?v=3.1.2" class="preview-launch-btn">Open Full Studio →</a>
                     </div>
+
+                    <a href="visualizer.html?v=4.0.0" class="dock-launch-link">
+                        <span>Launch Full Studio</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- STATS -->
-    <section class="block" style="padding-top: 0;">
+    <!-- METRICS STRIP -->
+    <section class="metrics-strip">
         <div class="container">
-            <div class="stats reveal">
-                <div class="stat"><div class="stat-num">150K+</div><div class="stat-label">Videos Created</div></div>
-                <div class="stat"><div class="stat-num">12</div><div class="stat-label">Pro Modes</div></div>
-                <div class="stat"><div class="stat-num">4K 60fps</div><div class="stat-label">Fast MP4 Export</div></div>
-                <div class="stat"><div class="stat-num">$0</div><div class="stat-label">Free Forever</div></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- AD BANNER SLOT 1: Responsive Leaderboard (728x90 Desktop / 320x50 Mobile) -->
-    <div class="ad-slot ad-banner" aria-label="Advertisement">
-        <div data-wf-ad="responsive"></div>
-    </div>
-
-    <!-- FEATURES -->
-    <section class="block alt" id="features">
-        <div class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow">Studio v3.1 Features</span>
-                <h2>Built to outperform paid music visualizers</h2>
-                <p>Everything producers, beatmakers, podcasters, and streamers need — running natively in your browser with zero paywalls.</p>
-            </div>
-
-            <div class="grid grid-3">
-                <article class="card reveal">
-                    <div class="card-icon">🎬</div>
-                    <h3>Fast 4K MP4 Export</h3>
-                    <p>Hardware-accelerated WebCodecs encoding renders crisp H.264 MP4 videos with AAC audio faster than realtime — with zero watermarks.</p>
-                </article>
-                <article class="card reveal">
-                    <div class="card-icon">📱</div>
-                    <h3>16:9, 9:16 &amp; 1:1 Aspect Ratios</h3>
-                    <p>Switch seamlessly between 16:9 (YouTube), 9:16 vertical (TikTok, Reels, Shorts), 1:1 square (Spotify Canvas), and 4:5 portrait.</p>
-                </article>
-                <article class="card reveal">
-                    <div class="card-icon">✍️</div>
-                    <h3>Track Title &amp; Artist Overlays</h3>
-                    <p>Add your song name, artist handle, custom logo, and background wallpaper with beat-reactive typography directly on the canvas.</p>
-                </article>
-                <article class="card reveal">
-                    <div class="card-icon">🎛️</div>
-                    <h3>3-Band EQ &amp; Bass Booster</h3>
-                    <p>Sculpt your sound and visual punch in real time with dedicated Low-Shelf Bass Boost (110Hz), Mid Presence (1kHz), and Treble Air filters.</p>
-                </article>
-                <article class="card reveal">
-                    <div class="card-icon">🎨</div>
-                    <h3>12 Palettes &amp; Retro Post-FX</h3>
-                    <p>Choose from 12 curated color palettes plus real-time Hue Cycling, CRT Scanlines, Cinema Vignette, Mirroring, and Progress Bars.</p>
-                </article>
-                <article class="card reveal">
-                    <div class="card-icon">🔗</div>
-                    <h3>Shareable Preset Links</h3>
-                    <p>Generate instant URL preset links or JSON files to save and share your exact mode, palette, sensitivity, and text setup with fans.</p>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- MODES (12 MODES) -->
-    <section class="block" id="modes">
-        <div class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow">Visualization modes</span>
-                <h2>12 stunning ways to see your music</h2>
-                <p>Click any mode below to launch directly into that visual style inside the WaveForge Studio.</p>
-            </div>
-
-            <div class="grid grid-4">
-                <a href="visualizer.html?mode=8" class="card mode-tile mode-tile-new reveal"><div class="card-icon">🎬</div><h3>Logo Visualizer</h3><p>Your logo &amp; background, beat-reactive</p></a>
-                <a href="visualizer.html?mode=10" class="card mode-tile mode-tile-new reveal"><div class="card-icon">🔥</div><h3>Bass Nation</h3><p>Harmonic rings &amp; beat shockwaves</p></a>
-                <a href="visualizer.html?mode=9" class="card mode-tile mode-tile-new reveal"><div class="card-icon">🌀</div><h3>Cyber Tunnel</h3><p>3D neon polygon warp tunnel</p></a>
-                <a href="visualizer.html?mode=11" class="card mode-tile mode-tile-new reveal"><div class="card-icon">🌆</div><h3>Synthwave Grid</h3><p>80s Outrun sun &amp; laser horizon</p></a>
-                <a href="visualizer.html?mode=0" class="card mode-tile reveal"><div class="card-icon">📊</div><h3>Bar Spectrum</h3><p>Mirrored frequency bars + peak hold</p></a>
-                <a href="visualizer.html?mode=1" class="card mode-tile reveal"><div class="card-icon">〰️</div><h3>Waveform</h3><p>Oscilloscope time-domain wave</p></a>
-                <a href="visualizer.html?mode=2" class="card mode-tile reveal"><div class="card-icon">🎯</div><h3>Radial EQ</h3><p>360° circular equalizer</p></a>
-                <a href="visualizer.html?mode=3" class="card mode-tile reveal"><div class="card-icon">✨</div><h3>Particles</h3><p>Audio-reactive starfield</p></a>
-                <a href="visualizer.html?mode=4" class="card mode-tile reveal"><div class="card-icon">🔬</div><h3>Spectrogram</h3><p>Scrolling frequency heatmap</p></a>
-                <a href="visualizer.html?mode=5" class="card mode-tile reveal"><div class="card-icon">🧱</div><h3>3D Bars</h3><p>Isometric depth equalizer</p></a>
-                <a href="visualizer.html?mode=6" class="card mode-tile reveal"><div class="card-icon">🧬</div><h3>DNA Helix</h3><p>Rotating double-helix strand</p></a>
-                <a href="visualizer.html?mode=7" class="card mode-tile reveal"><div class="card-icon">🌌</div><h3>Galaxy</h3><p>Spiral nebula arms</p></a>
-            </div>
-        </div>
-    </section>
-
-    <!-- NATIVE BANNER + CREATOR SPONSOR SHOWCASE -->
-    <section class="block" style="padding-top: 0; padding-bottom: 2.5rem;">
-        <div class="container">
-            <div class="native-sponsor-card reveal">
-                <div class="native-sponsor-top">
-                    <span class="ad-label">Sponsored Advertisement</span>
-                    <a href="https://araplhn.org/4/f28b978e066eac35ed88538faa37500f" data-wf-smartlink target="_blank" rel="noopener sponsored" class="sponsor-partner-link">Sponsored Partner ↗</a>
+            <div class="metrics-grid reveal">
+                <div class="metric-card">
+                    <div class="metric-val">12</div>
+                    <div class="metric-lbl">Audio-Reactive Modes</div>
                 </div>
-                <script async="async" data-cfasync="false" src="https://bauval.org/21/7d5620353411eac086d1a38c87043739"></script>
-                <div id="container-7d5620353411eac086d1a38c87043739"></div>
+                <div class="metric-card">
+                    <div class="metric-val">4K 60fps</div>
+                    <div class="metric-lbl">WebCodecs MP4 Export</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-val">16,384</div>
+                    <div class="metric-lbl">Max FFT Sample Bins</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-val">0 ms</div>
+                    <div class="metric-lbl">Server Upload Queue</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- USE CASES FOR CREATORS (SEO LONG-TAIL TRAFFIC SECTION) -->
-    <section class="block alt" id="creators">
+    <!-- BENTO CAPABILITIES -->
+    <section class="block" id="features">
         <div class="container">
             <div class="section-head reveal">
-                <span class="eyebrow">Built for every platform</span>
-                <h2>Tailored workflows for musicians, podcasters &amp; streamers</h2>
-                <p>Export platform-ready videos optimized for maximum engagement across every social channel.</p>
+                <span class="eyebrow">Studio Architecture</span>
+                <h2>Engineered for producers, beatmakers &amp; creators</h2>
+                <p>Desktop-class audio analysis and hardware video encoding — directly inside your browser with zero paywalls.</p>
+            </div>
+
+            <div class="bento-grid">
+                <article class="bento-card bento-span-2 reveal">
+                    <div class="bento-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <div class="bento-badge">FASTER THAN REALTIME</div>
+                    <h3>Hardware-Accelerated WebCodecs 4K MP4 Export</h3>
+                    <p>Unlike basic screen-recorders that drop frames, WaveForge steps through an offline audio graph frame-by-frame and encodes directly to H.264 MP4 + 192kbps AAC audio at up to 3840×2160 (4K) 60 FPS.</p>
+                </article>
+
+                <article class="bento-card reveal">
+                    <div class="bento-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                    </div>
+                    <h3>Multi-Platform Aspect Ratios</h3>
+                    <p>Switch seamlessly between <strong>16:9</strong> (YouTube), <strong>9:16 Vertical</strong> (TikTok, Reels, Shorts), <strong>1:1 Square</strong> (Spotify Canvas), and <strong>4:5 Portrait</strong> with live safe-frame guides.</p>
+                </article>
+
+                <article class="bento-card reveal">
+                    <div class="bento-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                    </div>
+                    <h3>3-Band Hardware Equalizer</h3>
+                    <p>Shape both your audio output and visual beat reactivity with dedicated Low-Shelf Bass Boost (110Hz), Mid Presence (1kHz), and Treble Air (4.2kHz) BiquadFilters.</p>
+                </article>
+
+                <article class="bento-card bento-span-2 reveal">
+                    <div class="bento-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                    </div>
+                    <div class="bento-badge">BRANDING STUDIO</div>
+                    <h3>Custom Logo Reactor, Artist Typography &amp; Post-FX</h3>
+                    <p>Upload your circular emblem and custom background artwork, display beat-pulsing Track Title and Artist Handle text overlays, and layer CRT Scanlines, Cinema Vignettes, and 12 curated color palettes.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- 12 VISUALIZATION MODES -->
+    <section class="block alt" id="modes">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">12 Visual Engines</span>
+                <h2>Click any mode to launch it in the Studio</h2>
+                <p>Every visualizer engine is frame-rate independent and supports logarithmic frequency mapping.</p>
+            </div>
+
+            <div class="modes-showcase-grid">
+                <a href="visualizer.html?mode=8&amp;v=4.0.0" class="mode-showcase-card featured reveal">
+                    <div class="msc-top">
+                        <span class="msc-num">MODE 09</span>
+                        <span class="msc-tag">POPULAR</span>
+                    </div>
+                    <h3>Logo Visualizer</h3>
+                    <p>Upload your custom emblem and background with drone camera pan, bass trauma shake, and radial rays.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=10&amp;v=4.0.0" class="mode-showcase-card featured reveal">
+                    <div class="msc-top">
+                        <span class="msc-num">MODE 11</span>
+                        <span class="msc-tag">NEW</span>
+                    </div>
+                    <h3>Bass Nation Ring</h3>
+                    <p>Triple-layered harmonic bass spectrum rings with expanding beat shockwaves and center equalizer bars.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=9&amp;v=4.0.0" class="mode-showcase-card featured reveal">
+                    <div class="msc-top">
+                        <span class="msc-num">MODE 10</span>
+                        <span class="msc-tag">NEW</span>
+                    </div>
+                    <h3>Cyber Tunnel</h3>
+                    <p>3D geometric octagons flying through perspective warp space synchronized to sub-bass and mid frequencies.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=11&amp;v=4.0.0" class="mode-showcase-card featured reveal">
+                    <div class="msc-top">
+                        <span class="msc-num">MODE 12</span>
+                        <span class="msc-tag">NEW</span>
+                    </div>
+                    <h3>Synthwave Grid</h3>
+                    <p>Retro 80s Outrun laser horizon, scrolling perspective grid, and audio-reactive mountain peaks.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=0&amp;v=4.0.0" class="mode-showcase-card reveal">
+                    <div class="msc-top"><span class="msc-num">MODE 01</span></div>
+                    <h3>Bar Spectrum</h3>
+                    <p>Mirrored studio frequency analyzer with gravity peak-hold caps.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=1&amp;v=4.0.0" class="mode-showcase-card reveal">
+                    <div class="msc-top"><span class="msc-num">MODE 02</span></div>
+                    <h3>Oscilloscope Wave</h3>
+                    <p>Time-domain waveform with optional stereo reflection and beat glow.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=2&amp;v=4.0.0" class="mode-showcase-card reveal">
+                    <div class="msc-top"><span class="msc-num">MODE 03</span></div>
+                    <h3>Radial EQ</h3>
+                    <p>360° circular equalizer radiating outward with inner reflection.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=3&amp;v=4.0.0" class="mode-showcase-card reveal">
+                    <div class="msc-top"><span class="msc-num">MODE 04</span></div>
+                    <h3>Reactive Particles</h3>
+                    <p>200-node luminous particle field driven by sub-bass velocity.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=4&amp;v=4.0.0" class="mode-showcase-card reveal">
+                    <div class="msc-top"><span class="msc-num">MODE 05</span></div>
+                    <h3>Spectrogram</h3>
+                    <p>Real-time scrolling frequency-over-time thermal acoustic waterfall.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=5&amp;v=4.0.0" class="mode-showcase-card reveal">
+                    <div class="msc-top"><span class="msc-num">MODE 06</span></div>
+                    <h3>Isometric 3D Bars</h3>
+                    <p>Extruded 3D frequency columns with shaded depth faces.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=6&amp;v=4.0.0" class="mode-showcase-card reveal">
+                    <div class="msc-top"><span class="msc-num">MODE 07</span></div>
+                    <h3>DNA Double Helix</h3>
+                    <p>Rotating dual-strand molecular helix modulated by harmonic bins.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+
+                <a href="visualizer.html?mode=7&amp;v=4.0.0" class="mode-showcase-card reveal">
+                    <div class="msc-top"><span class="msc-num">MODE 08</span></div>
+                    <h3>Spiral Galaxy</h3>
+                    <p>Elliptical four-arm orbital starfield pulsing with audio energy.</p>
+                    <span class="msc-action">Open Mode →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CREATOR WORKFLOWS -->
+    <section class="block" id="workflows">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="eyebrow">Creator Workflows</span>
+                <h2>Designed for every release format</h2>
+                <p>From full-length YouTube beat uploads to vertical short-form teasers and live DJ backdrops.</p>
             </div>
 
             <div class="grid grid-3">
-                <article class="card reveal">
-                    <div class="card-icon">📺</div>
-                    <h3>YouTube Type Beats &amp; Mixes</h3>
-                    <p>Upload your cover art and emblem in <strong>Logo Visualizer</strong> or <strong>Bass Nation</strong> mode, add your track title, and export a 16:9 4K MP4 ready for YouTube monetization.</p>
+                <article class="workflow-card reveal">
+                    <div class="wf-step">01 / YOUTUBE &amp; TYPE BEATS</div>
+                    <h3>16:9 4K Master Videos</h3>
+                    <p>Drop your mastered WAV or MP3, upload your producer logo and background cover, set your track title overlay, and encode a 4K 60fps MP4 in seconds.</p>
                 </article>
-                <article class="card reveal">
-                    <div class="card-icon">📱</div>
-                    <h3>TikTok, Reels &amp; Shorts (9:16)</h3>
-                    <p>Switch the Aspect Ratio selector to <strong>9:16 Vertical</strong>, boost the 110Hz Bass EQ for hard-hitting drops, and export 15s or 30s vertical teasers in seconds.</p>
+                <article class="workflow-card reveal">
+                    <div class="wf-step">02 / TIKTOK, REELS &amp; SHORTS</div>
+                    <h3>9:16 Vertical Social Clips</h3>
+                    <p>Select the 9:16 Vertical aspect ratio, boost the 110Hz Bass Shelf EQ for extra visual punch, and export a 15s or 30s vertical promo clip with zero cropping hassle.</p>
                 </article>
-                <article class="card reveal">
-                    <div class="card-icon">🎙️</div>
-                    <h3>Podcasts &amp; Live Twitch Streams</h3>
-                    <p>Use <strong>Waveform</strong> or <strong>Radial EQ</strong> for audiograms, or toggle <strong>Live Microphone Input</strong> in fullscreen mode as a reactive OBS backdrop for DJ sets and streams.</p>
+                <article class="workflow-card reveal">
+                    <div class="wf-step">03 / LIVE STREAMS &amp; PODCASTS</div>
+                    <h3>Live Mic &amp; OBS Fullscreen</h3>
+                    <p>Enable live Microphone or audio-interface input, press <kbd>F</kbd> for distraction-free fullscreen, and capture the canvas directly inside OBS Studio or Twitch.</p>
                 </article>
             </div>
         </div>
     </section>
 
-    <!-- COMPARISON TABLE (SEO KEYWORD RICH) -->
-    <section class="block" id="compare">
+    <!-- COMPARISON TABLE -->
+    <section class="block alt" id="compare">
         <div class="container">
             <div class="section-head reveal">
-                <span class="eyebrow">Why creators switch</span>
-                <h2>WaveForge v3.1 vs. paid online visualizers</h2>
-                <p>Stop paying $15–$30/month just to remove watermarks or unlock 1080p/4K exports.</p>
+                <span class="eyebrow">Transparent Comparison</span>
+                <h2>Why creators choose WaveForge Studio</h2>
+                <p>No monthly subscriptions, no cloud upload queues, and no watermarks forced onto your artwork.</p>
             </div>
 
             <div class="compare-table-wrap reveal">
                 <table class="compare-table">
                     <thead>
                         <tr>
-                            <th>Feature</th>
-                            <th class="highlight-col">WaveForge v3.1</th>
-                            <th>Typical Paid Visualizers</th>
+                            <th>Capability</th>
+                            <th class="highlight-col">WaveForge Studio 4.0</th>
+                            <th>Cloud Subscription Visualizers</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Price &amp; Watermarks</td>
-                            <td class="highlight-col"><strong>100% Free • No Watermark</strong></td>
-                            <td>$15–$29/mo to remove watermark</td>
+                            <td>Cost &amp; Watermarks</td>
+                            <td class="highlight-col"><strong>100% Free • Zero Watermarks</strong></td>
+                            <td>$15–$29/mo required to remove watermark</td>
                         </tr>
                         <tr>
-                            <td>Maximum Export Resolution</td>
-                            <td class="highlight-col"><strong>Up to 4K Ultra HD (60 FPS MP4)</strong></td>
-                            <td>720p free / 4K locked behind Pro tier</td>
+                            <td>Maximum Export Quality</td>
+                            <td class="highlight-col"><strong>4K Ultra HD (3840×2160 @ 60 FPS MP4)</strong></td>
+                            <td>720p on free tier / 4K paywalled</td>
                         </tr>
                         <tr>
                             <td>Aspect Ratios</td>
-                            <td class="highlight-col"><strong>16:9, 9:16 Vertical, 1:1, 4:5</strong></td>
-                            <td>16:9 only on free tier</td>
+                            <td class="highlight-col"><strong>16:9, 9:16 Vertical, 1:1 Square, 4:5</strong></td>
+                            <td>16:9 only on free plans</td>
                         </tr>
                         <tr>
-                            <td>Built-In 3-Band Audio EQ</td>
-                            <td class="highlight-col"><strong>Yes (Live Bass, Mid &amp; Treble)</strong></td>
-                            <td>No built-in EQ</td>
+                            <td>Audio Equalizer</td>
+                            <td class="highlight-col"><strong>Built-In 3-Band Hardware EQ (Bass/Mid/Treble)</strong></td>
+                            <td>Not included</td>
                         </tr>
                         <tr>
-                            <td>Privacy &amp; Upload Wait Time</td>
-                            <td class="highlight-col"><strong>0s Instant Local Browser Processing</strong></td>
-                            <td>Slow cloud queue uploads</td>
+                            <td>Privacy &amp; Speed</td>
+                            <td class="highlight-col"><strong>Instant Local WebCodecs Encoding</strong></td>
+                            <td>Slow server upload &amp; render queues</td>
                         </tr>
                     </tbody>
                 </table>
@@ -436,84 +507,8 @@
         </div>
     </section>
 
-    <!-- HOW IT WORKS -->
-    <section class="block alt" id="how">
-        <div class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow">How it works</span>
-                <h2>Create 4K music videos in 4 simple steps</h2>
-                <p>No signup, no cloud waiting queues, no complicated timeline editors.</p>
-            </div>
-
-            <div class="steps">
-                <div class="step reveal">
-                    <div class="step-num">1</div>
-                    <h3>Drop your audio</h3>
-                    <p>Drag and drop any MP3, WAV, FLAC, OGG, or M4A track — or click <strong>Demo</strong> to test immediately.</p>
-                </div>
-                <div class="step reveal">
-                    <div class="step-num">2</div>
-                    <h3>Pick from 12 modes</h3>
-                    <p>Choose Logo Visualizer, Bass Nation, Cyber Tunnel, Synthwave Grid, or classic spectrum analyzers.</p>
-                </div>
-                <div class="step reveal">
-                    <div class="step-num">3</div>
-                    <h3>Customize EQ &amp; text</h3>
-                    <p>Add your song title, dial in the 3-band Bass Boost EQ, pick a color palette, and select 16:9 or 9:16.</p>
-                </div>
-                <div class="step reveal">
-                    <div class="step-num">4</div>
-                    <h3>Export 4K MP4</h3>
-                    <p>Encode directly to MP4 or WebM with full audio and share on YouTube, TikTok, Instagram, or Spotify.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- AD BANNER SLOT 2: Mid-Page Responsive Banner -->
-    <div class="ad-slot ad-banner" aria-label="Advertisement">
-        <div data-wf-ad="responsive"></div>
-    </div>
-
-    <!-- TESTIMONIALS -->
-    <section class="block">
-        <div class="container">
-            <div class="section-head reveal">
-                <span class="eyebrow">Testimonials</span>
-                <h2>Loved by producers &amp; creators worldwide</h2>
-            </div>
-
-            <div class="grid grid-3">
-                <figure class="testimonial reveal">
-                    <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-                    <blockquote>“WaveForge v3.1 is unreal. The 9:16 export and Bass Nation mode saved me $25/month on paid visualizer subscriptions.”</blockquote>
-                    <figcaption class="author">
-                        <div class="author-avatar">JD</div>
-                        <div class="author-info"><strong>Jake Davidson</strong><span>Music Producer</span></div>
-                    </figcaption>
-                </figure>
-                <figure class="testimonial reveal">
-                    <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-                    <blockquote>“Finally a browser visualizer with a real 3-band EQ and song title overlays. My YouTube type-beat channel runs entirely on this.”</blockquote>
-                    <figcaption class="author">
-                        <div class="author-avatar">SM</div>
-                        <div class="author-info"><strong>Sarah Mitchell</strong><span>Beatmaker &amp; Streamer</span></div>
-                    </figcaption>
-                </figure>
-                <figure class="testimonial reveal">
-                    <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-                    <blockquote>“The WebCodecs MP4 export is blazing fast and has zero watermarks. Hands down the best free audio visualizer online.”</blockquote>
-                    <figcaption class="author">
-                        <div class="author-avatar">MR</div>
-                        <div class="author-info"><strong>Mike Reynolds</strong><span>Content Creator</span></div>
-                    </figcaption>
-                </figure>
-            </div>
-        </div>
-    </section>
-
     <!-- FAQ -->
-    <section class="block alt" id="faq">
+    <section class="block" id="faq">
         <div class="container">
             <div class="section-head reveal">
                 <span class="eyebrow">FAQ</span>
@@ -523,40 +518,39 @@
             <div class="faq-list">
                 <div class="faq-item reveal">
                     <button class="faq-q" type="button" aria-expanded="false">Is WaveForge really 100% free with no watermark? <span class="chev" aria-hidden="true">+</span></button>
-                    <div class="faq-a"><p>Yes — WaveForge is 100% free with no hidden costs, no premium paywalls, and no watermarks on your exports. Every feature including 4K 60FPS MP4 export is unlocked for everyone.</p></div>
+                    <div class="faq-a"><p>Yes. Every feature in WaveForge Studio — including all 12 modes, 3-band EQ, custom logo/text overlays, and 4K 60fps MP4 exports — is completely free with no forced watermark.</p></div>
                 </div>
                 <div class="faq-item reveal">
-                    <button class="faq-q" type="button" aria-expanded="false">Can I export vertical 9:16 videos for TikTok, Reels, and Shorts? <span class="chev" aria-hidden="true">+</span></button>
-                    <div class="faq-a"><p>Yes! Open the Config or Export dialog and choose between 16:9 Widescreen (YouTube), 9:16 Vertical (TikTok, Instagram Reels, YouTube Shorts), 1:1 Square (Spotify Canvas), and 4:5 Portrait.</p></div>
+                    <button class="faq-q" type="button" aria-expanded="false">Can I export 9:16 vertical videos for TikTok, Reels, and YouTube Shorts? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>Yes. Select 9:16 Vertical (TikTok / Reels / Shorts), 1:1 Square (Spotify / Instagram), 4:5 Portrait, or 16:9 Widescreen in either the Studio Settings or the Export dialog.</p></div>
                 </div>
                 <div class="faq-item reveal">
-                    <button class="faq-q" type="button" aria-expanded="false">What video and audio formats are supported? <span class="chev" aria-hidden="true">+</span></button>
-                    <div class="faq-a"><p>WaveForge loads MP3, WAV, OGG, FLAC, AAC, M4A, and WebM audio. For video exports, browsers with WebCodecs encode directly to H.264 MP4 with AAC audio faster than realtime, while other browsers use realtime WebM recording.</p></div>
+                    <button class="faq-q" type="button" aria-expanded="false">Do my audio files ever get uploaded to a server? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>Never. All audio decoding, FFT frequency analysis, 3-band EQ filtering, and MP4/WebM video encoding run 100% locally on your device inside your browser.</p></div>
                 </div>
                 <div class="faq-item reveal">
-                    <button class="faq-q" type="button" aria-expanded="false">Can I add my own logo, background image, and song title? <span class="chev" aria-hidden="true">+</span></button>
-                    <div class="faq-a"><p>Absolutely. Use the Track Title &amp; Artist Overlay section in Config to display beat-reactive text on any mode, and upload your custom brand emblem and wallpaper in Logo Visualizer mode.</p></div>
+                    <button class="faq-q" type="button" aria-expanded="false">How does the fast MP4 export work? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>On modern browsers supporting the WebCodecs API (Chrome, Edge, Brave, Opera), WaveForge renders offline frames directly to a hardware H.264 video encoder and AAC audio encoder, producing a standard .mp4 file faster than realtime.</p></div>
                 </div>
                 <div class="faq-item reveal">
-                    <button class="faq-q" type="button" aria-expanded="false">Do my audio files ever leave my computer or phone? <span class="chev" aria-hidden="true">+</span></button>
-                    <div class="faq-a"><p>Never. All audio decoding, FFT spectrum analysis, 3-band EQ, and video encoding happen 100% locally inside your browser. Your unreleased tracks stay completely private.</p></div>
-                </div>
-                <div class="faq-item reveal">
-                    <button class="faq-q" type="button" aria-expanded="false">Can I use the exported videos commercially? <span class="chev" aria-hidden="true">+</span></button>
-                    <div class="faq-a"><p>Yes. Videos you create are yours to monetize across YouTube, TikTok, Spotify, and client projects, provided you hold the rights to the audio track you visualize.</p></div>
+                    <button class="faq-q" type="button" aria-expanded="false">Can I use exported videos for commercial monetized channels? <span class="chev" aria-hidden="true">+</span></button>
+                    <div class="faq-a"><p>Yes. All visual animations generated by WaveForge are royalty-free for commercial use on YouTube, TikTok, Spotify, and client projects, provided you have the rights to the audio track you use.</p></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA -->
-    <section class="block">
+    <!-- FINAL CTA -->
+    <section class="block" style="padding-top:0;">
         <div class="container">
-            <div class="cta reveal">
-                <h2>Ready to visualize your music in 4K?</h2>
-                <p>Join thousands of music producers, podcasters, and creators using WaveForge v3.1 to bring their sound to life.</p>
-                <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-                    <a href="visualizer.html?v=3.1.2" class="btn btn-primary btn-lg">Launch WaveForge Studio →</a>
+            <div class="cta-banner reveal">
+                <h2>Ready to build your next music video?</h2>
+                <p>No account required. Drop your audio track and start visualizing in seconds.</p>
+                <div class="hero-actions" style="margin-bottom:0;">
+                    <a href="visualizer.html?v=4.0.0" class="btn btn-primary btn-lg">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        <span>Launch WaveForge Studio</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -568,64 +562,58 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="index.html" class="logo">
-                        <span class="logo-mark">🎵</span>
-                        <span>WaveForge</span>
+                        <span class="logo-mark" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+                        </span>
+                        <span class="logo-text">WaveForge</span>
                     </a>
-                    <p>The free, browser-based music visualizer studio. Transform your audio into viral 4K visual experiences.</p>
-                    <div class="socials">
-                        <a href="https://github.com/progameryt-op/WaveForge" aria-label="GitHub"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1-.02-1.97-3.2.69-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.18 1.19a11.05 11.05 0 0 1 5.78 0c2.21-1.5 3.18-1.19 3.18-1.19.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.13 0 1.54-.01 2.78-.01 3.16 0 .31.21.68.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg></a>
-                    </div>
+                    <p>Professional browser-based audio visualization &amp; 4K video studio. Built with Web Audio API, Canvas 2D &amp; WebCodecs.</p>
                 </div>
 
                 <div class="footer-col">
                     <h4>Studio</h4>
                     <ul>
-                        <li><a href="visualizer.html?v=3.1.2">Launch Visualizer</a></li>
-                        <li><a href="visualizer.html?mode=8">Logo Visualizer</a></li>
-                        <li><a href="visualizer.html?mode=10">Bass Nation Mode</a></li>
-                        <li><a href="visualizer.html?mode=9">Cyber Tunnel Mode</a></li>
-                        <li><a href="visualizer.html?mode=11">Synthwave Grid</a></li>
+                        <li><a href="visualizer.html?v=4.0.0">Launch Studio</a></li>
+                        <li><a href="visualizer.html?mode=8&amp;v=4.0.0">Logo Visualizer</a></li>
+                        <li><a href="visualizer.html?mode=10&amp;v=4.0.0">Bass Nation Mode</a></li>
+                        <li><a href="visualizer.html?mode=9&amp;v=4.0.0">Cyber Tunnel Mode</a></li>
+                        <li><a href="visualizer.html?mode=11&amp;v=4.0.0">Synthwave Grid</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
-                    <h4>Resources</h4>
+                    <h4>Product</h4>
                     <ul>
-                        <li><a href="#features">v3.1 Features</a></li>
-                        <li><a href="#compare">Compare Visualizers</a></li>
-                        <li><a href="https://github.com/progameryt-op/WaveForge">Source on GitHub</a></li>
+                        <li><a href="#features">Architecture</a></li>
+                        <li><a href="#modes">All 12 Modes</a></li>
+                        <li><a href="#compare">Comparison</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Legal &amp; Open Source</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="https://github.com/progameryt-op/WaveForge" target="_blank" rel="noopener">GitHub Repository</a></li>
                         <li><a href="sitemap.xml">Sitemap</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="privacy.html">Privacy policy</a></li>
-                        <li><a href="terms.html">Terms of service</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>© <span id="year">2026</span> WaveForge. All rights reserved.</p>
+                <p>© <span id="year">2026</span> WaveForge Studio. All rights reserved.</p>
                 <div class="footer-bottom-links">
                     <a href="privacy.html">Privacy</a>
                     <a href="terms.html">Terms</a>
-                    <a href="visualizer.html?v=3.1.2">Launch Studio</a>
+                    <a href="visualizer.html?v=4.0.0">Launch Studio</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- STICKY AD SLOT: bottom bar 320×50 -->
-    <div class="ad-sticky" aria-label="Advertisement">
-        <button class="ad-sticky-close" type="button" data-ad-dismiss aria-label="Close advertisement">✕</button>
-        <div class="ad-sticky-inner" data-wf-ad="compact"></div>
-    </div>
-
-    <script src="assets/js/ads.js?v=3.1.2"></script>
-    <script src="assets/js/landing.js?v=3.1.2"></script>
+    <script src="assets/js/landing.js?v=4.0.0"></script>
     <script>
         if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
             window.addEventListener('load', function () {

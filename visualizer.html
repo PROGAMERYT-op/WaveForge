@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '3.1.2';
+            var VER = '4.0.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -21,6 +21,7 @@
             } catch (e) {}
         })();
     </script>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DG4Q2KJ2JD"></script>
     <script>
@@ -33,126 +34,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- PRIMARY SEO META TAGS -->
-    <title>WaveForge Studio v3.1 | Free Online Music Visualizer, 9:16 TikTok & 4K MP4 Video Maker</title>
-    <meta name="description" content="WaveForge Studio v3.1 is the ultimate free online music visualizer. Create audio-reactive videos with 12 modes (Logo Visualizer, Bass Nation, Cyber Tunnel, Synthwave), 3-band EQ, track title overlays, and 16:9 / 9:16 / 1:1 4K MP4 export with no watermark.">
+    <title>WaveForge Studio 4.0 | Professional Music Visualizer &amp; 4K Video Maker</title>
+    <meta name="description" content="WaveForge Studio 4.0 is a browser-based audio visualization workstation with 12 modes, 3-band hardware EQ, custom text and logo overlays, and 16:9 / 9:16 4K MP4 export.">
     <meta name="keywords" content="music visualizer, free music visualizer, online audio visualizer, tiktok audio visualizer, 9:16 music visualizer, youtube music video maker, trap nation visualizer online, spectrum analyzer, audio waveform, beat detector, mp3 to video converter, logo visualizer, spotify canvas maker">
     <meta name="author" content="WaveForge">
-    <meta name="theme-color" content="#0b1020">
+    <meta name="theme-color" content="#060812">
 
-    <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="googlebot" content="index, follow">
-    <meta name="bingbot" content="index, follow">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+    <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://progameryt-op.github.io/WaveForge/visualizer.html">
 
-    <!-- LANGUAGE & REGION -->
-    <meta name="language" content="English">
-    <meta name="geo.region" content="US">
-    <link rel="alternate" hreflang="en" href="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <link rel="alternate" hreflang="x-default" href="https://progameryt-op.github.io/WaveForge/visualizer.html">
-
-    <!-- OPEN GRAPH / FACEBOOK -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <meta property="og:title" content="WaveForge Studio v3.1 — Free Online Music Visualizer & 4K MP4 Export">
-    <meta property="og:description" content="Create stunning music visualizations instantly. 12 modes, 3-band Bass EQ, text overlays, and 16:9 / 9:16 / 1:1 4K MP4 video export. 100% free, no signup!">
+    <meta property="og:title" content="WaveForge Studio 4.0 — Free 4K Music Visualizer">
+    <meta property="og:description" content="12 visualization modes, 3-band Bass EQ, text overlays, and 16:9 / 9:16 4K MP4 video export with zero watermarks.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="WaveForge Music Visualizer Studio Interface">
-    <meta property="og:site_name" content="WaveForge">
-    <meta property="og:locale" content="en_US">
 
-    <!-- TWITTER CARD -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="WaveForge Studio v3.1 — Free Music Visualizer with 4K MP4 Export">
-    <meta name="twitter:description" content="Transform your music into stunning visuals. 12 modes, 3-band EQ, text overlays, and 9:16 / 16:9 4K MP4 export!">
-    <meta name="twitter:image" content="https://progameryt-op.github.io/WaveForge/assets/img/twitter-card.png">
-    <meta name="twitter:image:alt" content="WaveForge Visualizer Preview">
-
-    <!-- ADDITIONAL SEO META -->
-    <meta name="application-name" content="WaveForge">
-    <meta name="apple-mobile-web-app-title" content="WaveForge">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="msapplication-TileColor" content="#00f2ff">
-    <meta name="msapplication-config" content="browserconfig.xml">
-
-    <!-- PWA -->
     <link rel="manifest" href="assets/manifest.json">
-
-    <!-- FAVICONS -->
     <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
     <link rel="icon" type="image/png" sizes="192x192" href="assets/img/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <!-- PRECONNECT FOR PERFORMANCE -->
-    <link rel="preconnect" href="https://www.googletagmanager.com">
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-
-    <!-- STRUCTURED DATA - ORGANIZATION & WEBAPPLICATION -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "@id": "https://progameryt-op.github.io/WaveForge/#webapp",
-        "name": "WaveForge Music Visualizer Studio",
-        "alternateName": ["WaveForge", "WaveForge Visualizer", "WaveForge Audio Visualizer"],
-        "url": "https://progameryt-op.github.io/WaveForge/visualizer.html",
-        "description": "Professional browser-based music visualizer with 12 visualization modes, 3-band audio equalizer, track title overlays, social aspect ratios (16:9, 9:16, 1:1, 4:5), and 4K MP4 video export.",
-        "applicationCategory": "MultimediaApplication",
-        "applicationSubCategory": "Music Visualization",
-        "operatingSystem": "Any",
-        "browserRequirements": "Requires JavaScript. Works best in Chrome, Firefox, Safari, Edge.",
-        "softwareVersion": "3.0.0",
-        "datePublished": "2024-01-01",
-        "dateModified": "2026-10-29",
-        "inLanguage": "en-US",
-        "isAccessibleForFree": true,
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
-        },
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.9",
-            "ratingCount": "2840",
-            "bestRating": "5",
-            "worstRating": "1"
-        },
-        "featureList": [
-            "12 Visualization Modes (incl. Logo Visualizer, Bass Nation, Cyber Tunnel, Synthwave Grid)",
-            "3-Band Hardware Web Audio Equalizer (Bass Boost, Mid, Treble)",
-            "Social Video Aspect Ratios (16:9 YouTube, 9:16 TikTok/Reels/Shorts, 1:1 Spotify/Instagram, 4:5 Portrait)",
-            "On-Canvas Song Title & Artist Text Overlay with Beat Pulse",
-            "Fast WebCodecs MP4 (H.264 + AAC) & WebM Video Export up to 4K 60FPS",
-            "12 Color Palettes + CRT Scanlines & Cinema Vignette FX",
-            "Shareable Preset URLs & Offline PWA Support"
-        ]
-    }
-    </script>
-
-    <!-- APPLICATION STYLES -->
-    <link rel="stylesheet" href="assets/css/app.css?v=3.1.2">
+    <link rel="stylesheet" href="assets/css/app.css?v=4.0.0">
 
     <!-- Fast WebCodecs export: mp4-muxer -->
     <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <!-- SEO CONTENT (Accessible to screen readers and search engines) -->
     <main class="visually-hidden" role="main">
         <article>
-            <h2>WaveForge Studio v3.1 - Free Online Music Visualizer &amp; 4K Video Maker</h2>
-            <p>WaveForge is a browser-based music visualizer and audio spectrum analyzer with 12 modes, 3-band EQ, custom text overlays, and 16:9, 9:16, 1:1, and 4:5 video exports for YouTube, TikTok, Instagram Reels, and Spotify Canvas.</p>
+            <h2>WaveForge Studio 4.0 - Professional Online Music Visualizer</h2>
+            <p>Browser-based music visualizer and audio spectrum analyzer with 12 modes, 3-band EQ, custom text overlays, and 16:9, 9:16, 1:1, and 4:5 4K MP4 video exports.</p>
         </article>
     </main>
 
@@ -161,8 +76,11 @@
 
     <!-- DRAG & DROP OVERLAY -->
     <div id="drop-overlay" aria-hidden="true">
-        <span class="icon">📁</span>
-        <span>Drop Audio or Preset File Here</span>
+        <div class="drop-box">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Drop Audio Track or Preset JSON</span>
+            <small>Supports MP3, WAV, FLAC, OGG, M4A, AAC &amp; WaveForge .json</small>
+        </div>
     </div>
 
     <!-- TOAST NOTIFICATIONS -->
@@ -172,18 +90,13 @@
     <div id="mode-selector-modal" role="dialog" aria-modal="true" aria-label="Choose visualization mode">
         <div class="mode-selector-panel">
             <div class="mode-selector-header">
-                <h2>📊 Choose Visualization Mode (12 Modes)</h2>
-                <button id="btn-close-mode-selector" aria-label="Close mode selector">✕</button>
+                <div>
+                    <span class="modal-eyebrow">VISUAL ENGINES</span>
+                    <h2>Select Visualization Mode</h2>
+                </div>
+                <button id="btn-close-mode-selector" class="close-icon-btn" aria-label="Close mode selector">✕</button>
             </div>
             <div class="mode-grid" id="mode-grid"></div>
-            <!-- Sponsored Banner + Creator Perks Link inside Mode Selector -->
-            <div class="modal-ad-box" style="margin-top: 18px;">
-                <div class="modal-ad-header">
-                    <span class="ad-badge">SPONSORED</span>
-                    <a href="https://araplhn.org/4/f28b978e066eac35ed88538faa37500f" data-wf-smartlink target="_blank" rel="noopener sponsored" class="smartlink-inline-cta">Sponsored Partner ↗</a>
-                </div>
-                <div id="mode-selector-ad-slot" class="modal-ad-slot"></div>
-            </div>
         </div>
     </div>
 
@@ -191,368 +104,400 @@
     <input type="file" id="logo-bg-input" accept="image/*" class="hidden" aria-hidden="true">
     <input type="file" id="logo-img-input" accept="image/*" class="hidden" aria-hidden="true">
 
-    <!-- UI LAYER -->
+    <!-- STUDIO UI LAYER -->
     <nav id="ui-layer" role="navigation" aria-label="Visualizer controls">
 
-        <!-- HEADER -->
+        <!-- SLEEK STUDIO TOP HEADER -->
         <header class="top-bar interactive">
-            <div class="brand-section">
+            <div class="brand-cluster">
                 <a href="index.html" class="brand-link" aria-label="Back to WaveForge home">
-                    <span class="brand-mark" aria-hidden="true">W</span>
-                    <h1 class="brand">WaveForge <span class="pro-pill">v3.1</span></h1>
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+                    </span>
+                    <h1 class="brand">WaveForge</h1>
+                    <span class="pro-pill">STUDIO 4.0</span>
                 </a>
-                <div id="status-display" class="status-display">
-                    <span class="status-item">
+
+                <div id="status-display" class="status-pills">
+                    <span class="status-pill">
                         <span class="status-dot" id="status-dot"></span>
                         <span id="status-text">Ready</span>
                     </span>
-                    <span class="status-item" id="fps-display">60 FPS</span>
-                    <span class="status-item mode-indicator">
-                        Mode: <span class="mode-name" id="mode-name">Logo Viz</span>
-                    </span>
+                    <span class="status-pill mono-pill" id="fps-display">60 FPS</span>
+                    <button type="button" class="status-pill mode-indicator-btn" id="top-mode-pill" title="Click to switch visualization mode">
+                        <span class="mode-lbl">Mode:</span>
+                        <span class="mode-name" id="mode-name">Logo Viz</span>
+                    </button>
                 </div>
             </div>
+
             <div class="top-actions">
-                <button id="btn-export" aria-label="Export video" title="Export visualization as video">
-                    <span class="icon">🎬</span>
-                    <span class="btn-text">Export</span>
+                <button id="btn-export" class="btn-studio-primary" aria-label="Export video" title="Export 4K MP4 / WebM Video">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span class="btn-text">Export Video</span>
                 </button>
-                <button id="btn-settings" aria-label="Open settings" title="Visualizer settings">
-                    <span class="icon">⚙️</span>
-                    <span class="btn-text">Config</span>
+                <button id="btn-settings" aria-label="Open studio settings" title="Studio Settings &amp; Equalizer">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                    <span class="btn-text">Studio Config</span>
                 </button>
-                <button id="btn-share" aria-label="Share preset link" title="Share your custom preset link">
-                    <span class="icon">📣</span>
+                <button id="btn-share" class="icon-only-btn" aria-label="Share preset link" title="Share Custom Preset Link">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 </button>
-                <button id="btn-fullscreen" aria-label="Toggle fullscreen" title="Fullscreen mode">
-                    <span class="icon">⛶</span>
+                <button id="btn-fullscreen" class="icon-only-btn" aria-label="Toggle fullscreen" title="Fullscreen (F)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
                 </button>
             </div>
         </header>
 
-        <!-- MAIN CONTROLS -->
-        <div class="control-bar interactive" role="group" aria-label="Playback controls">
-            <!-- Scrubber -->
-            <div class="scrubber-container">
-                <span id="time-current" class="time-display">0:00</span>
-                <input type="range" id="seek-bar" value="0" min="0" max="100" step="0.1" aria-label="Seek position">
-                <span id="time-total" class="time-display">0:00</span>
-            </div>
+        <!-- FLOATING CENTERED STUDIO TRANSPORT DOCK -->
+        <div class="dock-wrapper">
+            <div class="control-bar interactive" role="group" aria-label="Playback and visual controls">
+                <!-- Timeline Scrubber -->
+                <div class="scrubber-container">
+                    <span id="time-current" class="time-display">0:00</span>
+                    <input type="range" id="seek-bar" value="0" min="0" max="100" step="0.1" aria-label="Seek position">
+                    <span id="time-total" class="time-display">0:00</span>
+                </div>
 
-            <!-- Transport -->
-            <div class="transport-controls">
-                <input type="file" id="file-input" accept="audio/*,.json" class="hidden" aria-hidden="true">
+                <!-- Transport & Studio Actions -->
+                <div class="transport-controls">
+                    <input type="file" id="file-input" accept="audio/*,.json" class="hidden" aria-hidden="true">
 
-                <button id="btn-upload" aria-label="Upload audio file">
-                    <span class="icon">📁</span>
-                    <span class="btn-text">Open</span>
-                </button>
+                    <div class="transport-group">
+                        <button id="btn-upload" aria-label="Upload audio file" title="Upload Audio File (MP3, WAV, FLAC)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span class="btn-text">Open Audio</span>
+                        </button>
 
-                <button id="btn-demo" aria-label="Load demo track" title="Try the built-in demo track — no file needed">
-                    <span class="icon">🎵</span>
-                    <span class="btn-text">Demo</span>
-                </button>
+                        <button id="btn-demo" aria-label="Load demo track" title="Play Built-In Demo Track">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                            <span class="btn-text">Demo</span>
+                        </button>
 
-                <button id="btn-mic" aria-label="Toggle microphone input">
-                    <span class="icon">🎤</span>
-                    <span class="btn-text">Mic</span>
-                </button>
+                        <button id="btn-mic" aria-label="Toggle microphone input" title="Live Microphone Input">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                            <span class="btn-text">Mic</span>
+                        </button>
+                    </div>
 
-                <button id="btn-play" class="active" aria-label="Play or pause">
-                    <span class="icon" id="play-icon">▶</span>
-                </button>
+                    <div class="transport-center">
+                        <button id="btn-play" class="play-hero-btn active" aria-label="Play or pause" title="Play / Pause (Space)">
+                            <span class="icon" id="play-icon">▶</span>
+                        </button>
 
-                <button id="btn-stop" aria-label="Stop playback">
-                    <span class="icon">⏹</span>
-                </button>
+                        <button id="btn-stop" class="icon-only-btn" aria-label="Stop playback" title="Stop (S)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+                        </button>
+                    </div>
 
-                <button id="btn-mode" aria-label="Change visualization mode">
-                    <span class="icon">📊</span>
-                    <span class="btn-text">Modes (12)</span>
-                </button>
+                    <div class="transport-group">
+                        <button id="btn-mode" aria-label="Change visualization mode" title="Choose Visualization Mode (M)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                            <span class="btn-text">Modes (12)</span>
+                        </button>
 
-                <button id="btn-random" aria-label="Randomize visual style" title="Surprise me — random mode, palette and sensitivity (Shortcut: R)">
-                    <span class="icon">🎲</span>
-                </button>
+                        <button id="btn-random" class="icon-only-btn" aria-label="Randomize visual style" title="Randomize Mode &amp; Palette (R)">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                        </button>
 
-                <div class="volume-control">
-                    <label for="vol-slider">🔊</label>
-                    <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="0.8" aria-label="Volume">
+                        <div class="volume-control" title="Output Volume">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                            <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="0.8" aria-label="Volume">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- COMPACT NON-INTRUSIVE STICKY AD BAR (Auto-fades during active playback) -->
-    <div class="wf-app-sticky-ad" id="app-sticky-ad" aria-label="Sponsored content">
-        <button class="ad-sticky-close" type="button" data-ad-dismiss aria-label="Close advertisement">✕</button>
-        <div class="wf-app-sticky-inner" data-wf-ad="compact"></div>
-    </div>
-
-    <!-- SETTINGS MODAL -->
+    <!-- TABBED STUDIO CONFIGURATION MODAL -->
     <div id="settings-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <div class="modal interactive">
             <div class="modal-header">
-                <h2 id="settings-title">⚙️ Studio Configuration</h2>
-                <button id="btn-close-settings" aria-label="Close settings">✕</button>
+                <div>
+                    <span class="modal-eyebrow">WORKSTATION PARAMETERS</span>
+                    <h2 id="settings-title">Studio Configuration</h2>
+                </div>
+                <button id="btn-close-settings" class="close-icon-btn" aria-label="Close settings">✕</button>
             </div>
 
-            <!-- NEW v3.1: TEXT & ARTIST OVERLAY -->
-            <div class="settings-group">
-                <h3>✍️ Track Title &amp; Artist Overlay</h3>
-                <div class="control-row">
-                    <label for="set-overlay-title">Track Title</label>
-                    <input type="text" id="set-overlay-title" class="text-input" placeholder="e.g. Midnight Horizon" maxlength="60">
-                </div>
-                <div class="control-row">
-                    <label for="set-overlay-artist">Artist / Handle</label>
-                    <input type="text" id="set-overlay-artist" class="text-input" placeholder="e.g. @YourArtistName" maxlength="60">
-                </div>
-                <div class="control-row">
-                    <label for="set-overlay-pos">Overlay Position</label>
-                    <select id="set-overlay-pos">
-                        <option value="bottom-left" selected>Bottom Left (Lower Third)</option>
-                        <option value="bottom-center">Bottom Center</option>
-                        <option value="top-center">Top Center</option>
-                        <option value="center">Center Screen</option>
-                    </select>
-                </div>
-                <div class="control-row">
-                    <label for="set-overlay-pulse">Beat-Reactive Text Pulse</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-overlay-pulse" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
+            <!-- 4-TAB SEGMENTED CONTROL -->
+            <div class="settings-tabs" role="tablist" aria-label="Configuration sections">
+                <button type="button" class="settings-tab active" data-tab="tab-visuals" role="tab" aria-selected="true">Visuals &amp; FX</button>
+                <button type="button" class="settings-tab" data-tab="tab-audio" role="tab" aria-selected="false">Audio &amp; EQ</button>
+                <button type="button" class="settings-tab" data-tab="tab-branding" role="tab" aria-selected="false">Text &amp; Logo</button>
+                <button type="button" class="settings-tab" data-tab="tab-system" role="tab" aria-selected="false">System</button>
             </div>
 
-            <!-- NEW v3.1: 3-BAND HARDWARE EQUALIZER -->
-            <div class="settings-group">
-                <h3>🎛️ 3-Band Audio Equalizer &amp; Bass Boost</h3>
-                <div class="control-row">
-                    <label for="set-eq-bass">Bass Boost (110Hz dB)</label>
-                    <input type="range" id="set-eq-bass" min="-12" max="15" step="1" value="0">
-                </div>
-                <div class="control-row">
-                    <label for="set-eq-mid">Mid Presence (1kHz dB)</label>
-                    <input type="range" id="set-eq-mid" min="-12" max="12" step="1" value="0">
-                </div>
-                <div class="control-row">
-                    <label for="set-eq-treble">Treble Air (4.2kHz dB)</label>
-                    <input type="range" id="set-eq-treble" min="-12" max="12" step="1" value="0">
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <h3>🎵 Audio Analysis</h3>
-                <div class="control-row">
-                    <label for="set-fft">FFT Resolution</label>
-                    <select id="set-fft">
-                        <option value="512">512 (Fast)</option>
-                        <option value="1024">1024</option>
-                        <option value="2048" selected>2048 (Balanced)</option>
-                        <option value="4096">4096</option>
-                        <option value="8192">8192</option>
-                        <option value="16384">16384 (Ultra)</option>
-                    </select>
-                </div>
-                <div class="control-row">
-                    <label for="set-smoothing">Smoothing (0-1)</label>
-                    <input type="range" id="set-smoothing" min="0" max="0.99" step="0.01" value="0.85">
-                </div>
-                <div class="control-row">
-                    <label for="set-sensitivity">Gain Sensitivity</label>
-                    <input type="range" id="set-sensitivity" min="0.5" max="5.0" step="0.1" value="1.5">
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <h3>🎨 Visual Style &amp; Post-FX</h3>
-                <div class="control-row">
-                    <label for="set-palette">Color Palette (12)</label>
-                    <select id="set-palette">
-                        <option value="cyberpunk">Cyberpunk (Cyan/Pink)</option>
-                        <option value="synthwave">Synthwave (Neon Magenta/Cyan) ★</option>
-                        <option value="trapneon">Trap Neon (Emerald/Crimson) ★</option>
-                        <option value="vaporwave">Vaporwave (Pastel Neon) ★</option>
-                        <option value="fire">Inferno (Red/Orange)</option>
-                        <option value="ocean">Oceanic (Blue/Teal)</option>
-                        <option value="matrix">Matrix (Green)</option>
-                        <option value="rainbow">Spectrum (Rainbow)</option>
-                        <option value="gold">Luxury (Gold)</option>
-                        <option value="sunset">Sunset (Purple/Orange)</option>
-                        <option value="arctic">Arctic (Ice Blue)</option>
-                        <option value="noir">Monochrome Noir ★</option>
-                    </select>
-                </div>
-                <div class="control-row">
-                    <label for="set-aspect">Aspect Ratio Guide &amp; Export</label>
-                    <select id="set-aspect">
-                        <option value="16:9" selected>16:9 Widescreen (YouTube)</option>
-                        <option value="9:16">9:16 Vertical (TikTok / Reels / Shorts)</option>
-                        <option value="1:1">1:1 Square (Spotify / Instagram)</option>
-                        <option value="4:5">4:5 Portrait (Instagram Feed)</option>
-                    </select>
-                </div>
-                <div class="control-row">
-                    <label for="set-bloom">Glow Intensity</label>
-                    <input type="range" id="set-bloom" min="0" max="100" value="60">
-                </div>
-                <div class="control-row">
-                    <label for="set-freq-scale">Frequency Scale</label>
-                    <select id="set-freq-scale">
-                        <option value="linear">Linear (classic)</option>
-                        <option value="log" selected>Logarithmic (balanced)</option>
-                    </select>
-                </div>
-                <div class="control-row">
-                    <label for="set-hue-cycle">Hue Cycling</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-hue-cycle">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="control-row">
-                    <label for="set-hue-speed">Hue Cycle Speed (°/s)</label>
-                    <input type="range" id="set-hue-speed" min="3" max="60" step="1" value="15">
-                </div>
-                <div class="control-row">
-                    <label for="set-mirror">Mirror Effect</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-mirror">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="control-row">
-                    <label for="set-fx-scanlines">CRT Scanlines Overlay</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-fx-scanlines">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="control-row">
-                    <label for="set-fx-vignette">Cinema Dark Vignette</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-fx-vignette">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="control-row">
-                    <label for="set-fx-progress">Bottom Audio Progress Bar</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-fx-progress" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <h3>💓 Beat Reactivity</h3>
-                <div class="control-row">
-                    <label for="set-beat-enabled">Enable Beat Pulse</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-beat-enabled" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="control-row">
-                    <label for="set-beat-thresh">Beat Threshold</label>
-                    <input type="range" id="set-beat-thresh" min="1.0" max="2.0" step="0.05" value="1.3">
-                </div>
-            </div>
-
-            <div class="settings-group" id="logo-viz-settings">
-                <h3>🎬 Logo Visualizer</h3>
-                <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:12px;">Upload images and customize the Logo Viz mode.</p>
-                <div class="upload-btn-group" style="margin-bottom:14px;">
-                    <div class="upload-btn" id="btn-upload-bg">
-                        <span class="upload-icon">🖼️</span>
-                        <span id="bg-label">Upload Background</span>
+            <!-- TAB 1: VISUALS & FX -->
+            <div class="settings-pane active" id="tab-visuals" role="tabpanel">
+                <div class="settings-group">
+                    <h3>Color &amp; Framing</h3>
+                    <div class="control-row">
+                        <label for="set-palette">Color Palette (12)</label>
+                        <select id="set-palette">
+                            <option value="cyberpunk">Cyberpunk (Cyan / Pink)</option>
+                            <option value="synthwave">Synthwave (Neon Magenta / Cyan)</option>
+                            <option value="trapneon">Trap Neon (Emerald / Crimson)</option>
+                            <option value="vaporwave">Vaporwave (Pastel Neon)</option>
+                            <option value="fire">Inferno (Red / Orange)</option>
+                            <option value="ocean">Oceanic (Blue / Teal)</option>
+                            <option value="matrix">Matrix (Phosphor Green)</option>
+                            <option value="rainbow">Spectrum (Full Rainbow)</option>
+                            <option value="gold">Luxury (24K Gold)</option>
+                            <option value="sunset">Sunset (Purple / Amber)</option>
+                            <option value="arctic">Arctic (Glacier Blue)</option>
+                            <option value="noir">Monochrome Noir</option>
+                        </select>
                     </div>
-                    <div class="upload-btn" id="btn-upload-logo">
-                        <span class="upload-icon">⭕</span>
-                        <span id="logo-label">Upload Logo</span>
+                    <div class="control-row">
+                        <label for="set-aspect">Aspect Ratio &amp; Safe Guide</label>
+                        <select id="set-aspect">
+                            <option value="16:9" selected>16:9 Widescreen (YouTube)</option>
+                            <option value="9:16">9:16 Vertical (TikTok / Reels / Shorts)</option>
+                            <option value="1:1">1:1 Square (Spotify / Instagram)</option>
+                            <option value="4:5">4:5 Portrait (Instagram Feed)</option>
+                        </select>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-bloom">Glow Intensity</label>
+                        <input type="range" id="set-bloom" min="0" max="100" value="60">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-hue-cycle">Dynamic Hue Cycling</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-hue-cycle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-hue-speed">Hue Cycle Speed (°/s)</label>
+                        <input type="range" id="set-hue-speed" min="3" max="60" step="1" value="15">
                     </div>
                 </div>
-                <div class="control-row">
-                    <label>Wave Color</label>
-                    <input type="color" id="set-wave-color" value="#00ff88" style="width:44px;height:32px;padding:2px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;cursor:pointer;">
-                </div>
-                <div class="color-swatch-row" style="margin-bottom:12px;">
-                    <div class="color-swatch active" style="background:#00ff88;" data-color="#00ff88"></div>
-                    <div class="color-swatch" style="background:#00c4ff;" data-color="#00c4ff"></div>
-                    <div class="color-swatch" style="background:#ff0099;" data-color="#ff0099"></div>
-                    <div class="color-swatch" style="background:#ff6600;" data-color="#ff6600"></div>
-                    <div class="color-swatch" style="background:#7b2dff;" data-color="#7b2dff"></div>
-                    <div class="color-swatch" style="background:#ffffff;" data-color="#ffffff"></div>
-                    <div class="color-swatch" style="background:#ffff00;" data-color="#ffff00"></div>
-                </div>
-                <div class="control-row">
-                    <label for="set-shake">Shake Intensity</label>
-                    <input type="range" id="set-shake" min="0" max="40" step="1" value="10">
-                </div>
-                <div class="control-row">
-                    <label for="set-ray-count">Ray Count</label>
-                    <input type="range" id="set-ray-count" min="32" max="256" step="16" value="128">
-                </div>
-                <div class="control-row">
-                    <label for="set-line-thick">Line Thickness</label>
-                    <input type="range" id="set-line-thick" min="1" max="6" step="0.5" value="2">
-                </div>
-                <div class="control-row">
-                    <label for="set-glow-size">Glow Size</label>
-                    <input type="range" id="set-glow-size" min="0" max="80" step="5" value="35">
-                </div>
-                <div class="control-row">
-                    <label for="set-logo-particles">Show Particles</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-logo-particles" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="control-row">
-                    <label for="set-logo-rotate">Rotating Ring</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-logo-rotate">
-                        <span class="toggle-slider"></span>
-                    </label>
+
+                <div class="settings-group">
+                    <h3>Post-Processing FX Rack</h3>
+                    <div class="control-row">
+                        <label for="set-mirror">Stereo Mirror Reflection</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-mirror">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-fx-scanlines">CRT Scanlines Overlay</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-fx-scanlines">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-fx-vignette">Cinema Dark Vignette</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-fx-vignette">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-fx-progress">Bottom Track Progress Bar</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-fx-progress" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
-            <div class="settings-group">
-                <h3>⚡ System</h3>
-                <div class="button-group">
-                    <button id="btn-export-preset">💾 Export Preset</button>
-                    <button id="btn-screenshot">📷 Screenshot</button>
-                    <button id="btn-reset-settings">↺ Reset to Defaults</button>
+            <!-- TAB 2: AUDIO & 3-BAND EQ -->
+            <div class="settings-pane" id="tab-audio" role="tabpanel">
+                <div class="settings-group">
+                    <h3>3-Band Hardware Equalizer</h3>
+                    <div class="control-row">
+                        <label for="set-eq-bass">Low Shelf Bass (110 Hz dB)</label>
+                        <input type="range" id="set-eq-bass" min="-12" max="15" step="1" value="0">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-eq-mid">Mid Presence (1 kHz dB)</label>
+                        <input type="range" id="set-eq-mid" min="-12" max="12" step="1" value="0">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-eq-treble">High Shelf Air (4.2 kHz dB)</label>
+                        <input type="range" id="set-eq-treble" min="-12" max="12" step="1" value="0">
+                    </div>
                 </div>
-                <div class="control-row" style="margin-top: 12px;">
-                    <label for="set-hc">High Contrast Mode</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-hc">
-                        <span class="toggle-slider"></span>
-                    </label>
+
+                <div class="settings-group">
+                    <h3>FFT Spectrum &amp; Beat Detector</h3>
+                    <div class="control-row">
+                        <label for="set-fft">FFT Sample Resolution</label>
+                        <select id="set-fft">
+                            <option value="512">512 (Fast)</option>
+                            <option value="1024">1024</option>
+                            <option value="2048" selected>2048 (Studio Balanced)</option>
+                            <option value="4096">4096 (High Detail)</option>
+                            <option value="8192">8192</option>
+                            <option value="16384">16384 (Mastering Ultra)</option>
+                        </select>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-freq-scale">Frequency Distribution</label>
+                        <select id="set-freq-scale">
+                            <option value="linear">Linear (Raw FFT)</option>
+                            <option value="log" selected>Logarithmic (Musical Balanced)</option>
+                        </select>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-smoothing">Temporal Smoothing</label>
+                        <input type="range" id="set-smoothing" min="0" max="0.99" step="0.01" value="0.85">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-sensitivity">Visual Gain Sensitivity</label>
+                        <input type="range" id="set-sensitivity" min="0.5" max="5.0" step="0.1" value="1.5">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-beat-enabled">Beat Detection Pulse</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-beat-enabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-beat-thresh">Beat Trigger Threshold</label>
+                        <input type="range" id="set-beat-thresh" min="1.0" max="2.0" step="0.05" value="1.3">
+                    </div>
                 </div>
-                <div class="control-row">
-                    <label for="set-watermark">Add “Made with WaveForge” badge to exports</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-watermark">
-                        <span class="toggle-slider"></span>
-                    </label>
+            </div>
+
+            <!-- TAB 3: TEXT & LOGO BRANDING -->
+            <div class="settings-pane" id="tab-branding" role="tabpanel">
+                <div class="settings-group">
+                    <h3>On-Canvas Track Typography</h3>
+                    <div class="control-row">
+                        <label for="set-overlay-title">Track Title</label>
+                        <input type="text" id="set-overlay-title" class="text-input" placeholder="e.g. Midnight Horizon" maxlength="60">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-overlay-artist">Artist / Producer Name</label>
+                        <input type="text" id="set-overlay-artist" class="text-input" placeholder="e.g. @ProdByWaveForge" maxlength="60">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-overlay-pos">Typography Placement</label>
+                        <select id="set-overlay-pos">
+                            <option value="bottom-left" selected>Bottom Left (Lower Third)</option>
+                            <option value="bottom-center">Bottom Center</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="center">Center Canvas</option>
+                        </select>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-overlay-pulse">Beat-Reactive Text Scale</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-overlay-pulse" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="control-row">
-                    <label for="set-show-fps">Show FPS Counter</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="set-show-fps" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
+
+                <div class="settings-group" id="logo-viz-settings">
+                    <h3>Logo Visualizer Mode Assets</h3>
+                    <div class="upload-btn-group" style="margin-bottom:14px;">
+                        <div class="upload-btn" id="btn-upload-bg">
+                            <span class="upload-icon">🖼️</span>
+                            <span id="bg-label">Upload Backdrop</span>
+                        </div>
+                        <div class="upload-btn" id="btn-upload-logo">
+                            <span class="upload-icon">⭕</span>
+                            <span id="logo-label">Upload Center Logo</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label>Ring Accent Color</label>
+                        <input type="color" id="set-wave-color" value="#00ff88" style="width:44px;height:32px;padding:2px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;cursor:pointer;">
+                    </div>
+                    <div class="color-swatch-row" style="margin-bottom:12px;">
+                        <div class="color-swatch active" style="background:#00ff88;" data-color="#00ff88"></div>
+                        <div class="color-swatch" style="background:#00c4ff;" data-color="#00c4ff"></div>
+                        <div class="color-swatch" style="background:#ff0099;" data-color="#ff0099"></div>
+                        <div class="color-swatch" style="background:#ff6600;" data-color="#ff6600"></div>
+                        <div class="color-swatch" style="background:#7b2dff;" data-color="#7b2dff"></div>
+                        <div class="color-swatch" style="background:#ffffff;" data-color="#ffffff"></div>
+                        <div class="color-swatch" style="background:#ffff00;" data-color="#ffff00"></div>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-shake">Bass Camera Shake</label>
+                        <input type="range" id="set-shake" min="0" max="40" step="1" value="10">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-ray-count">Radial Ray Count</label>
+                        <input type="range" id="set-ray-count" min="32" max="256" step="16" value="128">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-line-thick">Ray Line Thickness</label>
+                        <input type="range" id="set-line-thick" min="1" max="6" step="0.5" value="2">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-glow-size">Ring Halo Size</label>
+                        <input type="range" id="set-glow-size" min="0" max="80" step="5" value="35">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-logo-particles">Ambient Particles</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-logo-particles" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-logo-rotate">Orbital Ring Rotation</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-logo-rotate">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: SYSTEM & PRESETS -->
+            <div class="settings-pane" id="tab-system" role="tabpanel">
+                <div class="settings-group">
+                    <h3>Presets &amp; Snapshots</h3>
+                    <div class="button-group">
+                        <button id="btn-export-preset">💾 Save Preset (.json)</button>
+                        <button id="btn-screenshot">📷 Capture PNG Frame</button>
+                        <button id="btn-reset-settings">↺ Reset Defaults</button>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Display &amp; Export Options</h3>
+                    <div class="control-row">
+                        <label for="set-hc">High Contrast Canvas</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-hc">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-watermark">Include subtle “Made with WaveForge” badge</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-watermark">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-show-fps">Show FPS Counter in Top Bar</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-show-fps" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
             <div class="version-info">
-                WaveForge Studio v3.1.0 • 12 Modes • 3-Band EQ • 4K Social Export<br>
+                WaveForge Studio v4.0.0 • 12 Modes • 3-Band EQ • 4K WebCodecs Engine<br>
                 <a id="btn-shortcuts" role="button" tabindex="0">Keyboard Shortcuts</a> •
-                <a href="index.html#how">Documentation</a>
+                <a href="index.html">Back to Home</a>
             </div>
         </div>
     </div>
@@ -561,10 +506,13 @@
     <div id="share-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="share-title">
         <div class="modal interactive">
             <div class="modal-header">
-                <h2 id="share-title">📣 Share Your Custom Preset</h2>
-                <button id="btn-close-share" aria-label="Close share dialog">✕</button>
+                <div>
+                    <span class="modal-eyebrow">COLLABORATE &amp; SHARE</span>
+                    <h2 id="share-title">Share Your Studio Preset</h2>
+                </div>
+                <button id="btn-close-share" class="close-icon-btn" aria-label="Close share dialog">✕</button>
             </div>
-            <p class="share-lead">Your link includes your active visualization mode, color palette, aspect ratio, and title overlay settings so anyone can launch your exact look!</p>
+            <p class="share-lead">Your custom preset link saves your active mode, color palette, sensitivity, aspect ratio, and title overlay in the URL so anyone can open your exact visual setup.</p>
             <div class="share-buttons" id="share-buttons">
                 <a class="share-btn share-x" href="#" target="_blank" rel="noopener" data-share-network="x">
                     <span class="share-icon">𝕏</span><span>Post on X</span>
@@ -576,10 +524,9 @@
                     <span class="share-icon">f</span><span>Share on Facebook</span>
                 </a>
                 <button class="share-btn share-copy" id="btn-copy-link" type="button">
-                    <span class="share-icon">🔗</span><span>Copy Shareable Preset Link</span>
+                    <span class="share-icon">🔗</span><span>Copy Preset Link</span>
                 </button>
             </div>
-            <p class="share-note">Tip: export a video with your music and the “Made with WaveForge” badge enabled for easy word-of-mouth.</p>
         </div>
     </div>
 
@@ -587,8 +534,11 @@
     <div id="shortcuts-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
         <div class="modal interactive">
             <div class="modal-header">
-                <h2 id="shortcuts-title">⌨️ Keyboard Shortcuts</h2>
-                <button id="btn-close-shortcuts" aria-label="Close shortcuts">✕</button>
+                <div>
+                    <span class="modal-eyebrow">HOTKEYS</span>
+                    <h2 id="shortcuts-title">Keyboard Shortcuts</h2>
+                </div>
+                <button id="btn-close-shortcuts" class="close-icon-btn" aria-label="Close shortcuts">✕</button>
             </div>
             <div class="shortcut-list">
                 <div class="shortcut-row"><span>Play / Pause</span><kbd>Space</kbd></div>
@@ -605,47 +555,46 @@
         </div>
     </div>
 
-    <!-- EXPORT MODAL (WITH HIGH-YIELD ADSTERRA NATIVE + ROTATING BANNER + SMARTLINK) -->
+    <!-- EXPORT VIDEO MODAL (CLEAN, HIGH-CONVERSION ADSTERRA PLACEMENT) -->
     <div id="export-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="export-title">
         <div class="modal interactive">
             <div class="modal-header">
-                <h2 id="export-title">🎬 Export Video (MP4 / WebM)</h2>
-                <button id="btn-close-export" aria-label="Close export dialog">✕</button>
+                <div>
+                    <span class="modal-eyebrow">RENDER PIPELINE</span>
+                    <h2 id="export-title">Export Video</h2>
+                </div>
+                <button id="btn-close-export" class="close-icon-btn" aria-label="Close export dialog">✕</button>
             </div>
 
-            <p style="color: var(--text-dim); margin-bottom: var(--spacing-md); font-size: 0.88rem;">
-                Record your visualization with EQ-processed audio, text overlays, and post-FX.
-            </p>
-
             <div class="settings-group">
-                <h3>Video Quality</h3>
+                <h3>Resolution Preset</h3>
                 <div class="export-options" id="quality-options">
-                    <label class="export-option selected">
-                        <input type="radio" name="export-quality" value="720" checked>
+                    <label class="export-option">
+                        <input type="radio" name="export-quality" value="720">
                         <div class="export-option-info">
                             <div class="export-option-title">720p HD</div>
-                            <div class="export-option-desc">Fastest export • Compact file size</div>
+                            <div class="export-option-desc">Fastest encode • Compact file</div>
                         </div>
                     </label>
-                    <label class="export-option">
-                        <input type="radio" name="export-quality" value="1080">
+                    <label class="export-option selected">
+                        <input type="radio" name="export-quality" value="1080" checked>
                         <div class="export-option-info">
-                            <div class="export-option-title">1080p Full HD (Recommended)</div>
-                            <div class="export-option-desc">Crisp social &amp; YouTube quality • Balanced</div>
+                            <div class="export-option-title">1080p Full HD <span class="rec-tag">Recommended</span></div>
+                            <div class="export-option-desc">10 Mbps bitrate • Crisp YouTube &amp; TikTok quality</div>
                         </div>
                     </label>
                     <label class="export-option">
                         <input type="radio" name="export-quality" value="1440">
                         <div class="export-option-info">
                             <div class="export-option-title">1440p 2K QHD</div>
-                            <div class="export-option-desc">Studio master quality • High bitrate</div>
+                            <div class="export-option-desc">16 Mbps bitrate • Studio master</div>
                         </div>
                     </label>
                     <label class="export-option">
                         <input type="radio" name="export-quality" value="2160">
                         <div class="export-option-info">
                             <div class="export-option-title">4K Ultra HD</div>
-                            <div class="export-option-desc">Maximum detail • Ultra high bitrate</div>
+                            <div class="export-option-desc">28 Mbps bitrate • Maximum cinema detail</div>
                         </div>
                     </label>
                 </div>
@@ -656,17 +605,17 @@
                 <div class="control-row">
                     <label for="export-aspect">Aspect Ratio</label>
                     <select id="export-aspect">
-                        <option value="16:9" selected>16:9 Widescreen (YouTube / Desktop)</option>
+                        <option value="16:9" selected>16:9 Widescreen (YouTube)</option>
                         <option value="9:16">9:16 Vertical (TikTok / Reels / Shorts)</option>
                         <option value="1:1">1:1 Square (Spotify Canvas / IG)</option>
                         <option value="4:5">4:5 Portrait (Instagram Feed)</option>
                     </select>
                 </div>
                 <div class="control-row">
-                    <label for="export-duration">Duration</label>
+                    <label for="export-duration">Clip Duration</label>
                     <select id="export-duration">
                         <option value="full">Full Track</option>
-                        <option value="15">15 seconds (Reels / TikTok Teaser)</option>
+                        <option value="15">15 seconds (Short Teaser)</option>
                         <option value="30">30 seconds</option>
                         <option value="60">1 minute</option>
                         <option value="120">2 minutes</option>
@@ -681,7 +630,7 @@
                     </select>
                 </div>
                 <div class="control-row">
-                    <label for="export-mode">Visualization Mode</label>
+                    <label for="export-mode">Visualization Engine</label>
                     <select id="export-mode"></select>
                 </div>
             </div>
@@ -696,27 +645,27 @@
                 </div>
             </div>
 
-            <div class="button-group" style="margin-top: var(--spacing-md);">
-                <button id="btn-start-export" class="success">
-                    <span class="icon">🎬</span> Start Export
+            <div class="button-group" style="margin-top: 14px;">
+                <button id="btn-start-export" class="btn-studio-primary" style="padding:12px 20px;font-size:0.9rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Start Render</span>
                 </button>
                 <button id="btn-cancel-export" class="danger" style="display: none;">
-                    <span class="icon">⏹</span> Cancel
+                    <span>⏹ Cancel Render</span>
                 </button>
             </div>
 
-            <p id="export-engine-note" style="font-size: 0.72rem; margin-top: 10px; padding: 6px 10px; border-radius: 6px; background: rgba(0, 255, 136, 0.08); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.25);">
-                ⚡ Checking export engine…
+            <p id="export-engine-note" class="engine-note">
+                ⚡ Checking hardware encoder support…
             </p>
 
-            <!-- HIGH-ATTENTION SPONSORED AREA DURING EXPORT -->
-            <div class="modal-ad-box" style="margin-top: 14px;">
+            <!-- SPONSORED PLACEMENT (Supports Free 4K Hosting During Render Wait) -->
+            <div class="modal-ad-box" style="margin-top: 16px;">
                 <div class="modal-ad-header">
-                    <span class="ad-badge">SPONSORED PARTNER</span>
+                    <span class="ad-badge">SPONSORED</span>
                     <a href="https://araplhn.org/4/f28b978e066eac35ed88538faa37500f" data-wf-smartlink target="_blank" rel="noopener sponsored" class="smartlink-inline-cta">Sponsored Partner ↗</a>
                 </div>
                 <div id="export-ad-slot" class="modal-ad-slot"></div>
-                <!-- Adsterra Native Banner -->
                 <div class="native-ad-container" style="margin-top: 8px;">
                     <script async="async" data-cfasync="false" src="https://bauval.org/21/7d5620353411eac086d1a38c87043739"></script>
                     <div id="container-7d5620353411eac086d1a38c87043739"></div>
@@ -726,21 +675,21 @@
     </div>
 
     <!-- VISUALIZER MODE REGISTRY (12 Modes) -->
-    <script src="Visualizers/bars.js?v=3.1.2"></script>
-    <script src="Visualizers/wave.js?v=3.1.2"></script>
-    <script src="Visualizers/radial.js?v=3.1.2"></script>
-    <script src="Visualizers/particles.js?v=3.1.2"></script>
-    <script src="Visualizers/spectrogram.js?v=3.1.2"></script>
-    <script src="Visualizers/3dbars.js?v=3.1.2"></script>
-    <script src="Visualizers/dna.js?v=3.1.2"></script>
-    <script src="Visualizers/galaxy.js?v=3.1.2"></script>
-    <script src="Visualizers/logo.js?v=3.1.2"></script>
-    <script src="Visualizers/tunnel.js?v=3.1.2"></script>
-    <script src="Visualizers/trapnation.js?v=3.1.2"></script>
-    <script src="Visualizers/synthwave.js?v=3.1.2"></script>
+    <script src="Visualizers/bars.js?v=4.0.0"></script>
+    <script src="Visualizers/wave.js?v=4.0.0"></script>
+    <script src="Visualizers/radial.js?v=4.0.0"></script>
+    <script src="Visualizers/particles.js?v=4.0.0"></script>
+    <script src="Visualizers/spectrogram.js?v=4.0.0"></script>
+    <script src="Visualizers/3dbars.js?v=4.0.0"></script>
+    <script src="Visualizers/dna.js?v=4.0.0"></script>
+    <script src="Visualizers/galaxy.js?v=4.0.0"></script>
+    <script src="Visualizers/logo.js?v=4.0.0"></script>
+    <script src="Visualizers/tunnel.js?v=4.0.0"></script>
+    <script src="Visualizers/trapnation.js?v=4.0.0"></script>
+    <script src="Visualizers/synthwave.js?v=4.0.0"></script>
 
     <!-- SMART MONETIZATION ENGINE & APPLICATION SCRIPT -->
-    <script src="assets/js/ads.js?v=3.1.2"></script>
-    <script src="assets/js/app.js?v=3.1.2"></script>
+    <script src="assets/js/ads.js?v=4.0.0"></script>
+    <script src="assets/js/app.js?v=4.0.0"></script>
 </body>
 </html>

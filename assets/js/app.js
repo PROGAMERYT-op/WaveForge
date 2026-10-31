@@ -574,6 +574,7 @@
             this._refreshEngineNote();
             if (window.WaveForgeAds) {
                 window.WaveForgeAds.startModalAdRefresh('export-ad-slot', true);
+                window.WaveForgeAds.injectSocialBar(500);
             }
         },
 
@@ -1567,6 +1568,22 @@
             document.getElementById('btn-mode').onclick = () => {
                 this.openModeSelector();
             };
+            const topModePill = document.getElementById('top-mode-pill');
+            if (topModePill) {
+                topModePill.onclick = () => this.openModeSelector();
+            }
+            document.querySelectorAll('.settings-tab').forEach((tabBtn) => {
+                tabBtn.addEventListener('click', () => {
+                    const targetId = tabBtn.getAttribute('data-tab');
+                    document.querySelectorAll('.settings-tab').forEach(b => {
+                        b.classList.toggle('active', b === tabBtn);
+                        b.setAttribute('aria-selected', b === tabBtn ? 'true' : 'false');
+                    });
+                    document.querySelectorAll('.settings-pane').forEach(pane => {
+                        pane.classList.toggle('active', pane.id === targetId);
+                    });
+                });
+            });
 
             document.getElementById('btn-close-mode-selector').onclick = () => {
                 this.closeModeSelector();
@@ -2162,11 +2179,9 @@
 
         viz.loop();
 
-        if (window.WaveForgeAds) {
-            window.WaveForgeAds.injectSocialBar(3500);
-        }
+        // Social Bar deferred to Export Modal so creative canvas stays 100% clean
 
-        console.log('%c🎵 WaveForge v3.1.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
+        console.log('%c🎵 WaveForge Studio v4.0.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
         console.log('%cProfessional Music Visualizer Studio', 'color: #ff0099; font-size: 12px;');
     });
 
