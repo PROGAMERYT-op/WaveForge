@@ -1,6 +1,6 @@
 /*
  * WaveForge — Acoustic Waterfall Spectrogram mode (mode 4)
- * Palette-aware scrolling frequency heatmap with a live glowing crest analyzer.
+ * Pure scrolling frequency-over-time thermal heatmap (no wave line overlay).
  */
 (function (registry) {
     'use strict';
@@ -15,7 +15,7 @@
     registry[4] = {
         name: 'Spectrogram',
         icon: '🔬',
-        desc: 'Thermal frequency waterfall with live harmonic crest analyzer.',
+        desc: 'Scrolling frequency-over-time thermal acoustic heatmap.',
         ownBackground: true,
 
         render(engine, ctx, w, h, cx, cy, data, isBeat) {
@@ -35,8 +35,7 @@
             ctx.fillRect(0, 0, w, h);
 
             const sliceWidth = w / MAX_HISTORY;
-            const cellH = (h * 0.82) / binsToKeep;
-            const baseY = h * 0.92;
+            const cellH = h / binsToKeep;
 
             for (let x = 0; x < history.length; x++) {
                 const frame = history[x];
@@ -45,30 +44,14 @@
 
                 for (let y = 0; y < binsToKeep; y++) {
                     const v = frame[y] / 255;
-                    if (v > 0.06) {
-                        const hue = (260 - v * 220 + (engine.config.hueCycle ? engine.nowSec() * 20 : 0)) % 360;
-                        const light = 15 + v * 52;
+                    if (v > 0.05) {
+                        const hue = (250 - v * 230 + (engine.config.hueCycle ? engine.nowSec() * 20 : 0)) % 360;
+                        const light = 14 + v * 52;
                         ctx.fillStyle = `hsla(${hue}, 95%, ${light}%, ${v * ageAlpha})`;
-                        ctx.fillRect(xPos, baseY - (y + 1) * cellH, sliceWidth + 0.9, cellH + 0.9);
+                        ctx.fillRect(xPos, h - (y + 1) * cellH, sliceWidth + 0.9, cellH + 0.9);
                     }
                 }
             }
-
-            // Live glowing frequency crest along the bottom-top overlay
-            ctx.save();
-            ctx.beginPath();
-            for (let i = 0; i < binsToKeep; i++) {
-                const px = (i / (binsToKeep - 1)) * w;
-                const py = baseY - (slice[i] / 255) * (h * 0.45);
-                if (i === 0) ctx.moveTo(px, py);
-                else ctx.lineTo(px, py);
-            }
-            ctx.strokeStyle = engine.getColor(0);
-            ctx.lineWidth = isBeat ? 3.2 : 2;
-            ctx.shadowBlur = 16;
-            ctx.shadowColor = engine.getColor(0);
-            ctx.stroke();
-            ctx.restore();
         }
     };
 })(window.WaveForgeVisualizers = window.WaveForgeVisualizers || {});
