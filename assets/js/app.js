@@ -1537,6 +1537,24 @@
                 };
                 grid.appendChild(card);
             });
+
+            const qStrip = document.getElementById('quick-mode-strip');
+            if (qStrip) {
+                qStrip.innerHTML = '';
+                Object.keys(VIS_MODS).sort((a, b) => parseInt(a) - parseInt(b)).forEach(key => {
+                    const mod = VIS_MODS[key];
+                    const pill = document.createElement('button');
+                    pill.type = 'button';
+                    pill.className = 'qmode-pill';
+                    pill.dataset.mode = key;
+                    pill.textContent = mod.icon + ' ' + mod.name;
+                    pill.onclick = () => {
+                        setMode(parseInt(key));
+                        this.showToast(mod.icon + ' ' + mod.name, 'info');
+                    };
+                    qStrip.appendChild(pill);
+                });
+            }
         },
 
         buildExportModeOptions() {
@@ -1558,6 +1576,30 @@
 
         bindEvents() {
             document.getElementById('btn-upload').onclick = () => this.els.fileInput.click();
+            const onboardDemo = document.getElementById('onboard-demo-btn');
+            if (onboardDemo) onboardDemo.onclick = () => this.loadDemoTrack();
+            const onboardUpload = document.getElementById('onboard-upload-btn');
+            if (onboardUpload) onboardUpload.onclick = () => this.els.fileInput.click();
+            const prevModeBtn = document.getElementById('btn-prev-mode');
+            if (prevModeBtn) {
+                prevModeBtn.onclick = () => {
+                    const keys = Object.keys(VIS_MODS).map(Number).sort((a, b) => a - b);
+                    const idx = keys.indexOf(APP_STATE.mode);
+                    const nextIdx = (idx - 1 + keys.length) % keys.length;
+                    setMode(keys[nextIdx]);
+                    this.showToast(VIS_MODS[keys[nextIdx]].name, 'info');
+                };
+            }
+            const nextModeBtn = document.getElementById('btn-next-mode');
+            if (nextModeBtn) {
+                nextModeBtn.onclick = () => {
+                    const keys = Object.keys(VIS_MODS).map(Number).sort((a, b) => a - b);
+                    const idx = keys.indexOf(APP_STATE.mode);
+                    const nextIdx = (idx + 1) % keys.length;
+                    setMode(keys[nextIdx]);
+                    this.showToast(VIS_MODS[keys[nextIdx]].name, 'info');
+                };
+            }
             document.getElementById('btn-demo').onclick = () => this.loadDemoTrack();
             document.getElementById('btn-random').onclick = () => this.randomizeVisual();
             this.els.fileInput.onchange = (e) => this.handleFile(e.target.files[0]);
@@ -1768,6 +1810,24 @@
                         break;
                     case 'KeyR':
                         this.randomizeVisual();
+                        break;
+                    case 'BracketLeft':
+                        if (document.getElementById('btn-prev-mode')) document.getElementById('btn-prev-mode').click();
+                        break;
+                    case 'BracketRight':
+                        if (document.getElementById('btn-next-mode')) document.getElementById('btn-next-mode').click();
+                        break;
+                    case 'Digit1': case 'Digit2': case 'Digit3': case 'Digit4': case 'Digit5':
+                    case 'Digit6': case 'Digit7': case 'Digit8': case 'Digit9': {
+                        const mIdx = parseInt(e.code.replace('Digit', ''), 10) - 1;
+                        if (VIS_MODS[mIdx]) {
+                            setMode(mIdx);
+                            this.showToast(VIS_MODS[mIdx].icon + ' ' + VIS_MODS[mIdx].name, 'info');
+                        }
+                        break;
+                    }
+                    case 'Digit0':
+                        if (VIS_MODS[9]) { setMode(9); this.showToast(VIS_MODS[9].name, 'info'); }
                         break;
                     case 'ArrowRight':
                         audio.audioElement.currentTime = Math.min(
@@ -2070,6 +2130,10 @@
             this.els.playIcon.textContent = APP_STATE.isPlaying ? '⏸' : '▶';
             this.els.playBtn.classList.toggle('active', APP_STATE.isPlaying);
             document.getElementById('status-text').textContent = APP_STATE.isPlaying ? 'Playing' : 'Paused';
+            const onboard = document.getElementById('studio-onboarding');
+            if (onboard && (APP_STATE.isPlaying || audio.hasAudio())) {
+                onboard.classList.add('hidden-card');
+            }
         },
 
         updateProgressBar() {
@@ -2107,7 +2171,7 @@
         },
 
         updateModeCards() {
-            document.querySelectorAll('.mode-card').forEach(card => {
+            document.querySelectorAll('.mode-card, .qmode-pill').forEach(card => {
                 const modeNum = parseInt(card.dataset.mode);
                 card.classList.toggle('active', modeNum === APP_STATE.mode);
             });
@@ -2181,7 +2245,7 @@
 
         // Social Bar deferred to Export Modal so creative canvas stays 100% clean
 
-        console.log('%c🎵 WaveForge Studio v4.0.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
+        console.log('%c🎵 WaveForge Studio v5.0.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
         console.log('%cProfessional Music Visualizer Studio', 'color: #ff0099; font-size: 12px;');
     });
 

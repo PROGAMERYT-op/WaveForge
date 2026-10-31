@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '4.0.0';
+            var VER = '5.0.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -82,7 +82,7 @@
         "description": "Studio-grade browser music visualizer with 12 modes, 3-band hardware EQ, custom text and logo overlays, and 4K MP4 export with no watermark.",
         "applicationCategory": "MultimediaApplication",
         "operatingSystem": "Any modern browser",
-        "softwareVersion": "4.0.0",
+        "softwareVersion": "5.0.0",
         "isAccessibleForFree": true,
         "offers": {
             "@type": "Offer",
@@ -97,7 +97,7 @@
     }
     </script>
 
-    <link rel="stylesheet" href="assets/css/landing.css?v=4.0.0">
+    <link rel="stylesheet" href="assets/css/landing.css?v=5.0.0">
 </head>
 <body>
     <!-- AMBIENT AURORA BACKGROUND -->
@@ -112,7 +112,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
                 </span>
                 <span class="logo-text">WaveForge</span>
-                <span class="version-chip">4.0</span>
+                <span class="version-chip">5.0</span>
             </a>
 
             <ul class="nav-links">
@@ -128,7 +128,7 @@
                     <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                     <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
                 </button>
-                <a href="visualizer.html?v=4.0.0" class="btn btn-primary">
+                <a href="visualizer.html?v=5.0.0" class="btn btn-primary">
                     <span>Launch Studio</span>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </a>
@@ -148,15 +148,15 @@
             <li><a href="#compare">Compare</a></li>
             <li><a href="#faq">FAQ</a></li>
         </ul>
-        <a href="visualizer.html?v=4.0.0" class="btn btn-primary" style="width:100%;justify-content:center;">Launch Studio →</a>
+        <a href="visualizer.html?v=5.0.0" class="btn btn-primary" style="width:100%;justify-content:center;">Launch Studio →</a>
     </div>
 
     <!-- HERO SECTION -->
     <header class="hero">
         <div class="container hero-inner">
-            <a href="visualizer.html?v=4.0.0" class="eyebrow-pill">
+            <a href="visualizer.html?v=5.0.0" class="eyebrow-pill">
                 <span class="pulse-dot"></span>
-                <span>WaveForge Studio 4.0 — WebCodecs 4K MP4 Engine &amp; 12 Reactive Modes</span>
+                <span>WaveForge Studio 5.0 — WebCodecs 4K MP4 Engine &amp; 12 Reactive Modes</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>
             </a>
 
@@ -167,11 +167,11 @@
             </p>
 
             <div class="hero-actions">
-                <a href="visualizer.html?v=4.0.0" class="btn btn-primary btn-lg">
+                <a href="visualizer.html?v=5.0.0" class="btn btn-primary btn-lg">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     <span>Open Visualizer Studio</span>
                 </a>
-                <a href="visualizer.html?mode=10&amp;palette=synthwave&amp;v=4.0.0" class="btn btn-secondary btn-lg">
+                <a href="visualizer.html?mode=10&amp;palette=synthwave&amp;v=5.0.0" class="btn btn-secondary btn-lg">
                     <span>Try Bass Nation Preset</span>
                 </a>
             </div>
@@ -239,10 +239,15 @@
                         </div>
                     </div>
 
-                    <a href="visualizer.html?v=4.0.0" class="dock-launch-link">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <button type="button" id="previewAudioBtn" class="preview-audio-btn" title="Listen to built-in demo audio">
+                            <span>🔊 Play Demo Audio</span>
+                        </button>
+                        <a href="visualizer.html?v=5.0.0" class="dock-launch-link">
                         <span>Launch Full Studio</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </a>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -329,7 +334,7 @@
             </div>
 
             <div class="modes-showcase-grid">
-                <a href="visualizer.html?mode=8&amp;v=4.0.0" class="mode-showcase-card featured reveal">
+                <a href="visualizer.html?mode=8&amp;v=5.0.0" class="mode-showcase-card featured reveal">
                     <div class="msc-top">
                         <span class="msc-num">MODE 09</span>
                         <span class="msc-tag">POPULAR</span>
@@ -339,7 +344,7 @@
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=10&amp;v=4.0.0" class="mode-showcase-card featured reveal">
+                <a href="visualizer.html?mode=10&amp;v=5.0.0" class="mode-showcase-card featured reveal">
                     <div class="msc-top">
                         <span class="msc-num">MODE 11</span>
                         <span class="msc-tag">NEW</span>
@@ -349,7 +354,7 @@
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=9&amp;v=4.0.0" class="mode-showcase-card featured reveal">
+                <a href="visualizer.html?mode=9&amp;v=5.0.0" class="mode-showcase-card featured reveal">
                     <div class="msc-top">
                         <span class="msc-num">MODE 10</span>
                         <span class="msc-tag">NEW</span>
@@ -359,7 +364,7 @@
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=11&amp;v=4.0.0" class="mode-showcase-card featured reveal">
+                <a href="visualizer.html?mode=11&amp;v=5.0.0" class="mode-showcase-card featured reveal">
                     <div class="msc-top">
                         <span class="msc-num">MODE 12</span>
                         <span class="msc-tag">NEW</span>
@@ -369,56 +374,56 @@
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=0&amp;v=4.0.0" class="mode-showcase-card reveal">
+                <a href="visualizer.html?mode=0&amp;v=5.0.0" class="mode-showcase-card reveal">
                     <div class="msc-top"><span class="msc-num">MODE 01</span></div>
                     <h3>Bar Spectrum</h3>
                     <p>Mirrored studio frequency analyzer with gravity peak-hold caps.</p>
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=1&amp;v=4.0.0" class="mode-showcase-card reveal">
+                <a href="visualizer.html?mode=1&amp;v=5.0.0" class="mode-showcase-card reveal">
                     <div class="msc-top"><span class="msc-num">MODE 02</span></div>
                     <h3>Oscilloscope Wave</h3>
                     <p>Time-domain waveform with optional stereo reflection and beat glow.</p>
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=2&amp;v=4.0.0" class="mode-showcase-card reveal">
+                <a href="visualizer.html?mode=2&amp;v=5.0.0" class="mode-showcase-card reveal">
                     <div class="msc-top"><span class="msc-num">MODE 03</span></div>
                     <h3>Radial EQ</h3>
                     <p>360° circular equalizer radiating outward with inner reflection.</p>
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=3&amp;v=4.0.0" class="mode-showcase-card reveal">
+                <a href="visualizer.html?mode=3&amp;v=5.0.0" class="mode-showcase-card reveal">
                     <div class="msc-top"><span class="msc-num">MODE 04</span></div>
                     <h3>Reactive Particles</h3>
                     <p>200-node luminous particle field driven by sub-bass velocity.</p>
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=4&amp;v=4.0.0" class="mode-showcase-card reveal">
+                <a href="visualizer.html?mode=4&amp;v=5.0.0" class="mode-showcase-card reveal">
                     <div class="msc-top"><span class="msc-num">MODE 05</span></div>
                     <h3>Spectrogram</h3>
                     <p>Real-time scrolling frequency-over-time thermal acoustic waterfall.</p>
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=5&amp;v=4.0.0" class="mode-showcase-card reveal">
+                <a href="visualizer.html?mode=5&amp;v=5.0.0" class="mode-showcase-card reveal">
                     <div class="msc-top"><span class="msc-num">MODE 06</span></div>
                     <h3>Isometric 3D Bars</h3>
                     <p>Extruded 3D frequency columns with shaded depth faces.</p>
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=6&amp;v=4.0.0" class="mode-showcase-card reveal">
+                <a href="visualizer.html?mode=6&amp;v=5.0.0" class="mode-showcase-card reveal">
                     <div class="msc-top"><span class="msc-num">MODE 07</span></div>
                     <h3>DNA Double Helix</h3>
                     <p>Rotating dual-strand molecular helix modulated by harmonic bins.</p>
                     <span class="msc-action">Open Mode →</span>
                 </a>
 
-                <a href="visualizer.html?mode=7&amp;v=4.0.0" class="mode-showcase-card reveal">
+                <a href="visualizer.html?mode=7&amp;v=5.0.0" class="mode-showcase-card reveal">
                     <div class="msc-top"><span class="msc-num">MODE 08</span></div>
                     <h3>Spiral Galaxy</h3>
                     <p>Elliptical four-arm orbital starfield pulsing with audio energy.</p>
@@ -471,7 +476,7 @@
                     <thead>
                         <tr>
                             <th>Capability</th>
-                            <th class="highlight-col">WaveForge Studio 4.0</th>
+                            <th class="highlight-col">WaveForge Studio 5.0</th>
                             <th>Cloud Subscription Visualizers</th>
                         </tr>
                     </thead>
@@ -547,7 +552,7 @@
                 <h2>Ready to build your next music video?</h2>
                 <p>No account required. Drop your audio track and start visualizing in seconds.</p>
                 <div class="hero-actions" style="margin-bottom:0;">
-                    <a href="visualizer.html?v=4.0.0" class="btn btn-primary btn-lg">
+                    <a href="visualizer.html?v=5.0.0" class="btn btn-primary btn-lg">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                         <span>Launch WaveForge Studio</span>
                     </a>
@@ -573,11 +578,11 @@
                 <div class="footer-col">
                     <h4>Studio</h4>
                     <ul>
-                        <li><a href="visualizer.html?v=4.0.0">Launch Studio</a></li>
-                        <li><a href="visualizer.html?mode=8&amp;v=4.0.0">Logo Visualizer</a></li>
-                        <li><a href="visualizer.html?mode=10&amp;v=4.0.0">Bass Nation Mode</a></li>
-                        <li><a href="visualizer.html?mode=9&amp;v=4.0.0">Cyber Tunnel Mode</a></li>
-                        <li><a href="visualizer.html?mode=11&amp;v=4.0.0">Synthwave Grid</a></li>
+                        <li><a href="visualizer.html?v=5.0.0">Launch Studio</a></li>
+                        <li><a href="visualizer.html?mode=8&amp;v=5.0.0">Logo Visualizer</a></li>
+                        <li><a href="visualizer.html?mode=10&amp;v=5.0.0">Bass Nation Mode</a></li>
+                        <li><a href="visualizer.html?mode=9&amp;v=5.0.0">Cyber Tunnel Mode</a></li>
+                        <li><a href="visualizer.html?mode=11&amp;v=5.0.0">Synthwave Grid</a></li>
                     </ul>
                 </div>
 
@@ -607,13 +612,13 @@
                 <div class="footer-bottom-links">
                     <a href="privacy.html">Privacy</a>
                     <a href="terms.html">Terms</a>
-                    <a href="visualizer.html?v=4.0.0">Launch Studio</a>
+                    <a href="visualizer.html?v=5.0.0">Launch Studio</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="assets/js/landing.js?v=4.0.0"></script>
+    <script src="assets/js/landing.js?v=5.0.0"></script>
     <script>
         if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
             window.addEventListener('load', function () {

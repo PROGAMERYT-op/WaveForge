@@ -1011,3 +1011,88 @@ kbd {
     .window-meta { display: none; }
     .footer-grid { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   WaveForge 5.0 Ultra — Micro-Animations, Spotlight Cards & Shimmer
+   ========================================================================== */
+
+@keyframes textShimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.gradient-text {
+    background-size: 200% auto;
+    animation: textShimmer 6s ease infinite;
+}
+
+@keyframes floatGlow {
+    0%, 100% { transform: translate(-65%, 0px) scale(1); }
+    50% { transform: translate(-60%, 24px) scale(1.08); }
+}
+
+.glow-1 {
+    animation: floatGlow 10s ease-in-out infinite;
+}
+
+.bento-card,
+.mode-showcase-card,
+.workflow-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.28s ease, box-shadow 0.28s ease;
+}
+
+.bento-card::before,
+.mode-showcase-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99, 102, 241, 0.14), transparent 40%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.bento-card:hover::before,
+.mode-showcase-card:hover::before {
+    opacity: 1;
+}
+
+.preview-audio-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.32);
+    padding: 7px 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.preview-audio-btn:hover {
+    background: rgba(16, 185, 129, 0.22);
+    transform: translateY(-1px);
+}
+
+.preview-audio-btn.playing {
+    background: #10b981;
+    color: #04130d;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.45);
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(20px) scale(0.985);
+    transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}

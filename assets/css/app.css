@@ -1080,3 +1080,156 @@ kbd {
     .control-row { flex-direction: column; align-items: flex-start; gap: 6px; }
     .control-row select, .control-row .text-input, .control-row input[type="range"] { width: 100%; }
 }
+
+/* ==========================================================================
+   WaveForge Studio 5.0 — Quick-Start Onboarding, Quick Mode Strip & Animations
+   ========================================================================== */
+
+.studio-onboarding {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -54%) scale(1);
+    z-index: 15;
+    width: 90%;
+    max-width: 470px;
+    background: rgba(11, 16, 32, 0.82);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 24px;
+    padding: 28px 26px;
+    text-align: center;
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7), 0 0 60px rgba(99, 102, 241, 0.16);
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.studio-onboarding.hidden-card {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.94);
+    pointer-events: none;
+}
+
+.onboard-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--accent-secondary);
+    background: rgba(0, 242, 255, 0.1);
+    border: 1px solid rgba(0, 242, 255, 0.25);
+    padding: 3px 10px;
+    border-radius: 99px;
+    margin-bottom: 12px;
+}
+
+.studio-onboarding h2 {
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+}
+
+.studio-onboarding p {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    margin: 0 0 20px;
+    line-height: 1.55;
+}
+
+.onboard-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.onboard-btn {
+    padding: 11px 18px;
+    font-size: 0.86rem;
+    border-radius: 12px;
+}
+
+.onboard-btn-secondary {
+    padding: 11px 18px;
+    font-size: 0.86rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.onboard-hints {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* 1-CLICK QUICK MODE SWITCHER STRIP IN DOCK */
+.quick-mode-strip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+}
+.quick-mode-strip::-webkit-scrollbar {
+    display: none;
+}
+
+.qmode-pill {
+    flex: 0 0 auto;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.qmode-pill:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateY(-1px);
+}
+
+.qmode-pill.active {
+    background: rgba(99, 102, 241, 0.22);
+    color: #ffffff;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 14px rgba(99, 102, 241, 0.3);
+}
+
+/* SPRING MODAL ANIMATIONS */
+.modal,
+.mode-selector-panel {
+    transform: translateY(12px) scale(0.97);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-overlay.open .modal,
+#mode-selector-modal.open .mode-selector-panel {
+    transform: translateY(0) scale(1);
+}
+
+@media (max-width: 640px) {
+    .studio-onboarding {
+        padding: 20px 18px;
+        top: 44%;
+    }
+    .onboard-hints {
+        display: none;
+    }
+}

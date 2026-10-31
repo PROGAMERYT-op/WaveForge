@@ -197,6 +197,39 @@
         document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
     }, 450);
 
+    
+    /* ---------- Cursor Spotlight Glow on Bento & Mode Cards ---------- */
+    document.querySelectorAll('.bento-card, .mode-showcase-card').forEach((card) => {
+        card.addEventListener('pointermove', (e) => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+            card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+        });
+    });
+
+    /* ---------- Live Demo Audio Toggle on Landing Page Showcase ---------- */
+    const previewAudioBtn = document.getElementById('previewAudioBtn');
+    let demoAudio = null;
+    if (previewAudioBtn) {
+        previewAudioBtn.addEventListener('click', () => {
+            if (!demoAudio) {
+                demoAudio = new Audio('assets/audio/demo-track.wav');
+                demoAudio.loop = true;
+                demoAudio.volume = 0.75;
+            }
+            if (demoAudio.paused) {
+                demoAudio.play().then(() => {
+                    previewAudioBtn.classList.add('playing');
+                    previewAudioBtn.innerHTML = '<span>⏸ Pause Demo Audio</span>';
+                }).catch(() => {});
+            } else {
+                demoAudio.pause();
+                previewAudioBtn.classList.remove('playing');
+                previewAudioBtn.innerHTML = '<span>🔊 Play Demo Audio</span>';
+            }
+        });
+    }
+
     const yearEl = document.getElementById('year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
 })();
