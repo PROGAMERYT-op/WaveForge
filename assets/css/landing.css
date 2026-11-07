@@ -1096,3 +1096,75 @@ kbd {
     opacity: 1;
     transform: translateY(0) scale(1);
 }
+
+/* ==========================================================================
+   WaveForge 6.0 — Mobile-First Landing Page Optimizations
+   ========================================================================== */
+@media (max-width: 720px) {
+    .container { padding: 0 16px; }
+    .navbar { height: 60px; }
+    .nav-inner { padding: 0 16px; }
+    .logo { font-size: 1rem; gap: 8px; }
+    .logo-mark { width: 30px; height: 30px; }
+    .nav-actions .btn-primary { padding: 7px 13px; font-size: 0.8rem; }
+
+    .hero { padding: 42px 0 28px; }
+    .eyebrow-pill {
+        font-size: 0.7rem;
+        padding: 5px 11px;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .hero h1 { font-size: clamp(1.95rem, 8vw, 2.6rem); line-height: 1.12; margin-bottom: 14px; }
+    .hero .lead { font-size: 0.94rem; margin-bottom: 22px; }
+    .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
+    .hero-actions .btn-lg { width: 100%; justify-content: center; padding: 13px 18px; }
+    .hero-trust { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; }
+    .trust-item { font-size: 0.75rem; }
+
+    /* Showcase frame mobile layout */
+    .studio-frame-top { padding: 10px 12px; }
+    .window-title { font-size: 0.68rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #heroPreviewCanvas { height: 210px; }
+    .studio-frame-dock {
+        padding: 12px;
+        gap: 10px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .dock-group {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+    }
+    .dock-group::-webkit-scrollbar { display: none; }
+    .preview-pill-group { flex-wrap: nowrap; }
+    .preview-pill { flex: 0 0 auto; font-size: 0.72rem; padding: 6px 11px; }
+
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .metric-card { padding: 16px 12px; }
+    .metric-val { font-size: 1.45rem; }
+    .metric-lbl { font-size: 0.74rem; }
+
+    .block { padding: 52px 0; }
+    .section-head { margin-bottom: 28px; }
+    .bento-card { padding: 20px; }
+    .bento-badge { position: static; display: inline-block; margin-bottom: 10px; }
+
+    /* 2-column compact mode grid on mobile */
+    .modes-showcase-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .mode-showcase-card { padding: 14px; }
+    .mode-showcase-card h3 { font-size: 0.92rem; }
+    .mode-showcase-card p { font-size: 0.74rem; margin-bottom: 10px; line-height: 1.4; }
+
+    .compare-table th, .compare-table td { padding: 12px 14px; font-size: 0.8rem; }
+    .cta-banner { padding: 34px 20px; }
+}

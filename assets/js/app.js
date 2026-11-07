@@ -1734,6 +1734,13 @@
 
         bindEvents() {
             document.getElementById('btn-upload').onclick = () => this.els.fileInput.click();
+            const onboardClose = document.getElementById('onboard-close-btn');
+            if (onboardClose) {
+                onboardClose.onclick = () => {
+                    const card = document.getElementById('studio-onboarding');
+                    if (card) card.classList.add('hidden-card');
+                };
+            }
             const onboardDemo = document.getElementById('onboard-demo-btn');
             if (onboardDemo) onboardDemo.onclick = () => this.loadDemoTrack();
             const onboardUpload = document.getElementById('onboard-upload-btn');
@@ -2403,7 +2410,7 @@
 
         // Social Bar deferred to Export Modal so creative canvas stays 100% clean
 
-        console.log('%c🎵 WaveForge Studio v5.1.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
+        console.log('%c🎵 WaveForge Studio v6.0.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
         console.log('%cProfessional Music Visualizer Studio', 'color: #ff0099; font-size: 12px;');
     });
 
