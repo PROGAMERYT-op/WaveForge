@@ -15,6 +15,7 @@
             const freqData = data.freq;
             const t = engine.nowSec();
             const sens = engine.config.sensitivity;
+            const resScale = Math.max(0.6, Math.min(w, h) / 500);
 
             let bass = 0;
             for (let i = 0; i < 20; i++) bass += freqData[i];
@@ -46,7 +47,7 @@
             ctx.fillStyle = '#120529';
             for (let slice = 0; slice < 7; slice++) {
                 const sy = sunY + (slice / 7) * sunR;
-                const sh = 2 + slice * 1.8;
+                const sh = (2 + slice * 1.8) * resScale;
                 ctx.fillRect(cx - sunR, sy, sunR * 2, sh);
             }
             ctx.restore();
@@ -67,7 +68,7 @@
             ctx.fillStyle = '#090318';
             ctx.fill();
             ctx.strokeStyle = engine.getColor(0);
-            ctx.lineWidth = isBeat ? 3 : 1.8;
+            ctx.lineWidth = (isBeat ? 3 : 1.8) * resScale;
             ctx.stroke();
 
             const groundGrad = ctx.createLinearGradient(0, horizonY, 0, h);
@@ -78,7 +79,7 @@
 
             const gridColor = engine.getColor(0);
             ctx.strokeStyle = gridColor;
-            ctx.lineWidth = 1.3;
+            ctx.lineWidth = 1.3 * resScale;
             const vLines = 24;
             for (let i = -vLines; i <= vLines; i++) {
                 const topX = cx + i * (w * 0.015);
@@ -96,7 +97,7 @@
                 const p = (j + scroll) / hLines;
                 const y = horizonY + Math.pow(p, 2.2) * (h - horizonY);
                 ctx.globalAlpha = Math.min(0.85, p * (0.5 + bass * 0.6));
-                ctx.lineWidth = 1 + p * 1.8;
+                ctx.lineWidth = (1 + p * 1.8) * resScale;
                 ctx.beginPath();
                 ctx.moveTo(0, y);
                 ctx.lineTo(w, y);

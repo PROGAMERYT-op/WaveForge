@@ -26,11 +26,47 @@
         }));
     }
 
+    // Smooth scroll-reveal observer for .reveal elements
+    const revealEls = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window && revealEls.length > 0) {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+        revealEls.forEach((el) => io.observe(el));
+    } else {
+        revealEls.forEach((el) => el.classList.add('in-view'));
+    }
+
+    let demoAudio = null;
+    let demoCtx = null;
+    let demoAnalyser = null;
+    let demoFreqData = null;
+
     const canvas = document.getElementById('heroPreviewCanvas');
     if (canvas) {
         const ctx = canvas.getContext('2d');
         let previewMode = 'ring';
         let previewPalette = 'synthwave';
+        let logicalW = 1120;
+        let logicalH = 340;
+
+        function resizePreviewCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            logicalW = Math.max(280, Math.round(rect.width || 1120));
+            logicalH = Math.max(180, Math.round(rect.height || 340));
+            canvas.width = Math.round(logicalW * dpr);
+            canvas.height = Math.round(logicalH * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        resizePreviewCanvas();
+        window.addEventListener('resize', resizePreviewCanvas);
 
         const PALETTES = {
             synthwave: ['#a855f7', '#00f5d4', '#ff2a85', '#ffffff'],
@@ -57,13 +93,25 @@
 
         function renderPreview() {
             requestAnimationFrame(renderPreview);
-            const w = canvas.width;
-            const h = canvas.height;
+            const w = logicalW;
+            const h = logicalH;
             const cx = w / 2;
             const cy = h / 2;
             const t = performance.now() * 0.001;
             const pal = PALETTES[previewPalette] || PALETTES.synthwave;
-            const beat = Math.pow(Math.max(0, Math.sin(t * 4.2)), 6);
+
+            let liveBass = 0;
+            let hasLiveAudio = false;
+            if (demoAnalyser && demoFreqData && demoAudio && !demoAudio.paused) {
+                demoAnalyser.getByteFrequencyData(demoFreqData);
+                hasLiveAudio = true;
+                for (let i = 0; i < 16; i++) liveBass += demoFreqData[i];
+                liveBass = (liveBass / 16) / 255;
+            }
+
+            const beat = hasLiveAudio
+                ? Math.min(1.2, Math.pow(liveBass, 1.5) * 1.35)
+                : Math.pow(Math.max(0, Math.sin(t * 4.2)), 6);
 
             ctx.fillStyle = 'rgba(5, 7, 17, 0.32)';
             ctx.fillRect(0, 0, w, h);
@@ -77,7 +125,7 @@
                 ctx.strokeStyle = '#ffffff';
                 for (let s = 0; s < 24; s++) {
                     const a = (s / 24) * Math.PI * 2 + t * 0.2;
-                    const d = ((t * 0.8 + s * 0.17) % 1) * cx * 0.9;
+                    const d = ((t * (0.8 + beat * 0.5) + s * 0.17) % 1) * cx * 0.9;
                     if (d > baseR) {
                         ctx.globalAlpha = 0.45;
                         ctx.beginPath();
@@ -94,9 +142,11 @@
                     const pts = 96;
                     for (let i = 0; i <= pts; i++) {
                         const a = (i / pts) * Math.PI * 2 - Math.PI / 2;
+                        const symIdx = i <= pts / 2 ? i : pts - i;
+                        const binVal = hasLiveAudio ? (demoFreqData[Math.min(demoFreqData.length - 1, symIdx)] / 255) : 0;
                         const wave = Math.sin(a * 6 + t * 4 + layer) * Math.cos(a * 3 - t * 3);
-                        const horn = Math.max(0, Math.cos(a)) * 28 * (0.5 + beat);
-                        const r = baseR + Math.abs(wave) * 32 * (1 + beat * 0.7) + horn + layer * 8;
+                        const horn = Math.max(0, Math.cos(a)) * 24 * (0.45 + beat + binVal * 0.5);
+                        const r = baseR + (Math.abs(wave) * 26 + binVal * 22) * (1 + beat * 0.6) + horn + layer * 6;
                         const px = Math.cos(a) * r;
                         const py = Math.sin(a) * r;
                         if (i === 0) ctx.moveTo(px, py);
@@ -116,16 +166,22 @@
                 ctx.fill();
                 ctx.restore();
             } else if (previewMode === 'bars') {
-                const count = 54;
-                const bw = (w / 2) / count - 3;
+                const count = Math.min(54, Math.max(24, Math.floor(w / 18)));
+                const bw = Math.max(2, (w / 2) / count - 3);
                 const grad = ctx.createLinearGradient(0, h, 0, 0);
                 grad.addColorStop(0, pal[0]);
                 grad.addColorStop(1, pal[1]);
                 ctx.fillStyle = grad;
 
                 for (let i = 0; i < count; i++) {
-                    const n = Math.sin(t * 3.2 + i * 0.3) * 0.5 + 0.5;
-                    const env = Math.max(0.1, (1 - i / count) * (0.45 + n * 0.55) + beat * 0.28 * (1 - i / count));
+                    let env;
+                    if (hasLiveAudio) {
+                        const fIdx = Math.floor((i / count) * (demoFreqData.length * 0.65));
+                        env = Math.max(0.08, (demoFreqData[fIdx] / 255) * 0.95);
+                    } else {
+                        const n = Math.sin(t * 3.2 + i * 0.3) * 0.5 + 0.5;
+                        env = Math.max(0.1, (1 - i / count) * (0.45 + n * 0.55) + beat * 0.28 * (1 - i / count));
+                    }
                     const bh = env * h * 0.74;
                     const xOff = i * (bw + 3);
                     ctx.fillRect(cx + xOff, cy - bh / 2, bw, bh);
@@ -137,7 +193,7 @@
                 const rings = 14;
                 const maxR = Math.hypot(cx, cy);
                 for (let i = 0; i < rings; i++) {
-                    const depth = ((i / rings) + t * 0.35) % 1;
+                    const depth = ((i / rings) + t * (0.35 + beat * 0.15)) % 1;
                     const persp = Math.pow(depth, 2.2);
                     const r = Math.max(4, persp * maxR);
                     ctx.beginPath();
@@ -178,13 +234,28 @@
     }
 
     const previewAudioBtn = document.getElementById('previewAudioBtn');
-    let demoAudio = null;
     if (previewAudioBtn) {
         previewAudioBtn.addEventListener('click', () => {
             if (!demoAudio) {
                 demoAudio = new Audio('assets/audio/demo-track.wav');
                 demoAudio.loop = true;
                 demoAudio.volume = 0.75;
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) {
+                        demoCtx = new AudioContext();
+                        demoAnalyser = demoCtx.createAnalyser();
+                        demoAnalyser.fftSize = 256;
+                        demoAnalyser.smoothingTimeConstant = 0.82;
+                        demoFreqData = new Uint8Array(demoAnalyser.frequencyBinCount);
+                        const src = demoCtx.createMediaElementSource(demoAudio);
+                        src.connect(demoAnalyser);
+                        demoAnalyser.connect(demoCtx.destination);
+                    }
+                } catch (e) {}
+            }
+            if (demoCtx && demoCtx.state === 'suspended') {
+                demoCtx.resume().catch(() => {});
             }
             if (demoAudio.paused) {
                 demoAudio.play().then(() => {

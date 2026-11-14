@@ -15,13 +15,14 @@
             const waveData = data.wave;
             const t = engine.nowSec();
             const sens = engine.config.sensitivity;
+            const resScale = Math.max(0.6, Math.min(w, h) / 500);
 
             let bass = 0;
             for (let i = 0; i < 20; i++) bass += freqData[i];
             bass = (bass / 20) / 255;
 
             let mid = 0;
-            for (let i = 20; i < 80; i++) mid += freqData[i];
+            for (let i = 20; i < Math.min(80, freqData.length); i++) mid += freqData[i];
             mid = (mid / 60) / 255;
 
             const speed = 0.65 + bass * 1.4;
@@ -35,7 +36,7 @@
             const swayX = Math.sin(t * 1.3) * w * 0.03 * (1 + mid);
             const swayY = Math.cos(t * 0.9) * h * 0.03 * (1 + mid);
 
-            ctx.lineWidth = 1.2;
+            ctx.lineWidth = 1.2 * resScale;
             for (let s = 0; s < sides * 2; s++) {
                 const ang = (s / (sides * 2)) * Math.PI * 2 + t * 0.18;
                 const fVal = (freqData[(s * 6) % freqData.length] / 255) * sens;
@@ -50,7 +51,7 @@
             for (let i = 0; i < rings; i++) {
                 const depth = ((i / rings) + (t * speed * 0.35)) % 1;
                 const persp = Math.pow(depth, 2.35);
-                const r = Math.max(4, persp * maxR);
+                const r = Math.max(4 * resScale, persp * maxR);
                 const fIdx = Math.floor((1 - depth) * freqData.length * 0.45);
                 const fVal = (freqData[fIdx] / 255) * sens;
 
@@ -72,7 +73,7 @@
 
                 const color = engine.getColor(i % engine.palette.length);
                 ctx.strokeStyle = color;
-                ctx.lineWidth = Math.max(1, persp * (3.5 + fVal * 2.5));
+                ctx.lineWidth = Math.max(1, persp * (3.5 + fVal * 2.5)) * resScale;
                 ctx.globalAlpha = Math.min(1, persp * (0.55 + fVal * 0.6));
                 ctx.stroke();
             }
@@ -91,7 +92,7 @@
             }
             ctx.closePath();
             ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = isBeat ? 3.5 : 2;
+            ctx.lineWidth = (isBeat ? 3.5 : 2) * resScale;
             ctx.globalAlpha = 0.9;
             ctx.stroke();
 

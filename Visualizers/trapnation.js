@@ -15,6 +15,13 @@
             const t = engine.nowSec();
             const sens = engine.config.sensitivity;
             const state = engine.state;
+            const dt = state.lastTrapT ? Math.min(Math.abs(t - state.lastTrapT), 0.1) : 0.016;
+            state.lastTrapT = t;
+            const dtMul = dt * 60;
+
+            const effectiveMinDim = engine.getActiveMinDim ? engine.getActiveMinDim(w, h) : Math.min(w, h);
+            const resScale = Math.max(0.6, effectiveMinDim / 500);
+            const halfDim = effectiveMinDim / 2;
 
             let bass = 0;
             for (let i = 0; i < 18; i++) bass += freqData[i];
@@ -25,9 +32,9 @@
                 state.shockwaves.push({ r: 1, alpha: 0.85, color: engine.getColor(Math.floor(t * 2) % engine.palette.length) });
             }
 
-            const baseR = Math.min(cx, cy) * (0.26 + bass * 0.14 * Math.min(sens, 2.2));
-            const jitterX = isBeat ? (Math.random() - 0.5) * 8 * bass : 0;
-            const jitterY = isBeat ? (Math.random() - 0.5) * 8 * bass : 0;
+            const baseR = halfDim * (0.26 + bass * 0.14 * Math.min(sens, 2.2));
+            const jitterX = isBeat ? Math.sin(t * 60) * 5 * bass * resScale : 0;
+            const jitterY = isBeat ? Math.cos(t * 53) * 5 * bass * resScale : 0;
 
             ctx.save();
             ctx.translate(cx + jitterX, cy + jitterY);
@@ -43,8 +50,8 @@
 
             for (let i = state.shockwaves.length - 1; i >= 0; i--) {
                 const sw = state.shockwaves[i];
-                sw.r += (4.5 + bass * 8);
-                sw.alpha *= 0.94;
+                sw.r += (4.5 + bass * 8) * resScale * dtMul;
+                sw.alpha *= Math.pow(0.94, dtMul);
                 if (sw.alpha <= 0.03) {
                     state.shockwaves.splice(i, 1);
                     continue;
@@ -52,7 +59,7 @@
                 ctx.beginPath();
                 ctx.arc(0, 0, baseR + sw.r, 0, Math.PI * 2);
                 ctx.strokeStyle = sw.color;
-                ctx.lineWidth = 2.5;
+                ctx.lineWidth = 2.5 * resScale;
                 ctx.globalAlpha = sw.alpha;
                 ctx.stroke();
             }
@@ -60,9 +67,9 @@
 
             const points = 128;
             const layers = [
-                { mul: 1.0, colorIdx: 0, alpha: 0.9, width: 3.5 },
-                { mul: 0.72, colorIdx: 1, alpha: 0.65, width: 2.2 },
-                { mul: 1.28, colorIdx: 2, alpha: 0.4, width: 1.6 }
+                { mul: 1.0, colorIdx: 0, alpha: 0.9, width: 3.5 * resScale },
+                { mul: 0.72, colorIdx: 1, alpha: 0.65, width: 2.2 * resScale },
+                { mul: 1.28, colorIdx: 2, alpha: 0.4, width: 1.6 * resScale }
             ];
 
             layers.forEach((layer, lIdx) => {
@@ -73,7 +80,7 @@
                     const fIdx = Math.floor((mirrorIdx / half) * (freqData.length * 0.45));
                     const val = (freqData[fIdx] / 255) * sens * layer.mul;
                     const angle = (i / points) * Math.PI * 2 - Math.PI / 2 + lIdx * 0.03;
-                    const r = baseR + val * (Math.min(cx, cy) * 0.38);
+                    const r = baseR + val * (halfDim * 0.38);
                     const px = Math.cos(angle) * r;
                     const py = Math.sin(angle) * r;
                     if (i === 0) ctx.moveTo(px, py);
@@ -82,7 +89,7 @@
                 ctx.closePath();
                 const col = engine.getColor(layer.colorIdx);
                 ctx.strokeStyle = col;
-                ctx.lineWidth = layer.width + (isBeat ? 1.2 : 0);
+                ctx.lineWidth = layer.width + (isBeat ? 1.2 * resScale : 0);
                 ctx.globalAlpha = layer.alpha;
                 ctx.stroke();
             });
@@ -92,7 +99,7 @@
             ctx.arc(0, 0, baseR * 0.92, 0, Math.PI * 2);
             ctx.fillStyle = '#070913';
             ctx.fill();
-            ctx.lineWidth = 2.5;
+            ctx.lineWidth = 2.5 * resScale;
             ctx.strokeStyle = engine.getColor(0);
             ctx.stroke();
 
@@ -102,7 +109,7 @@
             for (let b = 0; b < miniBars; b++) {
                 const distFromCenter = Math.abs(b - (miniBars - 1) / 2);
                 const bin = Math.floor(distFromCenter * 6);
-                const bh = Math.max(8, (freqData[bin] / 255) * baseR * 0.95 * Math.min(sens, 2));
+                const bh = Math.max(8 * resScale, (freqData[bin] / 255) * baseR * 0.95 * Math.min(sens, 2));
                 const bx = (b - (miniBars - 1) / 2) * (totalW / miniBars) - bw / 2;
                 ctx.fillStyle = engine.getColor(b % engine.palette.length);
                 ctx.fillRect(bx, -bh / 2, bw, bh);

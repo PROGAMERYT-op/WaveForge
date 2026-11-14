@@ -6,16 +6,25 @@
 
     function renderConstellation(engine, ctx, w, h, cx, cy, data, isBeat, scaleX, scaleY) {
         const freqData = data.freq;
+        const state = engine.state;
+        const t = engine.nowSec();
+        const dt = state.lastPartT ? Math.min(Math.abs(t - state.lastPartT), 0.1) : 0.016;
+        state.lastPartT = t;
+        const dtMul = dt * 60;
+
         let bass = 0;
         for (let i = 0; i < 20; i++) bass += freqData[i];
         bass = (bass / 20) / 255;
 
-        const speed = 0.6 + bass * 5.2;
+        const speed = (0.6 + bass * 5.2) * dtMul;
         const pList = engine.palette;
         const minScale = Math.min(scaleX, scaleY);
         const pts = engine.particles;
         const maxDist = 115 * minScale;
         const maxDistSq = maxDist * maxDist;
+        const refW = engine.width || w;
+        const refH = engine.height || h;
+        const bloomMul = (typeof engine.config.bloomIntensity === 'number' ? engine.config.bloomIntensity : 60) / 60;
 
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
@@ -30,18 +39,18 @@
         const screenCoords = new Array(pts.length);
         for (let idx = 0; idx < pts.length; idx++) {
             const p = pts[idx];
-            const dx = p.x - engine.width / 2;
-            const dy = p.y - engine.height / 2;
+            const dx = p.x - refW / 2;
+            const dy = p.y - refH / 2;
             const dist = Math.max(40, Math.hypot(dx, dy));
-            const swirl = (bass * 1.4) / dist;
+            const swirl = ((bass * 1.4) / dist) * dtMul;
 
             p.x += p.vx * speed - dy * swirl;
             p.y += p.vy * speed + dx * swirl;
 
-            if (p.x < 0) p.x = engine.width;
-            if (p.x > engine.width) p.x = 0;
-            if (p.y < 0) p.y = engine.height;
-            if (p.y > engine.height) p.y = 0;
+            if (p.x < 0) p.x = refW;
+            if (p.x > refW) p.x = 0;
+            if (p.y < 0) p.y = refH;
+            if (p.y > refH) p.y = 0;
 
             const sx = p.x * scaleX;
             const sy = p.y * scaleY;
@@ -80,7 +89,7 @@
             ctx.fillStyle = sc.col;
             ctx.globalAlpha = Math.min(1, 0.45 + sc.fVal * 0.55);
             if (isBeat && i % 5 === 0) {
-                ctx.shadowBlur = 18 * minScale;
+                ctx.shadowBlur = 18 * minScale * Math.max(0.2, bloomMul);
                 ctx.shadowColor = sc.col;
             } else {
                 ctx.shadowBlur = 0;

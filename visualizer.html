@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '7.0.0';
+            var VER = '7.1.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -34,8 +34,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-    <title>WaveForge Studio 7.0 | Phonk &amp; Hardtekk Template Maker + 4K Music Visualizer</title>
-    <meta name="description" content="WaveForge Studio 7.0 lets you create viral TikTok Hardtekk, Brazilian Funk &amp; Phonk music videos in 1 click. Features AirPods volume intro, liquid plasma rings, custom logo/background uploads, and 4K MP4 export.">
+    <title>WaveForge Studio 7.1 | Phonk &amp; Hardtekk Template Maker + 4K Music Visualizer</title>
+    <meta name="description" content="WaveForge Studio 7.1 lets you create viral TikTok Hardtekk, Brazilian Funk &amp; Phonk music videos in 1 click. Features AirPods volume intro, liquid plasma rings, custom logo/background uploads, and 4K MP4 export.">
     <meta name="keywords" content="phonk visualizer, hardtekk visualizer, brazilian funk video maker, tiktok music visualizer, 9:16 audio visualizer, free music visualizer, logo visualizer, avee player online alternative">
     <meta name="author" content="WaveForge">
     <meta name="theme-color" content="#05070f">
@@ -48,7 +48,7 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <meta property="og:title" content="WaveForge Studio 7.0 — Phonk &amp; Hardtekk Music Video Templates">
+    <meta property="og:title" content="WaveForge Studio 7.1 — Phonk &amp; Hardtekk Music Video Templates">
     <meta property="og:description" content="1-click viral Phonk &amp; Hardtekk templates, AirPods volume intro, 13 modes, 3-band EQ, and 4K MP4 export.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
 
@@ -58,7 +58,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="assets/css/app.css?v=7.0.0">
+    <link rel="stylesheet" href="assets/css/app.css?v=7.1.0">
 
     <!-- Fast WebCodecs export: mp4-muxer -->
     <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
@@ -66,7 +66,7 @@
 <body>
     <main class="visually-hidden" role="main">
         <article>
-            <h2>WaveForge Studio 7.0 - Viral Phonk &amp; Hardtekk Music Visualizer Templates</h2>
+            <h2>WaveForge Studio 7.1 - Viral Phonk &amp; Hardtekk Music Visualizer Templates</h2>
             <p>Browser-based music visualizer with 1-click Phonk, Hardtekk, and Brazilian Funk templates, AirPods volume intro, 13 modes, 3-band EQ, and 4K MP4 video exports.</p>
         </article>
     </main>
@@ -78,8 +78,8 @@
     <div id="drop-overlay" aria-hidden="true">
         <div class="drop-box">
             <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span>Drop Audio Track or Preset</span>
-            <small>MP3, WAV, FLAC, OGG, M4A, AAC &amp; .json</small>
+            <span>Drop Audio Track, Image or Preset</span>
+            <small>MP3, WAV, FLAC, OGG, M4A, AAC, PNG/JPG (Background) &amp; .json</small>
         </div>
     </div>
 
@@ -303,7 +303,7 @@
             <div class="settings-pane active" id="tab-branding" role="tabpanel">
                 <div class="settings-group" id="logo-viz-settings">
                     <h3>Custom Background &amp; Logo Upload</h3>
-                    <div class="upload-btn-group" style="margin-bottom:14px;">
+                    <div class="upload-btn-group" style="margin-bottom:10px;">
                         <div class="upload-btn" id="btn-upload-bg">
                             <span class="upload-icon">🖼️</span>
                             <span id="bg-label">Upload Background</span>
@@ -312,6 +312,19 @@
                             <span class="upload-icon">⭕</span>
                             <span id="logo-label">Upload Center Logo</span>
                         </div>
+                    </div>
+                    <div id="clear-branding-row" class="hidden" style="margin-bottom:12px;">
+                        <button type="button" id="btn-clear-branding" style="width:100%;font-size:0.74rem;padding:6px 10px;">✕ Clear Custom Background / Logo</button>
+                    </div>
+
+                    <div class="control-row">
+                        <label for="set-phonk-bg">Phonk Backdrop Style</label>
+                        <select id="set-phonk-bg">
+                            <option value="mage" selected>Dark Mage &amp; Arcane Halo</option>
+                            <option value="drift">Drift Shadow Silhouette</option>
+                            <option value="cyber">Cyber Neon Horizon Grid</option>
+                            <option value="none">Minimal Atmospheric Void</option>
+                        </select>
                     </div>
 
                     <div class="control-row toggle-row">
@@ -327,7 +340,7 @@
                     </div>
 
                     <div class="control-row toggle-row">
-                        <label>Neon Ring Color</label>
+                        <label for="set-wave-color">Neon Ring Color</label>
                         <input type="color" id="set-wave-color" value="#a855f7" style="width:44px;height:32px;padding:2px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;cursor:pointer;">
                     </div>
                     <div class="color-swatch-row" style="margin-bottom:12px;">
@@ -348,11 +361,11 @@
                         <input type="range" id="set-glow-size" min="0" max="80" step="5" value="40">
                     </div>
                     <div class="control-row">
-                        <label for="set-ray-count">Radial Ray Count (Logo Mode)</label>
+                        <label for="set-ray-count">Ring Detail / Radial Rays</label>
                         <input type="range" id="set-ray-count" min="32" max="256" step="16" value="128">
                     </div>
                     <div class="control-row">
-                        <label for="set-line-thick">Ray Line Thickness</label>
+                        <label for="set-line-thick">Ring / Ray Line Thickness</label>
                         <input type="range" id="set-line-thick" min="1" max="6" step="0.5" value="2">
                     </div>
                     <div class="control-row toggle-row">
@@ -578,7 +591,7 @@
             </div>
 
             <div class="version-info">
-                WaveForge Studio v7.0 • 13 Modes • Trending Phonk Templates • Turbo MP4<br>
+                WaveForge Studio v7.1 • 13 Modes • Trending Phonk Templates • Turbo MP4<br>
                 <a id="btn-shortcuts" role="button" tabindex="0">Keyboard Shortcuts</a> •
                 <a href="index.html">Back to Home</a>
             </div>
@@ -776,22 +789,22 @@
     </div>
 
     <!-- VISUALIZER MODE REGISTRY (13 Modes) -->
-    <script src="Visualizers/bars.js?v=7.0.0"></script>
-    <script src="Visualizers/wave.js?v=7.0.0"></script>
-    <script src="Visualizers/radial.js?v=7.0.0"></script>
-    <script src="Visualizers/particles.js?v=7.0.0"></script>
-    <script src="Visualizers/spectrogram.js?v=7.0.0"></script>
-    <script src="Visualizers/3dbars.js?v=7.0.0"></script>
-    <script src="Visualizers/dna.js?v=7.0.0"></script>
-    <script src="Visualizers/galaxy.js?v=7.0.0"></script>
-    <script src="Visualizers/logo.js?v=7.0.0"></script>
-    <script src="Visualizers/tunnel.js?v=7.0.0"></script>
-    <script src="Visualizers/trapnation.js?v=7.0.0"></script>
-    <script src="Visualizers/synthwave.js?v=7.0.0"></script>
-    <script src="Visualizers/phonk.js?v=7.0.0"></script>
+    <script src="Visualizers/bars.js?v=7.1.0"></script>
+    <script src="Visualizers/wave.js?v=7.1.0"></script>
+    <script src="Visualizers/radial.js?v=7.1.0"></script>
+    <script src="Visualizers/particles.js?v=7.1.0"></script>
+    <script src="Visualizers/spectrogram.js?v=7.1.0"></script>
+    <script src="Visualizers/3dbars.js?v=7.1.0"></script>
+    <script src="Visualizers/dna.js?v=7.1.0"></script>
+    <script src="Visualizers/galaxy.js?v=7.1.0"></script>
+    <script src="Visualizers/logo.js?v=7.1.0"></script>
+    <script src="Visualizers/tunnel.js?v=7.1.0"></script>
+    <script src="Visualizers/trapnation.js?v=7.1.0"></script>
+    <script src="Visualizers/synthwave.js?v=7.1.0"></script>
+    <script src="Visualizers/phonk.js?v=7.1.0"></script>
 
     <!-- SMART MONETIZATION ENGINE & APPLICATION SCRIPT -->
-    <script src="assets/js/ads.js?v=7.0.0"></script>
-    <script src="assets/js/app.js?v=7.0.0"></script>
+    <script src="assets/js/ads.js?v=7.1.0"></script>
+    <script src="assets/js/app.js?v=7.1.0"></script>
 </body>
 </html>

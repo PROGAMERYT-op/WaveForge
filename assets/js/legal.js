@@ -1,9 +1,14 @@
-
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            const cur = document.documentElement.getAttribute('data-theme') || 'light';
+(function () {
+    'use strict';
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const cur = document.documentElement.getAttribute('data-theme') || 'dark';
             const nxt = cur === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', nxt);
             try { localStorage.setItem('wf-theme', nxt); } catch (e) {}
         });
-        document.getElementById('year').textContent = new Date().getFullYear();
-    
+    }
+    const yearEl = document.getElementById('year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+})();

@@ -12,16 +12,23 @@
         render(engine, ctx, w, h, cx, cy, data, isBeat) {
             const freqData = data.freq;
             const sens = engine.config.sensitivity;
+            const state = engine.state;
+            const t = engine.nowSec();
+            const dt = state.lastDnaT ? Math.min(Math.abs(t - state.lastDnaT), 0.1) : 0.016;
+            state.lastDnaT = t;
+            const resScale = Math.max(0.6, Math.min(w, h) / 500);
+            const bloomMul = (typeof engine.config.bloomIntensity === 'number' ? engine.config.bloomIntensity : 60) / 60;
 
             let bass = 0;
             for (let i = 0; i < 16; i++) bass += freqData[i];
             bass = (bass / 16) / 255;
 
-            engine.state.helixAngle = (engine.state.helixAngle || 0) + (0.025 + bass * 0.055);
-            const phase = engine.state.helixAngle;
+            state.helixAngle = (state.helixAngle || 0) + (0.025 + bass * 0.055) * (dt * 60);
+            const phase = state.helixAngle;
 
             const pairs = 46;
-            const amplitude = Math.min(cx, cy) * (0.38 + bass * 0.08);
+            const effectiveMinDim = engine.getActiveMinDim ? engine.getActiveMinDim(w, h) : Math.min(w, h);
+            const amplitude = (effectiveMinDim / 2) * (0.38 + bass * 0.08);
             const spacing = h / pairs;
 
             ctx.save();
@@ -46,7 +53,7 @@
                 ctx.moveTo(x1, y);
                 ctx.lineTo(x2, y);
                 ctx.strokeStyle = engine.getColor(2 % engine.palette.length) + '55';
-                ctx.lineWidth = 1.5 + freqVal * 1.5;
+                ctx.lineWidth = (1.5 + freqVal * 1.5) * resScale;
                 ctx.stroke();
 
                 const nodes = [
@@ -56,13 +63,13 @@
 
                 nodes.forEach((n) => {
                     const depthScale = 0.65 + (n.z + 1) * 0.35;
-                    const rad = Math.max(2.5, (4 + freqVal * 7) * depthScale);
+                    const rad = Math.max(2.5 * resScale, (4 + freqVal * 7) * depthScale * resScale);
                     ctx.beginPath();
                     ctx.arc(n.x, y, rad, 0, Math.PI * 2);
                     ctx.fillStyle = n.col;
                     ctx.globalAlpha = 0.45 + (n.z + 1) * 0.27;
                     if (isBeat && n.z > 0.3) {
-                        ctx.shadowBlur = 16;
+                        ctx.shadowBlur = 16 * resScale * Math.max(0.2, bloomMul);
                         ctx.shadowColor = n.col;
                     } else {
                         ctx.shadowBlur = 0;

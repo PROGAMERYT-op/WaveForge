@@ -13,6 +13,7 @@
             const freqData = data.freq;
             const sens = engine.config.sensitivity;
             const t = engine.nowSec();
+            const resScale = Math.max(0.6, Math.min(w, h) / 500);
 
             const bars = 44;
             const step = Math.max(1, Math.floor((freqData.length * 0.65) / bars));
@@ -20,24 +21,24 @@
             const spacing = totalW / bars;
             const barW = spacing * 0.64;
             const maxH = h * 0.52;
-            const isoX = 18;
-            const isoY = -12;
+            const isoX = 18 * resScale;
+            const isoY = -12 * resScale;
             const kick = isBeat ? 1.08 : 1.0;
 
             ctx.save();
-            const swayY = Math.sin(t * 1.2) * 8;
+            const swayY = Math.sin(t * 1.2) * 8 * resScale;
             ctx.translate(cx, cy + h * 0.16 + swayY);
 
             ctx.strokeStyle = engine.getColor(0) + '44';
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1.5 * resScale;
             ctx.beginPath();
-            ctx.moveTo(-totalW / 2 - 20, 10);
-            ctx.lineTo(totalW / 2 + 40, 10);
+            ctx.moveTo(-totalW / 2 - 20 * resScale, 10 * resScale);
+            ctx.lineTo(totalW / 2 + 40 * resScale, 10 * resScale);
             ctx.stroke();
 
             for (let i = 0; i < bars; i++) {
                 const val = (freqData[i * step] / 255) * sens * kick;
-                const barH = Math.max(6, Math.min(maxH, val * maxH));
+                const barH = Math.max(6 * resScale, Math.min(maxH, val * maxH));
                 const x = (i - bars / 2) * spacing;
                 const y = -barH;
 

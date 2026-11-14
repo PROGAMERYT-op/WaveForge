@@ -1,5 +1,5 @@
 /* ==========================================================================
-   WaveForge Studio 7.0 — Premium SaaS Landing Page & Phonk Templates Stylesheet
+   WaveForge Studio 7.1 — Premium SaaS Landing Page & Phonk Templates Stylesheet
    ========================================================================== */
 
 :root,
@@ -60,6 +60,20 @@ body { font-family: var(--font-sans); background-color: var(--bg); color: var(--
 .glow-2 { width: 540px; height: 420px; background: radial-gradient(circle, #00f2ff 0%, transparent 70%); top: 140px; left: 50%; transform: translateX(10%); opacity: 0.18; }
 
 .container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* SCROLL REVEAL ANIMATION */
+.reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+}
 
 /* NAVBAR */
 .navbar { position: sticky; top: 0; z-index: 60; height: 68px; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); }
@@ -122,7 +136,7 @@ body { font-family: var(--font-sans); background-color: var(--bg); color: var(--
 .tpl-landing-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
     text-decoration: none; color: var(--text); display: flex; flex-direction: column;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.55s ease;
 }
 .tpl-landing-card:hover {
     transform: translateY(-4px); border-color: var(--c, #a855f7);
@@ -194,7 +208,9 @@ body { font-family: var(--font-sans); background-color: var(--bg); color: var(--
 
 .faq-list { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
 .faq-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
-.faq-q { width: 100%; padding: 18px 22px; background: none; border: none; color: var(--text); font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600; text-align: left; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.faq-q { width: 100%; padding: 18px 22px; background: none; border: none; color: var(--text); font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600; text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+.faq-q .chev { display: inline-block; font-size: 1.2rem; line-height: 1; color: var(--accent); transition: transform 0.2s ease; }
+.faq-item.open .faq-q .chev { transform: rotate(45deg); }
 .faq-a { display: none; padding: 0 22px 18px; color: var(--text-muted); font-size: 0.9rem; }
 .faq-item.open .faq-a { display: block; }
 

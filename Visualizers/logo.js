@@ -19,8 +19,11 @@
             const state = engine.state;
             const config = engine.config;
             const waveColor = config.waveColor || '#00ff88';
-
             const freqData = data.freq;
+
+            const effectiveMinDim = engine.getActiveMinDim ? engine.getActiveMinDim(w, h) : Math.min(w, h);
+            const resScale = Math.max(0.55, effectiveMinDim / 480);
+            const bloomMul = (typeof config.bloomIntensity === 'number' ? config.bloomIntensity : 60) / 60;
 
             // Compute bass energy
             let bass = 0;
@@ -33,14 +36,14 @@
             const midStart = Math.floor(freqData.length * 0.1);
             const midEnd = Math.floor(freqData.length * 0.35);
             for (let i = midStart; i < midEnd; i++) mid += freqData[i];
-            mid = mid / (midEnd - midStart) / 255;
+            mid = midEnd > midStart ? mid / (midEnd - midStart) / 255 : 0;
 
             // Compute treble energy for overall intensity
             let treble = 0;
             const trebStart = Math.floor(freqData.length * 0.35);
             const trebEnd = freqData.length;
             for (let i = trebStart; i < trebEnd; i++) treble += freqData[i];
-            treble = treble / (trebEnd - trebStart) / 255;
+            treble = trebEnd > trebStart ? treble / (trebEnd - trebStart) / 255 : 0;
 
             // Time reference (seconds) — switches to export timeline during fast export
             const t = engine.nowSec();
@@ -50,7 +53,7 @@
             // ---------- Audio-reactive intensity (drives animation speed) ----------
             const rawIntensity = Math.min(1, bass * 0.55 + mid * 0.3 + treble * 0.25);
             if (state.logoIntensity === undefined) state.logoIntensity = 0;
-            const intensitySmoothing = 1 - Math.pow(0.5, dt / 0.18); // ~180ms half-life
+            const intensitySmoothing = 1 - Math.pow(0.5, dt / 0.18);
             state.logoIntensity += (rawIntensity - state.logoIntensity) * intensitySmoothing;
             const intensity = state.logoIntensity;
 
@@ -77,7 +80,7 @@
             state.shakeTrauma = Math.max(0, state.shakeTrauma * Math.pow(0.5, dt / 0.45));
             const trauma2 = state.shakeTrauma * state.shakeTrauma;
             const continuousShake = bass * bass * config.logoShakeIntensity * 0.18;
-            const totalShake = trauma2 * config.logoShakeIntensity + continuousShake;
+            const totalShake = (trauma2 * config.logoShakeIntensity + continuousShake) * resScale;
 
             const shakeFreqMul = 1 + intensity * 0.6;
             if (state.shakePhaseX === undefined) { state.shakePhaseX = 0; state.shakePhaseY = 2.3; }
@@ -129,47 +132,51 @@
                 ctx.drawImage(state.bgImg, (w - bw) / 2, (h - bh) / 2, bw, bh);
                 ctx.globalAlpha = 1;
                 // Dark vignette overlay
-                const vignette = ctx.createRadialGradient(cx, cy, w * 0.15, cx, cy, w * 0.7);
+                const vignette = ctx.createRadialGradient(cx, cy, effectiveMinDim * 0.15, cx, cy, Math.max(w, h) * 0.7);
                 vignette.addColorStop(0, 'rgba(0,0,0,0.1)');
                 vignette.addColorStop(1, 'rgba(0,0,0,0.72)');
                 ctx.fillStyle = vignette;
                 ctx.fillRect(0, 0, w, h);
             }
 
-            const logoRadius = Math.min(w, h) * 0.165;
-            const numBars = config.logoRayCount;
+            const logoRadius = effectiveMinDim * 0.165;
+            const numBars = config.logoRayCount || 128;
             const angleStep = (Math.PI * 2) / numBars;
-            const innerRadius = logoRadius + 12;
+            const innerRadius = logoRadius + 12 * resScale;
             const maxBarLen = logoRadius * 1.4;
-            const lineThick = config.logoLineThickness;
-            const glowSize = config.logoGlowSize;
+            const lineThick = (config.logoLineThickness || 2) * resScale;
+            const glowSize = (config.logoGlowSize || 40) * resScale * Math.max(0.25, bloomMul);
 
-            // Rotating offset for ring animation — speeds up with intensity
+            // Rotating offset for ring animation — frame-rate independent (dt * 60)
             if (config.logoRotateRing) {
-                const ringSpeed = (isBeat ? 0.04 : 0.006) * (1 + intensity * 3.5);
-                state.logoAngle += ringSpeed;
+                const ringSpeed = (isBeat ? 0.04 : 0.006) * (1 + intensity * 3.5) * (dt * 60);
+                state.logoAngle = (state.logoAngle || 0) + ringSpeed;
             }
 
-            // Particle motion multiplier — both bass kicks AND overall intensity
-            const particleSpeed = 1 + bass * 4 + intensity * 2.5;
+            // Particle motion multiplier — frame-rate & resolution independent
+            const particleSpeed = (1 + bass * 4 + intensity * 2.5) * (dt * 60);
+            const refW = engine.width || w;
+            const refH = engine.height || h;
+            const scaleX = w / refW;
+            const scaleY = h / refH;
 
-            // Draw particles beneath
+            // Draw particles beneath without corrupting base viewport coordinates
             if (config.logoParticles) {
                 ctx.globalCompositeOperation = 'lighter';
                 engine.particles.forEach((p, pIdx) => {
                     p.x += p.vx * particleSpeed;
                     p.y += p.vy * particleSpeed;
-                    if (p.x < 0) p.x = w;
-                    if (p.x > w) p.x = 0;
-                    if (p.y < 0) p.y = h;
-                    if (p.y > h) p.y = 0;
+                    if (p.x < 0) p.x = refW;
+                    if (p.x > refW) p.x = 0;
+                    if (p.y < 0) p.y = refH;
+                    if (p.y > refH) p.y = 0;
 
                     const freqIdx = Math.floor((pIdx / engine.particles.length) * freqData.length * 0.5);
                     const freqVal = freqData[freqIdx] / 255;
-                    const r = Math.max(p.size * (0.4 + freqVal * config.sensitivity * 1.8), 0.5);
+                    const r = Math.max(p.size * (0.4 + freqVal * config.sensitivity * 1.8) * resScale, 0.6);
 
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                    ctx.arc(p.x * scaleX, p.y * scaleY, r, 0, Math.PI * 2);
                     ctx.fillStyle = waveColor;
                     ctx.globalAlpha = 0.15 + freqVal * 0.45 + intensity * 0.15;
                     ctx.fill();
@@ -207,7 +214,7 @@
                 const freqIdx = Math.floor((i / numBars) * freqData.length * 0.55);
                 const val = (freqData[freqIdx] / 255) * config.sensitivity;
                 const barLen = val * maxBarLen;
-                const angle = i * angleStep + state.logoAngle - Math.PI / 2;
+                const angle = i * angleStep + (state.logoAngle || 0) - Math.PI / 2;
 
                 const x1 = Math.cos(angle) * innerRadius;
                 const y1 = Math.sin(angle) * innerRadius;
@@ -218,7 +225,7 @@
                 ctx.moveTo(x1, y1);
                 ctx.lineTo(x2, y2);
                 ctx.strokeStyle = waveColor;
-                ctx.lineWidth = lineThick + (isBeat ? 1.5 : 0);
+                ctx.lineWidth = lineThick + (isBeat ? 1.5 * resScale : 0);
                 ctx.globalAlpha = 0.55 + val * 0.45;
                 ctx.stroke();
             }
@@ -230,7 +237,7 @@
             ctx.beginPath();
             ctx.arc(0, 0, logoRadius * beatPulse, 0, Math.PI * 2);
             ctx.strokeStyle = waveColor;
-            ctx.lineWidth = isBeat ? 3.5 : 2;
+            ctx.lineWidth = (isBeat ? 3.5 : 2) * resScale;
             ctx.shadowBlur = isBeat ? glowSize * 1.5 : glowSize * 0.6;
             ctx.shadowColor = waveColor;
             ctx.globalAlpha = 0.85;
@@ -242,7 +249,7 @@
             ctx.beginPath();
             ctx.arc(0, 0, logoRadius * 0.82, 0, Math.PI * 2);
             ctx.strokeStyle = waveColor;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = Math.max(1, 1.2 * resScale);
             ctx.globalAlpha = 0.35 + mid * 0.35;
             ctx.stroke();
             ctx.globalAlpha = 1;
@@ -250,7 +257,7 @@
             // Clip circle for logo image
             ctx.save();
             ctx.beginPath();
-            ctx.arc(0, 0, logoRadius - 2, 0, Math.PI * 2);
+            ctx.arc(0, 0, logoRadius - 2 * resScale, 0, Math.PI * 2);
             ctx.clip();
 
             if (state.logoImg) {
@@ -270,7 +277,7 @@
                 ctx.fillRect(-logoRadius, -logoRadius, logoRadius * 2, logoRadius * 2);
 
                 ctx.fillStyle = waveColor;
-                ctx.shadowBlur = 18;
+                ctx.shadowBlur = 18 * resScale;
                 ctx.shadowColor = waveColor;
                 ctx.font = `bold ${Math.round(logoRadius * 0.62)}px 'Space Grotesk', sans-serif`;
                 ctx.textAlign = 'center';

@@ -1,17 +1,17 @@
 /**
- * WaveForge Music Visualizer Studio v7.0
+ * WaveForge Music Visualizer Studio v7.1
  * Features:
  *  - 13 Visualization Modes (including Mode 12: Hardtekk / Phonk Liquid Ring + AirPods Intro)
  *  - 1-Click Trending Templates Hub (6 viral presets + 3-step guided workflow bar)
  *  - 3-Band Hardware Equalizer, On-Canvas Typography, Post-FX & 4 Aspect Ratios
- *  - Zero-Suspend Radix-2 FFT Turbo MP4 Export Engine
+ *  - Zero-Suspend Radix-2 FFT Turbo MP4 Export Engine (with automatic mobile codec/resolution negotiation & neon glow preservation)
  *  - 8-Second Ad-Timer + Instant Sponsor Unlock Download Gate
  */
 (function () {
     'use strict';
 
     // ============================================
-    // TRENDING TEMPLATES REGISTRY (v7.0)
+    // TRENDING TEMPLATES REGISTRY (v7.1)
     // ============================================
     const TRENDING_TEMPLATES = [
         {
@@ -102,7 +102,7 @@
                 palette: 'cyberpunk',
                 phonkIntroEnabled: true,
                 phonkIntroDuration: 3.5,
-                phonkBgTheme: 'mage',
+                phonkBgTheme: 'cyber',
                 logoShakeIntensity: 14,
                 logoGlowSize: 48,
                 logoParticles: true,
@@ -192,6 +192,10 @@
         shakeTrauma: 0,
         lastLogoT: 0,
         lastPhonkT: 0,
+        lastPartT: 0,
+        lastDnaT: 0,
+        lastGalT: 0,
+        lastTrapT: 0,
         phonkKickEnv: 0,
         phonkSparks: null,
         bgImg: null,
@@ -205,7 +209,8 @@
         activeTemplateId: 'hardtekk-mage',
         pendingExportBlobUrl: null,
         pendingExportFilename: null,
-        unlockTimerId: null
+        unlockTimerId: null,
+        trackTitleLabel: ''
     };
 
     const VIS_MODS = window.WaveForgeVisualizers || {};
@@ -327,7 +332,11 @@
             const raw = localStorage.getItem(CONFIG_KEY);
             if (raw) {
                 const data = JSON.parse(raw);
-                if (data.config && typeof data.config === 'object') Object.assign(CONFIG, data.config);
+                if (data.config && typeof data.config === 'object') {
+                    Object.keys(CONFIG).forEach((k) => {
+                        if (data.config[k] !== undefined) CONFIG[k] = data.config[k];
+                    });
+                }
                 if (typeof data.mode === 'number' && VIS_MODS[data.mode]) APP_STATE.mode = data.mode;
             }
         } catch (e) {}
@@ -417,12 +426,16 @@
 
             this.analyser.fftSize = CONFIG.fftSize;
             this.analyser.smoothingTimeConstant = CONFIG.smoothing;
+            this.analyser.minDecibels = CONFIG.minDecibels || -90;
+            this.analyser.maxDecibels = CONFIG.maxDecibels || -10;
+
             const volEl = document.getElementById('vol-slider');
             this.gainNode.gain.value = Math.min(parseFloat(volEl ? volEl.value : 0.8) || 0.8, 1);
 
             this.micSource = null;
+            this.micStream = null;
             this.audioElement = new Audio();
-            this.audioElement.crossOrigin = 'anonymous';
+            this.audioElement.preload = 'auto';
             window.__wfAudioElement = this.audioElement;
 
             this.sourceNode = this.ctx.createMediaElementSource(this.audioElement);
@@ -443,8 +456,8 @@
             this.audioElement.addEventListener('ended', () => {
                 APP_STATE.isPlaying = false;
                 UI.updatePlayButton();
-                if (APP_STATE.isRecording) {
-                    Exporter.stop();
+                if (APP_STATE.isRecording && !APP_STATE.isFastExporting) {
+                    Exporter.stop(false);
                 }
             });
 
@@ -452,17 +465,26 @@
             this.audioElement.addEventListener('loadedmetadata', () => UI.updateProgressBar());
         }
 
-        resume() {
+        async resume() {
             if (this.ctx.state === 'suspended') {
-                this.ctx.resume();
+                try {
+                    await this.ctx.resume();
+                } catch (e) {}
             }
         }
 
-        playFile(url) {
+        playFile(url, label) {
             this.resume();
             this.stopMic();
-            if (this.fileURL && this.fileURL !== url) URL.revokeObjectURL(this.fileURL);
+            if (this.fileURL && this.fileURL !== url && this.fileURL.startsWith('blob:')) {
+                try { URL.revokeObjectURL(this.fileURL); } catch (e) {}
+            }
+            if (APP_STATE.decodedAudioSrc && APP_STATE.decodedAudioSrc !== url) {
+                APP_STATE.decodedAudioBuffer = null;
+                APP_STATE.decodedAudioSrc = null;
+            }
             this.fileURL = url;
+            APP_STATE.trackTitleLabel = label || '';
             this.audioElement.src = url;
             this.audioElement.currentTime = 0;
             this.audioElement.play().then(() => {
@@ -470,7 +492,9 @@
                 UI.updatePlayButton();
                 UI.showToast('🎵 Audio playing — ready to customize or export!', 'success');
             }).catch(e => {
-                UI.showToast('Error: ' + e.message, 'error');
+                APP_STATE.isPlaying = false;
+                UI.updatePlayButton();
+                UI.showToast('Tap Play (▶) to start audio playback', 'info');
             });
         }
 
@@ -479,18 +503,20 @@
             if (this.micSource) return;
 
             if (this.audioElement.paused) {
-                if (!this.audioElement.src) {
+                if (!this.hasAudio()) {
                     UI.showToast('Loading built-in demo track...', 'info');
                     UI.loadDemoTrack();
                     return;
                 }
-                this.audioElement.play().catch(() => {});
-                APP_STATE.isPlaying = true;
+                this.audioElement.play().then(() => {
+                    APP_STATE.isPlaying = true;
+                    UI.updatePlayButton();
+                }).catch(() => {});
             } else {
                 this.audioElement.pause();
                 APP_STATE.isPlaying = false;
+                UI.updatePlayButton();
             }
-            UI.updatePlayButton();
         }
 
         stop() {
@@ -499,6 +525,7 @@
             this.audioElement.currentTime = 0;
             APP_STATE.isPlaying = false;
             UI.updatePlayButton();
+            UI.updateProgressBar();
         }
 
         async enableMic() {
@@ -510,11 +537,12 @@
                 return;
             }
 
-            this.resume();
+            await this.resume();
             this.stop();
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                this.micStream = stream;
                 this.micSource = this.ctx.createMediaStreamSource(stream);
                 this.micSource.connect(this.bassFilter);
                 APP_STATE.isPlaying = true;
@@ -528,18 +556,30 @@
 
         stopMic() {
             if (this.micSource) {
-                this.micSource.disconnect();
+                try { this.micSource.disconnect(); } catch (e) {}
                 this.micSource = null;
-                document.getElementById('btn-mic').classList.remove('active');
             }
+            if (this.micStream) {
+                try {
+                    this.micStream.getTracks().forEach(track => track.stop());
+                } catch (e) {}
+                this.micStream = null;
+            }
+            const micBtn = document.getElementById('btn-mic');
+            if (micBtn) micBtn.classList.remove('active');
         }
 
         updateSettings() {
-            this.analyser.fftSize = CONFIG.fftSize;
+            if (this.analyser.fftSize !== CONFIG.fftSize) {
+                try { this.analyser.fftSize = CONFIG.fftSize; } catch (e) {}
+            }
             this.analyser.smoothingTimeConstant = CONFIG.smoothing;
+            this.analyser.minDecibels = CONFIG.minDecibels || -90;
+            this.analyser.maxDecibels = CONFIG.maxDecibels || -10;
+
             const volEl = document.getElementById('vol-slider');
-            const vol = Math.min(parseFloat(volEl ? volEl.value : 0.8) || 0.8, 1);
-            this.gainNode.gain.value = vol;
+            const vol = Math.min(parseFloat(volEl ? volEl.value : 0.8), 1);
+            this.gainNode.gain.value = isNaN(vol) ? 0.8 : vol;
 
             this.bassFilter.gain.value = Number(CONFIG.eqBass) || 0;
             this.midFilter.gain.value = Number(CONFIG.eqMid) || 0;
@@ -562,7 +602,7 @@
         }
 
         hasAudio() {
-            return this.audioElement.src && this.audioElement.src !== '';
+            return Boolean(this.audioElement.src && this.audioElement.src !== '' && this.audioElement.src !== window.location.href);
         }
 
         getDuration() {
@@ -589,7 +629,7 @@
             }
 
             let energy = 0;
-            const range = Math.floor(freqData.length * 0.12);
+            const range = Math.max(1, Math.floor(freqData.length * 0.12));
 
             for (let i = 0; i < range; i++) {
                 energy += freqData[i] * freqData[i];
@@ -630,12 +670,15 @@
 
     const Exporter = {
         _cancelFast: false,
+        _cancelledMediaRecorder: false,
+        _recordedMimeExt: 'webm',
+        _recordedMimeType: 'video/webm',
 
         init() {
             document.getElementById('btn-export').onclick = () => this.showModal();
             document.getElementById('btn-close-export').onclick = () => this.hideModal();
             document.getElementById('btn-start-export').onclick = () => this.startRecording();
-            document.getElementById('btn-cancel-export').onclick = () => this.stop();
+            document.getElementById('btn-cancel-export').onclick = () => this.stop(true);
 
             const unlockSponsorBtn = document.getElementById('btn-unlock-sponsor');
             if (unlockSponsorBtn) {
@@ -674,10 +717,15 @@
             }
         },
 
-        _clearUnlockGate() {
+        _clearUnlockGate(revokePending = false) {
             if (APP_STATE.unlockTimerId) {
                 clearInterval(APP_STATE.unlockTimerId);
                 APP_STATE.unlockTimerId = null;
+            }
+            if (revokePending && APP_STATE.pendingExportBlobUrl) {
+                try { URL.revokeObjectURL(APP_STATE.pendingExportBlobUrl); } catch (e) {}
+                APP_STATE.pendingExportBlobUrl = null;
+                APP_STATE.pendingExportFilename = null;
             }
             const gate = document.getElementById('export-unlock-gate');
             if (gate) gate.classList.add('hidden');
@@ -686,7 +734,7 @@
         },
 
         _presentAdUnlockGate(blobUrl, filename, summaryText) {
-            if (APP_STATE.pendingExportBlobUrl) {
+            if (APP_STATE.pendingExportBlobUrl && APP_STATE.pendingExportBlobUrl !== blobUrl) {
                 try { URL.revokeObjectURL(APP_STATE.pendingExportBlobUrl); } catch (e) {}
             }
             APP_STATE.pendingExportBlobUrl = blobUrl;
@@ -755,7 +803,7 @@
             APP_STATE.pendingExportFilename = null;
 
             UI.showToast('🎉 Downloading your video!', 'success');
-            this._clearUnlockGate();
+            this._clearUnlockGate(false);
             this.hideModal();
         },
 
@@ -769,17 +817,34 @@
                 && typeof OfflineAudioContext !== 'undefined';
         },
 
+        // Expanded H.264 / AVC profiles & levels for full Android / iOS / Desktop compatibility
         _videoCodecCandidates: [
-            'avc1.42E028',
-            'avc1.4D4028',
-            'avc1.640028',
-            'avc1.640032',
+            'avc1.640034',
             'avc1.640033',
-            'avc1.640034'
+            'avc1.640032',
+            'avc1.64002A',
+            'avc1.640029',
+            'avc1.640028',
+            'avc1.64001F',
+            'avc1.4D4034',
+            'avc1.4D4033',
+            'avc1.4D4032',
+            'avc1.4D402A',
+            'avc1.4D4029',
+            'avc1.4D4028',
+            'avc1.4D401F',
+            'avc1.42E034',
+            'avc1.42E033',
+            'avc1.42E032',
+            'avc1.42E02A',
+            'avc1.42E028',
+            'avc1.42E01F',
+            'avc1.420028',
+            'avc1.42001F'
         ],
 
         async _pickVideoCodec(width, height, fps, bitrate) {
-            const accelModes = ['prefer-hardware', 'no-preference'];
+            const accelModes = ['prefer-hardware', 'no-preference', 'prefer-software'];
             for (const hardwareAcceleration of accelModes) {
                 for (const codec of this._videoCodecCandidates) {
                     try {
@@ -801,12 +866,42 @@
             return null;
         },
 
+        async _negotiateBestVideoConfig(quality, aspectRatio, requestedFps) {
+            const bitrates = { '720': 5_000_000, '1080': 8_500_000, '1440': 14_000_000, '2160': 24_000_000 };
+            const tierOrder = ['2160', '1440', '1080', '720'];
+            const startIdx = Math.max(0, tierOrder.indexOf(String(quality)));
+            const candidateTiers = tierOrder.slice(startIdx);
+            const fpsCandidates = requestedFps > 30 ? [requestedFps, 30] : [requestedFps];
+
+            for (const tier of candidateTiers) {
+                const { width, height } = getExportDimensions(tier, aspectRatio);
+                const br = bitrates[tier] || 8_500_000;
+                for (const fpsTry of fpsCandidates) {
+                    const cfg = await this._pickVideoCodec(width, height, fpsTry, br);
+                    if (cfg) {
+                        return {
+                            videoCfg: cfg,
+                            width,
+                            height,
+                            fps: fpsTry,
+                            tier,
+                            downgraded: tier !== String(quality) || fpsTry !== requestedFps
+                        };
+                    }
+                }
+            }
+            return null;
+        },
+
         async _pickAudioCodec(sampleRate, channels) {
-            try {
-                const cfg = { codec: 'mp4a.40.2', sampleRate, numberOfChannels: channels, bitrate: 192000 };
-                const support = await AudioEncoder.isConfigSupported(cfg);
-                if (support && support.supported) return support.config;
-            } catch (e) {}
+            const rates = [sampleRate, 48000, 44100];
+            for (const sr of rates) {
+                try {
+                    const cfg = { codec: 'mp4a.40.2', sampleRate: sr, numberOfChannels: channels, bitrate: 192000 };
+                    const support = await AudioEncoder.isConfigSupported(cfg);
+                    if (support && support.supported) return support.config;
+                } catch (e) {}
+            }
             return null;
         },
 
@@ -829,7 +924,7 @@
                 note.style.color = '#34d399';
                 note.style.borderColor = 'rgba(16, 185, 129, 0.25)';
             } else {
-                note.textContent = '⏺ Realtime recording (WebM).';
+                note.textContent = '⏺ Realtime recording mode active.';
                 note.style.background = 'rgba(255, 200, 80, 0.08)';
                 note.style.color = '#ffc850';
                 note.style.borderColor = 'rgba(255, 200, 80, 0.25)';
@@ -841,17 +936,17 @@
                 UI.showToast('Loading built-in demo track so you can test export...', 'info');
                 UI.loadDemoTrack();
             }
-            this._clearUnlockGate();
+            this._clearUnlockGate(true);
             const isMobileDevice = window.innerWidth < 820 || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
             if (isMobileDevice && !this._mobileDefaultApplied) {
                 this._mobileDefaultApplied = true;
                 const fpsEl = document.getElementById('export-fps');
                 if (fpsEl) fpsEl.value = '30';
-                const q720 = document.querySelector('input[name="export-quality"][value="720"]');
-                if (q720) {
-                    q720.checked = true;
+                const q1080 = document.querySelector('input[name="export-quality"][value="1080"]');
+                if (q1080) {
+                    q1080.checked = true;
                     document.querySelectorAll('.export-option').forEach(o => o.classList.remove('selected'));
-                    q720.closest('.export-option').classList.add('selected');
+                    q1080.closest('.export-option').classList.add('selected');
                 }
             }
             const aspectSelect = document.getElementById('export-aspect');
@@ -866,7 +961,7 @@
 
         hideModal() {
             if (APP_STATE.isRecording) return;
-            this._clearUnlockGate();
+            this._clearUnlockGate(true);
             document.getElementById('export-modal').classList.remove('open');
             if (window.WaveForgeAds) {
                 window.WaveForgeAds.stopModalAdRefresh();
@@ -952,11 +1047,13 @@
 
         async startRecording() {
             if (APP_STATE.isRecording) return;
-            this._clearUnlockGate();
+            this._clearUnlockGate(true);
 
             const aspectSelect = document.getElementById('export-aspect');
             if (aspectSelect) {
                 CONFIG.aspectRatio = aspectSelect.value;
+                const sAspect = document.getElementById('set-aspect');
+                if (sAspect) sAspect.value = CONFIG.aspectRatio;
                 persistConfig();
             }
 
@@ -977,16 +1074,33 @@
             await this._startMediaRecorderExport();
         },
 
+        _pickMediaRecorderMime() {
+            if (typeof MediaRecorder === 'undefined') return { mimeType: '', ext: 'webm' };
+            const candidates = [
+                { mimeType: 'video/mp4;codecs=avc1,mp4a.40.2', ext: 'mp4' },
+                { mimeType: 'video/mp4', ext: 'mp4' },
+                { mimeType: 'video/webm;codecs=vp9,opus', ext: 'webm' },
+                { mimeType: 'video/webm;codecs=vp8,opus', ext: 'webm' },
+                { mimeType: 'video/webm', ext: 'webm' }
+            ];
+            for (const c of candidates) {
+                try {
+                    if (MediaRecorder.isTypeSupported(c.mimeType)) return c;
+                } catch (e) {}
+            }
+            return { mimeType: '', ext: 'webm' };
+        },
+
         async _startMediaRecorderExport() {
             if (APP_STATE.isRecording) return;
 
             const quality = document.querySelector('input[name="export-quality"]:checked').value;
             const durationSetting = document.getElementById('export-duration').value;
-            const fps = parseInt(document.getElementById('export-fps').value);
+            const fps = parseInt(document.getElementById('export-fps').value, 10) || 30;
             const modeSelect = document.getElementById('export-mode').value;
 
             if (modeSelect !== 'current') {
-                setMode(parseInt(modeSelect));
+                setMode(parseInt(modeSelect, 10));
             }
 
             const { width, height } = getExportDimensions(quality, CONFIG.aspectRatio);
@@ -996,12 +1110,18 @@
             APP_STATE.exportCanvas.height = height;
             APP_STATE.exportCtx = APP_STATE.exportCanvas.getContext('2d');
 
-            let maxDuration = audio.getDuration() - audio.getCurrentTime();
+            const trackDur = audio.getDuration() || 30;
+            if ((APP_STATE.mode === 12 && CONFIG.phonkIntroEnabled) || durationSetting === 'full' || (trackDur - audio.getCurrentTime() < 2)) {
+                audio.audioElement.currentTime = 0;
+            }
+
+            let maxDuration = Math.max(1, (audio.getDuration() || 30) - audio.getCurrentTime());
             if (durationSetting !== 'full') {
-                maxDuration = Math.min(maxDuration, parseInt(durationSetting));
+                maxDuration = Math.min(maxDuration, parseInt(durationSetting, 10));
             }
 
             APP_STATE.isRecording = true;
+            this._cancelledMediaRecorder = false;
             APP_STATE.recordedChunks = [];
             APP_STATE.recordingStartTime = audio.getCurrentTime();
             APP_STATE.recordingDuration = maxDuration;
@@ -1014,17 +1134,19 @@
                 canvasStream.addTrack(audioTracks[0]);
             }
 
-            const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
-                ? 'video/webm;codecs=vp9,opus'
-                : 'video/webm;codecs=vp8,opus';
+            const picked = this._pickMediaRecorderMime();
+            this._recordedMimeExt = picked.ext;
+            this._recordedMimeType = picked.mimeType || 'video/webm';
 
-            APP_STATE.mediaRecorder = new MediaRecorder(canvasStream, {
-                mimeType: mimeType,
+            const recOptions = {
                 videoBitsPerSecond: quality === '2160' ? 20000000 : quality === '1440' ? 12000000 : 8000000
-            });
+            };
+            if (picked.mimeType) recOptions.mimeType = picked.mimeType;
+
+            APP_STATE.mediaRecorder = new MediaRecorder(canvasStream, recOptions);
 
             APP_STATE.mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) {
+                if (e.data && e.data.size > 0) {
                     APP_STATE.recordedChunks.push(e.data);
                 }
             };
@@ -1049,24 +1171,24 @@
         },
 
         monitorProgress() {
-            if (!APP_STATE.isRecording) return;
+            if (!APP_STATE.isRecording || APP_STATE.isFastExporting) return;
 
-            const elapsed = audio.getCurrentTime() - APP_STATE.recordingStartTime;
-            const progress = Math.min((elapsed / APP_STATE.recordingDuration) * 100, 100);
+            const elapsed = Math.max(0, audio.getCurrentTime() - APP_STATE.recordingStartTime);
+            const progress = Math.min((elapsed / Math.max(0.1, APP_STATE.recordingDuration)) * 100, 100);
 
             document.getElementById('progress-fill').style.width = progress + '%';
             document.getElementById('progress-percent').textContent = Math.round(progress) + '%';
             document.getElementById('progress-status').textContent = `Recording... ${this.formatTime(elapsed)} / ${this.formatTime(APP_STATE.recordingDuration)}`;
 
             if (elapsed >= APP_STATE.recordingDuration) {
-                this.stop();
+                this.stop(false);
                 return;
             }
 
             requestAnimationFrame(() => this.monitorProgress());
         },
 
-        stop() {
+        stop(userCancelled = true) {
             if (!APP_STATE.isRecording) return;
 
             if (APP_STATE.isFastExporting) {
@@ -1076,32 +1198,35 @@
                 return;
             }
 
+            this._cancelledMediaRecorder = Boolean(userCancelled);
             APP_STATE.isRecording = false;
 
             if (APP_STATE.mediaRecorder && APP_STATE.mediaRecorder.state !== 'inactive') {
-                APP_STATE.mediaRecorder.stop();
+                try { APP_STATE.mediaRecorder.stop(); } catch (e) {}
             }
 
             document.getElementById('status-dot').classList.remove('recording');
-            document.getElementById('status-text').textContent = 'Processing...';
+            document.getElementById('status-text').textContent = userCancelled ? 'Ready' : 'Processing...';
         },
 
         async startFastExport() {
             const quality = document.querySelector('input[name="export-quality"]:checked').value;
             const durationSetting = document.getElementById('export-duration').value;
-            const fps = parseInt(document.getElementById('export-fps').value);
+            const requestedFps = parseInt(document.getElementById('export-fps').value, 10) || 60;
             const modeSelect = document.getElementById('export-mode').value;
 
             if (modeSelect !== 'current') {
-                setMode(parseInt(modeSelect));
+                setMode(parseInt(modeSelect, 10));
             }
 
-            const bitrates = { '720': 5_000_000, '1080': 8_500_000, '1440': 14_000_000, '2160': 24_000_000 };
-            const bitrate = bitrates[quality] || 8_500_000;
-            const { width, height } = getExportDimensions(quality, CONFIG.aspectRatio);
-
-            const videoCfg = await this._pickVideoCodec(width, height, fps, bitrate);
-            if (!videoCfg) throw new Error('No supported H.264 codec for ' + width + 'x' + height + '@' + fps);
+            const negotiated = await this._negotiateBestVideoConfig(quality, CONFIG.aspectRatio, requestedFps);
+            if (!negotiated) {
+                throw new Error('No supported H.264 hardware encoder found');
+            }
+            const { videoCfg, width, height, fps, downgraded } = negotiated;
+            if (downgraded) {
+                UI.showToast(`⚡ Adjusted to ${width}×${height} @ ${fps}fps for your device's hardware encoder`, 'info');
+            }
 
             this._setStatus('Decoding audio…', 0);
             const srcUrl = audio.audioElement.src;
@@ -1111,18 +1236,24 @@
             if (!decoded || APP_STATE.decodedAudioSrc !== srcUrl) {
                 const resp = await fetch(srcUrl);
                 const buf = await resp.arrayBuffer();
-                decoded = await audio.ctx.decodeAudioData(buf.slice(0));
+                decoded = await audio.ctx.decodeAudioData(buf);
                 APP_STATE.decodedAudioBuffer = decoded;
                 APP_STATE.decodedAudioSrc = srcUrl;
             }
 
-            const audioCfg = await this._pickAudioCodec(decoded.sampleRate, Math.min(2, decoded.numberOfChannels));
-            if (!audioCfg) throw new Error('No supported AAC encoder for ' + decoded.sampleRate + 'Hz');
+            const targetAudioRate = decoded.sampleRate;
+            const audioCfg = await this._pickAudioCodec(targetAudioRate, Math.min(2, decoded.numberOfChannels));
+            if (!audioCfg) throw new Error('No supported AAC encoder for ' + targetAudioRate + 'Hz');
 
-            // If Phonk Intro is enabled, start export from 0:00 so the 3.5s AirPods Intro is captured!
-            const startTime = (APP_STATE.mode === 12 && CONFIG.phonkIntroEnabled) ? 0 : audio.getCurrentTime();
+            // Start from 0:00 if Phonk Intro is enabled, Full Track is chosen, or playhead is near the end
+            const curPos = audio.getCurrentTime();
+            const startFromZero = (APP_STATE.mode === 12 && CONFIG.phonkIntroEnabled)
+                || durationSetting === 'full'
+                || (decoded.duration - curPos < 2.0);
+            const startTime = startFromZero ? 0 : curPos;
+
             let clipDuration = decoded.duration - startTime;
-            if (durationSetting !== 'full') clipDuration = Math.min(clipDuration, parseInt(durationSetting));
+            if (durationSetting !== 'full') clipDuration = Math.min(clipDuration, parseInt(durationSetting, 10));
             if (clipDuration <= 0.05) throw new Error('Nothing to export from current position');
 
             const totalFrames = Math.max(1, Math.floor(clipDuration * fps));
@@ -1146,12 +1277,13 @@
 
             this._setStatus('Pre-rendering 3-band EQ audio…', 2);
             const numChannels = Math.min(2, decoded.numberOfChannels);
+            const renderSampleRate = audioCfg.sampleRate || decoded.sampleRate;
             let audioBuffer;
             try {
                 const offlineCtx = new OfflineAudioContext(
                     numChannels,
-                    Math.ceil(clipDuration * decoded.sampleRate),
-                    decoded.sampleRate
+                    Math.max(1, Math.ceil(clipDuration * renderSampleRate)),
+                    renderSampleRate
                 );
                 const offlineSrc = offlineCtx.createBufferSource();
                 offlineSrc.buffer = decoded;
@@ -1223,12 +1355,17 @@
             renderCanvas.height = height;
             const renderCtx = renderCanvas.getContext('2d', { alpha: false, desynchronized: true, willReadFrequently: false });
 
+            // Preserve neon glow while capping maximum blur radius for fast hardware-friendly frame rasterization
             try {
-                Object.defineProperty(renderCtx, 'shadowBlur', {
-                    get() { return 0; },
-                    set() {},
-                    configurable: true
-                });
+                const protoDesc = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'shadowBlur');
+                if (protoDesc && protoDesc.set && protoDesc.get) {
+                    const maxBlur = Math.max(width, height) > 2000 ? 18 : 26;
+                    Object.defineProperty(renderCtx, 'shadowBlur', {
+                        get() { return protoDesc.get.call(this); },
+                        set(v) { protoDesc.set.call(this, Math.min(Number(v) || 0, maxBlur)); },
+                        configurable: true
+                    });
+                }
             } catch (e) {}
 
             APP_STATE.exportCanvas = renderCanvas;
@@ -1280,9 +1417,9 @@
 
                     fftAnalyzer.extractFrame(monoPcm, sampleIdx, smoothing, freqArr, waveArr);
 
-                    APP_STATE.exportTime = tFrame;
+                    APP_STATE.exportTime = startTime + tFrame;
                     const isBeat = BeatDetector.update(freqArr);
-                    this.renderFrame(renderCtx, width, height, { freq: freqArr, wave: waveArr }, isBeat, tFrame / clipDuration);
+                    this.renderFrame(renderCtx, width, height, { freq: freqArr, wave: waveArr }, isBeat, (startTime + tFrame) / decoded.duration);
 
                     const vf = new VideoFrame(renderCanvas, {
                         timestamp: i * usPerFrame,
@@ -1393,7 +1530,6 @@
             const speedX = clipDuration / Math.max(0.001, totalElapsed);
             const summaryText = `✅ MP4 Rendered in ${totalElapsed.toFixed(1)}s (${speedX.toFixed(1)}× speed) • ${width}×${height}`;
 
-            // Present the 8-Second Ad-Timer + Sponsor Smartlink Unlock Gate!
             this._presentAdUnlockGate(url, filename, summaryText);
         },
 
@@ -1426,6 +1562,10 @@
                 shakeTrauma: APP_STATE.shakeTrauma,
                 lastLogoT: APP_STATE.lastLogoT,
                 lastPhonkT: APP_STATE.lastPhonkT,
+                lastPartT: APP_STATE.lastPartT,
+                lastDnaT: APP_STATE.lastDnaT,
+                lastGalT: APP_STATE.lastGalT,
+                lastTrapT: APP_STATE.lastTrapT,
                 phonkKickEnv: APP_STATE.phonkKickEnv,
                 logoAngle: APP_STATE.logoAngle,
                 helixAngle: APP_STATE.helixAngle,
@@ -1442,6 +1582,10 @@
             APP_STATE.shakeTrauma = 0;
             APP_STATE.lastLogoT = 0;
             APP_STATE.lastPhonkT = 0;
+            APP_STATE.lastPartT = 0;
+            APP_STATE.lastDnaT = 0;
+            APP_STATE.lastGalT = 0;
+            APP_STATE.lastTrapT = 0;
             APP_STATE.phonkKickEnv = 0;
             APP_STATE.logoAngle = 0;
             APP_STATE.helixAngle = 0;
@@ -1462,6 +1606,10 @@
             APP_STATE.shakeTrauma = snap.shakeTrauma;
             APP_STATE.lastLogoT = snap.lastLogoT;
             APP_STATE.lastPhonkT = snap.lastPhonkT;
+            APP_STATE.lastPartT = snap.lastPartT;
+            APP_STATE.lastDnaT = snap.lastDnaT;
+            APP_STATE.lastGalT = snap.lastGalT;
+            APP_STATE.lastTrapT = snap.lastTrapT;
             APP_STATE.phonkKickEnv = snap.phonkKickEnv;
             APP_STATE.logoAngle = snap.logoAngle;
             APP_STATE.helixAngle = snap.helixAngle;
@@ -1495,16 +1643,28 @@
         },
 
         finishRecording() {
-            const blob = new Blob(APP_STATE.recordedChunks, { type: 'video/webm' });
+            if (this._cancelledMediaRecorder) {
+                this._cancelledMediaRecorder = false;
+                APP_STATE.exportCanvas = null;
+                APP_STATE.exportCtx = null;
+                APP_STATE.recordedChunks = [];
+                this._hideProgressUI();
+                document.getElementById('status-text').textContent = 'Ready';
+                UI.showToast('Recording cancelled', 'warning');
+                return;
+            }
+
+            const blob = new Blob(APP_STATE.recordedChunks, { type: this._recordedMimeType || 'video/webm' });
             const url = URL.createObjectURL(blob);
-            const filename = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.webm`;
+            const ext = this._recordedMimeExt || 'webm';
+            const filename = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.${ext}`;
 
             APP_STATE.exportCanvas = null;
             APP_STATE.exportCtx = null;
             APP_STATE.recordedChunks = [];
             document.getElementById('status-text').textContent = 'Ready';
 
-            this._presentAdUnlockGate(url, filename, '✅ WebM Video Recorded & Ready to Download!');
+            this._presentAdUnlockGate(url, filename, `✅ ${ext.toUpperCase()} Video Recorded & Ready to Download!`);
         },
 
         formatTime(seconds) {
@@ -1564,7 +1724,7 @@
             this.resize();
             window.addEventListener('resize', () => {
                 clearTimeout(this.resizeTimer);
-                this.resizeTimer = setTimeout(() => this.resize(), 150);
+                this.resizeTimer = setTimeout(() => this.resize(), 120);
             });
         }
 
@@ -1583,15 +1743,52 @@
         }
         nowSec() { return nowSec(); }
 
+        getActiveFrameBounds(w, h, isExport) {
+            if (isExport || !CONFIG.aspectRatio || CONFIG.aspectRatio === '16:9') {
+                return { fx: 0, fy: 0, fw: w, fh: h };
+            }
+            const ratios = { '9:16': 9 / 16, '1:1': 1, '4:5': 4 / 5 };
+            const targetRatio = ratios[CONFIG.aspectRatio];
+            if (!targetRatio) return { fx: 0, fy: 0, fw: w, fh: h };
+            const screenRatio = w / Math.max(1, h);
+            if (Math.abs(screenRatio - targetRatio) < 0.15) {
+                return { fx: 0, fy: 0, fw: w, fh: h };
+            }
+            let fw = h * 0.84 * targetRatio;
+            let fh = h * 0.84;
+            if (fw > w * 0.92) {
+                fw = w * 0.92;
+                fh = fw / targetRatio;
+            }
+            return { fx: (w - fw) / 2, fy: (h - fh) / 2, fw, fh };
+        }
+
+        getActiveMinDim(w, h) {
+            const isExportCanvas = (APP_STATE.exportCanvas && w === APP_STATE.exportCanvas.width && h === APP_STATE.exportCanvas.height);
+            const bounds = this.getActiveFrameBounds(w, h, isExportCanvas);
+            return Math.min(bounds.fw, bounds.fh);
+        }
+
         resize() {
+            const oldW = this.width || window.innerWidth;
+            const oldH = this.height || window.innerHeight;
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            this.canvas.width = window.innerWidth * dpr;
-            this.canvas.height = window.innerHeight * dpr;
-            this.ctx.scale(dpr, dpr);
             this.width = window.innerWidth;
             this.height = window.innerHeight;
+            this.canvas.width = Math.round(this.width * dpr);
+            this.canvas.height = Math.round(this.height * dpr);
+            this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             this.cx = this.width / 2;
             this.cy = this.height / 2;
+
+            if (oldW > 0 && oldH > 0 && (oldW !== this.width || oldH !== this.height)) {
+                const sx = this.width / oldW;
+                const sy = this.height / oldH;
+                for (let i = 0; i < this.particles.length; i++) {
+                    this.particles[i].x *= sx;
+                    this.particles[i].y *= sy;
+                }
+            }
         }
 
         createParticle() {
@@ -1650,12 +1847,42 @@
                 const b = this._logRanges[i][1];
                 let sum = 0;
                 for (let j = a; j < b; j++) sum += src[j];
-                out[i] = sum / (b - a);
+                out[i] = sum / Math.max(1, b - a);
             }
             return { freq: out, wave: data.wave };
         }
 
         renderPostOverlays(ctx, w, h, isBeat, progressRatio, isExport) {
+            // Stereo Mirror Reflection FX across modes (when enabled and not Mode 1 which handles its own wave mirror)
+            if (CONFIG.mirror && APP_STATE.mode !== 1) {
+                try {
+                    const srcCanvas = isExport ? APP_STATE.exportCanvas : this.canvas;
+                    if (srcCanvas) {
+                        ctx.save();
+                        const reflH = h * 0.24;
+                        ctx.globalAlpha = 0.22;
+                        ctx.translate(0, h);
+                        ctx.scale(1, -1);
+                        ctx.drawImage(srcCanvas, 0, 0, srcCanvas.width, srcCanvas.height, 0, 0, w, reflH);
+                        ctx.restore();
+                    }
+                } catch (e) {}
+            }
+
+            // Ambient Bloom FX driven by CONFIG.bloomIntensity
+            if (CONFIG.bloomIntensity > 65) {
+                const extraAlpha = ((CONFIG.bloomIntensity - 65) / 35) * (isBeat ? 0.16 : 0.08);
+                const bloomGrad = ctx.createRadialGradient(w / 2, h / 2, 10, w / 2, h / 2, Math.min(w, h) * 0.55);
+                bloomGrad.addColorStop(0, this.getColor(0));
+                bloomGrad.addColorStop(1, 'transparent');
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.globalAlpha = extraAlpha;
+                ctx.fillStyle = bloomGrad;
+                ctx.fillRect(0, 0, w, h);
+                ctx.restore();
+            }
+
             if (CONFIG.fxVignette) {
                 const vig = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.28, w / 2, h / 2, Math.max(w, h) * 0.72);
                 vig.addColorStop(0, 'rgba(0,0,0,0)');
@@ -1667,34 +1894,37 @@
             if (CONFIG.fxScanlines) {
                 ctx.save();
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-                for (let y = 0; y < h; y += 4) {
-                    ctx.fillRect(0, y, w, 1.5);
+                const stepY = Math.max(3, Math.round(h / 240));
+                for (let y = 0; y < h; y += stepY) {
+                    ctx.fillRect(0, y, w, Math.max(1, stepY * 0.38));
                 }
                 ctx.restore();
             }
 
+            const bounds = this.getActiveFrameBounds(w, h, isExport);
             const title = (CONFIG.overlayTitle || '').trim();
             const artist = (CONFIG.overlayArtist || '').trim();
             if (title || artist) {
                 ctx.save();
                 const pulse = (CONFIG.overlayBeatPulse && isBeat) ? 1.05 : 1.0;
-                const baseSize = Math.max(18, Math.round(Math.min(w, h) * 0.042));
-                const subSize = Math.max(12, Math.round(baseSize * 0.56));
-                let tx = w * 0.06;
-                let ty = h * 0.84;
+                const minFrame = Math.min(bounds.fw, bounds.fh);
+                const baseSize = Math.max(16, Math.round(minFrame * 0.046));
+                const subSize = Math.max(11, Math.round(baseSize * 0.56));
+                let tx = bounds.fx + bounds.fw * 0.07;
+                let ty = bounds.fy + bounds.fh * 0.84;
                 let align = 'left';
 
                 if (CONFIG.overlayPosition === 'center') {
-                    tx = w / 2;
-                    ty = h / 2;
+                    tx = bounds.fx + bounds.fw / 2;
+                    ty = bounds.fy + bounds.fh / 2;
                     align = 'center';
                 } else if (CONFIG.overlayPosition === 'top-center') {
-                    tx = w / 2;
-                    ty = h * 0.14;
+                    tx = bounds.fx + bounds.fw / 2;
+                    ty = bounds.fy + bounds.fh * 0.14;
                     align = 'center';
                 } else if (CONFIG.overlayPosition === 'bottom-center') {
-                    tx = w / 2;
-                    ty = h * 0.85;
+                    tx = bounds.fx + bounds.fw / 2;
+                    ty = bounds.fy + bounds.fh * 0.85;
                     align = 'center';
                 }
 
@@ -1733,29 +1963,17 @@
                 ctx.restore();
             }
 
-            if (!isExport && CONFIG.aspectRatio && CONFIG.aspectRatio !== '16:9') {
-                const ratios = { '9:16': 9 / 16, '1:1': 1, '4:5': 4 / 5 };
-                const targetRatio = ratios[CONFIG.aspectRatio];
-                if (targetRatio) {
-                    let fw = h * 0.82 * targetRatio;
-                    let fh = h * 0.82;
-                    if (fw > w * 0.92) {
-                        fw = w * 0.92;
-                        fh = fw / targetRatio;
-                    }
-                    const fx = (w - fw) / 2;
-                    const fy = (h - fh) / 2;
-                    ctx.save();
-                    ctx.strokeStyle = 'rgba(168, 85, 247, 0.45)';
-                    ctx.lineWidth = 1.5;
-                    ctx.setLineDash([6, 6]);
-                    ctx.strokeRect(fx, fy, fw, fh);
-                    ctx.setLineDash([]);
-                    ctx.font = '600 11px Inter, sans-serif';
-                    ctx.fillStyle = 'rgba(168, 85, 247, 0.85)';
-                    ctx.fillText(`Export Frame (${CONFIG.aspectRatio})`, fx + 8, fy + 16);
-                    ctx.restore();
-                }
+            if (!isExport && (bounds.fw < w - 4 || bounds.fh < h - 4)) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(168, 85, 247, 0.48)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([6, 6]);
+                ctx.strokeRect(bounds.fx, bounds.fy, bounds.fw, bounds.fh);
+                ctx.setLineDash([]);
+                ctx.font = '600 11px Inter, sans-serif';
+                ctx.fillStyle = 'rgba(168, 85, 247, 0.88)';
+                ctx.fillText(`Export Frame (${CONFIG.aspectRatio})`, bounds.fx + 8, bounds.fy + 16);
+                ctx.restore();
             }
         }
 
@@ -1775,6 +1993,9 @@
                     if (fpsEl) fpsEl.textContent = `${APP_STATE.fps} FPS`;
                 }
             }
+
+            // Skip redundant live canvas rendering while Zero-Suspend Fast Export is monopolizing the encoder
+            if (APP_STATE.isFastExporting) return;
 
             const data = audio.getAnalysis();
             const isBeat = BeatDetector.update(data.freq);
@@ -1899,7 +2120,6 @@
                 this.els.templatesModal.classList.remove('open');
             }
 
-            // Show the 3-Step Guided Template Bar so user knows exactly what to upload next!
             const wizardBar = document.getElementById('template-wizard-bar');
             const wizardName = document.getElementById('wizard-template-name');
             if (wizardBar) {
@@ -1907,15 +2127,12 @@
                 wizardBar.classList.remove('hidden');
             }
 
-            // Hide welcome card so user sees the live template immediately
             const onboard = document.getElementById('studio-onboarding');
             if (onboard) onboard.classList.add('hidden-card');
 
-            // Auto-start demo track if no audio is loaded yet so template comes alive!
             if (!audio.hasAudio()) {
                 this.loadDemoTrack();
             } else if (APP_STATE.mode === 12 && CONFIG.phonkIntroEnabled) {
-                // Restart track at 0:00 so user sees the 3.5s AirPods volume intro!
                 audio.audioElement.currentTime = 0;
                 if (audio.audioElement.paused) audio.togglePlay();
             }
@@ -1927,7 +2144,6 @@
             const grid = document.getElementById('mode-grid');
             if (!grid) return;
             grid.innerHTML = '';
-            // Put Mode 12 (Hardtekk Phonk) and Mode 8 (Logo Viz) right at the top!
             const order = [12, 8, 10, 9, 11, 0, 1, 2, 3, 4, 5, 6, 7].filter(k => VIS_MODS[k]);
 
             order.forEach(key => {
@@ -1950,7 +2166,7 @@
                 card.appendChild(name);
                 card.appendChild(desc);
                 card.onclick = () => {
-                    setMode(parseInt(key));
+                    setMode(parseInt(key, 10));
                     this.showToast(mod.icon + ' ' + mod.name, 'info');
                     setTimeout(() => this.closeModeSelector(), 220);
                 };
@@ -1968,7 +2184,7 @@
                     pill.dataset.mode = key;
                     pill.textContent = mod.icon + ' ' + mod.name;
                     pill.onclick = () => {
-                        setMode(parseInt(key));
+                        setMode(parseInt(key, 10));
                         this.showToast(mod.icon + ' ' + mod.name, 'info');
                     };
                     qStrip.appendChild(pill);
@@ -1984,7 +2200,7 @@
             current.value = 'current';
             current.textContent = 'Current Active Mode';
             select.appendChild(current);
-            Object.keys(VIS_MODS).sort((a, b) => parseInt(a) - parseInt(b)).forEach(key => {
+            Object.keys(VIS_MODS).sort((a, b) => parseInt(a, 10) - parseInt(b, 10)).forEach(key => {
                 const mod = VIS_MODS[key];
                 const opt = document.createElement('option');
                 opt.value = key;
@@ -1998,7 +2214,6 @@
             document.getElementById('btn-demo').onclick = () => this.loadDemoTrack();
             document.getElementById('btn-random').onclick = () => this.randomizeVisual();
 
-            // Templates Modal triggers
             const openTemplates = () => {
                 if (this.els.templatesModal) this.els.templatesModal.classList.add('open');
             };
@@ -2046,7 +2261,10 @@
             const onboardUpload = document.getElementById('onboard-upload-btn');
             if (onboardUpload) onboardUpload.onclick = () => this.els.fileInput.click();
 
-            this.els.fileInput.onchange = (e) => this.handleFile(e.target.files[0]);
+            this.els.fileInput.onchange = (e) => {
+                this.handleFile(e.target.files[0]);
+                e.target.value = '';
+            };
             this.els.playBtn.onclick = () => audio.togglePlay();
             document.getElementById('btn-stop').onclick = () => audio.stop();
             document.getElementById('btn-mic').onclick = () => audio.enableMic();
@@ -2088,7 +2306,7 @@
                 if (!document.fullscreenElement) {
                     document.documentElement.requestFullscreen().catch(() => {});
                 } else {
-                    document.exitFullscreen();
+                    document.exitFullscreen().catch(() => {});
                 }
             };
 
@@ -2253,6 +2471,35 @@
             });
         },
 
+        _loadCustomImage(file, targetType) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    if (targetType === 'logo') {
+                        APP_STATE.logoImg = img;
+                        document.getElementById('btn-upload-logo').classList.add('has-file');
+                        document.getElementById('logo-label').textContent = 'Logo: ' + file.name.substring(0, 14);
+                        const wizLogo = document.getElementById('wiz-btn-logo');
+                        if (wizLogo) wizLogo.classList.add('done-step');
+                        this.showToast('⭕ Custom center logo loaded!', 'success');
+                    } else {
+                        APP_STATE.bgImg = img;
+                        document.getElementById('btn-upload-bg').classList.add('has-file');
+                        document.getElementById('bg-label').textContent = 'BG: ' + file.name.substring(0, 14);
+                        const wizBg = document.getElementById('wiz-btn-bg');
+                        if (wizBg) wizBg.classList.add('done-step');
+                        this.showToast('🖼️ Custom background loaded!', 'success');
+                    }
+                    const clearRow = document.getElementById('clear-branding-row');
+                    if (clearRow) clearRow.classList.remove('hidden');
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+
         setupSettings() {
             const linkSetting = (id, configKey, type = 'float') => {
                 const el = document.getElementById(id);
@@ -2261,9 +2508,13 @@
                 el.onchange = el.oninput = (e) => {
                     let val = e.target.value;
                     if (type === 'float') val = parseFloat(val);
-                    else if (type === 'int') val = parseInt(val);
+                    else if (type === 'int') val = parseInt(val, 10);
                     else if (type === 'bool') val = e.target.checked;
                     CONFIG[configKey] = val;
+                    if (configKey === 'aspectRatio') {
+                        const expAspect = document.getElementById('export-aspect');
+                        if (expAspect) expAspect.value = val;
+                    }
                     audio.updateSettings();
                     persistConfig();
                 };
@@ -2295,9 +2546,10 @@
             linkSetting('set-fx-progress', 'fxProgressBar', 'bool');
             linkSetting('set-aspect', 'aspectRatio', 'string');
 
-            // Phonk / Hardtekk Intro bindings
+            // Phonk / Hardtekk Intro & Backdrop bindings
             linkSetting('set-phonk-intro', 'phonkIntroEnabled', 'bool');
             linkSetting('set-phonk-intro-dur', 'phonkIntroDuration', 'float');
+            linkSetting('set-phonk-bg', 'phonkBgTheme', 'string');
 
             document.querySelectorAll('#settings-modal input[type="range"]').forEach((input) => {
                 input.addEventListener('input', () => this.updateSliderLabels());
@@ -2358,44 +2610,33 @@
             document.getElementById('btn-upload-logo').onclick = () => document.getElementById('logo-img-input').click();
 
             document.getElementById('logo-bg-input').onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        APP_STATE.bgImg = img;
-                        document.getElementById('btn-upload-bg').classList.add('has-file');
-                        document.getElementById('bg-label').textContent = 'BG: ' + file.name.substring(0, 14);
-                        const wizBg = document.getElementById('wiz-btn-bg');
-                        if (wizBg) wizBg.classList.add('done-step');
-                        this.showToast('🖼️ Custom background loaded!', 'success');
-                    };
-                    img.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
+                this._loadCustomImage(e.target.files[0], 'bg');
                 e.target.value = '';
             };
 
             document.getElementById('logo-img-input').onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        APP_STATE.logoImg = img;
-                        document.getElementById('btn-upload-logo').classList.add('has-file');
-                        document.getElementById('logo-label').textContent = 'Logo: ' + file.name.substring(0, 14);
-                        const wizLogo = document.getElementById('wiz-btn-logo');
-                        if (wizLogo) wizLogo.classList.add('done-step');
-                        this.showToast('⭕ Custom center logo loaded!', 'success');
-                    };
-                    img.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
+                this._loadCustomImage(e.target.files[0], 'logo');
                 e.target.value = '';
             };
+
+            const clearBrandingBtn = document.getElementById('btn-clear-branding');
+            if (clearBrandingBtn) {
+                clearBrandingBtn.onclick = () => {
+                    APP_STATE.bgImg = null;
+                    APP_STATE.logoImg = null;
+                    document.getElementById('btn-upload-bg').classList.remove('has-file');
+                    document.getElementById('btn-upload-logo').classList.remove('has-file');
+                    document.getElementById('bg-label').textContent = 'Upload Background';
+                    document.getElementById('logo-label').textContent = 'Upload Center Logo';
+                    const wizBg = document.getElementById('wiz-btn-bg');
+                    const wizLogo = document.getElementById('wiz-btn-logo');
+                    if (wizBg) wizBg.classList.remove('done-step');
+                    if (wizLogo) wizLogo.classList.remove('done-step');
+                    const clearRow = document.getElementById('clear-branding-row');
+                    if (clearRow) clearRow.classList.add('hidden');
+                    this.showToast('Custom background & logo cleared', 'info');
+                };
+            }
 
             document.getElementById('set-wave-color').oninput = (e) => {
                 CONFIG.waveColor = e.target.value;
@@ -2414,7 +2655,7 @@
             });
 
             document.getElementById('set-shake').oninput = (e) => { CONFIG.logoShakeIntensity = parseFloat(e.target.value); persistConfig(); };
-            document.getElementById('set-ray-count').oninput = (e) => { CONFIG.logoRayCount = parseInt(e.target.value); persistConfig(); };
+            document.getElementById('set-ray-count').oninput = (e) => { CONFIG.logoRayCount = parseInt(e.target.value, 10); persistConfig(); };
             document.getElementById('set-line-thick').oninput = (e) => { CONFIG.logoLineThickness = parseFloat(e.target.value); persistConfig(); };
             document.getElementById('set-glow-size').oninput = (e) => { CONFIG.logoGlowSize = parseFloat(e.target.value); persistConfig(); };
             document.getElementById('set-logo-particles').onchange = (e) => { CONFIG.logoParticles = e.target.checked; persistConfig(); };
@@ -2452,6 +2693,7 @@
             setVal('set-aspect', CONFIG.aspectRatio);
             setVal('export-aspect', CONFIG.aspectRatio);
             setVal('set-phonk-intro-dur', CONFIG.phonkIntroDuration);
+            setVal('set-phonk-bg', CONFIG.phonkBgTheme || 'mage');
 
             setChk('set-beat-enabled', CONFIG.beatEnabled);
             setChk('set-mirror', CONFIG.mirror);
@@ -2483,7 +2725,9 @@
                 reader.onload = (e) => {
                     try {
                         const preset = JSON.parse(e.target.result);
-                        Object.assign(CONFIG, preset);
+                        Object.keys(CONFIG).forEach((k) => {
+                            if (preset[k] !== undefined) CONFIG[k] = preset[k];
+                        });
                         if (preset.mode !== undefined && VIS_MODS[preset.mode]) {
                             APP_STATE.mode = preset.mode;
                         }
@@ -2491,6 +2735,7 @@
                         this.applyConfigToUI();
                         this.updateModeDisplay();
                         this.updateModeCards();
+                        this.updateSliderLabels();
                         persistConfig();
                         this.showToast('Preset loaded!', 'success');
                     } catch (err) {
@@ -2498,19 +2743,21 @@
                     }
                 };
                 reader.readAsText(file);
+            } else if (file.type.startsWith('image/') || file.name.match(/\.(png|jpe?g|webp|gif|svg)$/i)) {
+                this._loadCustomImage(file, APP_STATE.bgImg && !APP_STATE.logoImg ? 'logo' : 'bg');
             } else if (file.type.includes('audio') || file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac|webm)$/i)) {
                 const wizMusic = document.getElementById('wiz-btn-music');
                 if (wizMusic) wizMusic.classList.add('done-step');
-                audio.playFile(URL.createObjectURL(file));
-                document.getElementById('status-text').textContent = file.name.substring(0, 18) + (file.name.length > 18 ? '...' : '');
+                const cleanName = file.name.replace(/\.[^/.]+$/, '');
+                const shortLabel = cleanName.substring(0, 18) + (cleanName.length > 18 ? '…' : '');
+                audio.playFile(URL.createObjectURL(file), shortLabel);
             } else {
                 this.showToast('Unsupported file type', 'error');
             }
         },
 
         loadDemoTrack() {
-            audio.playFile('assets/audio/demo-track.wav');
-            document.getElementById('status-text').textContent = 'Demo track';
+            audio.playFile('assets/audio/demo-track.wav', 'Demo Track');
         },
 
         toggleSettings(show) {
@@ -2521,7 +2768,8 @@
         updatePlayButton() {
             this.els.playIcon.textContent = APP_STATE.isPlaying ? '⏸' : '▶';
             this.els.playBtn.classList.toggle('active', APP_STATE.isPlaying);
-            document.getElementById('status-text').textContent = APP_STATE.isPlaying ? 'Playing' : 'Paused';
+            const labelSuffix = APP_STATE.trackTitleLabel ? ` · ${APP_STATE.trackTitleLabel}` : '';
+            document.getElementById('status-text').textContent = (APP_STATE.isPlaying ? 'Playing' : 'Paused') + labelSuffix;
             const onboard = document.getElementById('studio-onboarding');
             if (onboard && (APP_STATE.isPlaying || audio.hasAudio())) {
                 onboard.classList.add('hidden-card');
@@ -2557,7 +2805,7 @@
 
         updateModeCards() {
             document.querySelectorAll('.mode-card, .qmode-pill').forEach(card => {
-                const modeNum = parseInt(card.dataset.mode);
+                const modeNum = parseInt(card.dataset.mode, 10);
                 card.classList.toggle('active', modeNum === APP_STATE.mode);
             });
         },
@@ -2627,13 +2875,12 @@
 
         viz.loop();
 
-        // If user launched via ?template=... on index.html, automatically open the 3-step guided bar
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('template')) {
             UI.applyTemplate(urlParams.get('template'));
         }
 
-        console.log('%c🎵 WaveForge Studio v7.0.0', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+        console.log('%c🎵 WaveForge Studio v7.1.0', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

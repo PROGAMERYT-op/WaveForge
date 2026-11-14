@@ -1,5 +1,5 @@
-/* WaveForge Service Worker v7.0.0 */
-const CACHE_VERSION = 'waveforge-v7.0.0';
+/* WaveForge Service Worker v7.1.0 */
+const CACHE_VERSION = 'waveforge-v7.1.0';
 const PRECACHE = [
     './',
     'index.html',
@@ -7,26 +7,26 @@ const PRECACHE = [
     'privacy.html',
     'terms.html',
     'assets/manifest.json',
-    'assets/css/app.css?v=7.0.0',
-    'assets/css/landing.css?v=7.0.0',
+    'assets/css/app.css?v=7.1.0',
+    'assets/css/landing.css?v=7.1.0',
     'assets/css/legal.css',
-    'assets/js/ads.js?v=7.0.0',
-    'assets/js/app.js?v=7.0.0',
-    'assets/js/landing.js?v=7.0.0',
+    'assets/js/ads.js?v=7.1.0',
+    'assets/js/app.js?v=7.1.0',
+    'assets/js/landing.js?v=7.1.0',
     'assets/js/legal.js',
-    'Visualizers/bars.js?v=7.0.0',
-    'Visualizers/wave.js?v=7.0.0',
-    'Visualizers/radial.js?v=7.0.0',
-    'Visualizers/particles.js?v=7.0.0',
-    'Visualizers/spectrogram.js?v=7.0.0',
-    'Visualizers/3dbars.js?v=7.0.0',
-    'Visualizers/dna.js?v=7.0.0',
-    'Visualizers/galaxy.js?v=7.0.0',
-    'Visualizers/logo.js?v=7.0.0',
-    'Visualizers/tunnel.js?v=7.0.0',
-    'Visualizers/trapnation.js?v=7.0.0',
-    'Visualizers/synthwave.js?v=7.0.0',
-    'Visualizers/phonk.js?v=7.0.0',
+    'Visualizers/bars.js?v=7.1.0',
+    'Visualizers/wave.js?v=7.1.0',
+    'Visualizers/radial.js?v=7.1.0',
+    'Visualizers/particles.js?v=7.1.0',
+    'Visualizers/spectrogram.js?v=7.1.0',
+    'Visualizers/3dbars.js?v=7.1.0',
+    'Visualizers/dna.js?v=7.1.0',
+    'Visualizers/galaxy.js?v=7.1.0',
+    'Visualizers/logo.js?v=7.1.0',
+    'Visualizers/tunnel.js?v=7.1.0',
+    'Visualizers/trapnation.js?v=7.1.0',
+    'Visualizers/synthwave.js?v=7.1.0',
+    'Visualizers/phonk.js?v=7.1.0',
     'assets/audio/demo-track.wav',
     'assets/img/favicon.svg',
     'assets/img/icon-192.png',
@@ -58,7 +58,8 @@ self.addEventListener('fetch', (event) => {
     if (req.headers.has('range')) return;
 
     const url = new URL(req.url);
-    const isCodeOrHtml = req.mode === 'navigate' || /\.(html|css|js)$/i.test(url.pathname);
+    const isNavigate = req.mode === 'navigate';
+    const isCodeOrHtml = isNavigate || /\.(html|css|js)$/i.test(url.pathname);
 
     if (isCodeOrHtml) {
         event.respondWith(
@@ -66,11 +67,22 @@ self.addEventListener('fetch', (event) => {
                 .then((resp) => {
                     if (resp && resp.ok) {
                         const copy = resp.clone();
-                        caches.open(CACHE_VERSION).then((c) => c.put(req, copy));
+                        caches.open(CACHE_VERSION).then((c) => c.put(req, copy)).catch(() => {});
                     }
                     return resp;
                 })
-                .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('index.html')))
+                .catch(() =>
+                    caches.match(req, { ignoreSearch: true }).then((hit) => {
+                        if (hit) return hit;
+                        if (isNavigate) {
+                            if (url.pathname.endsWith('visualizer.html')) {
+                                return caches.match('visualizer.html', { ignoreSearch: true }) || caches.match('index.html', { ignoreSearch: true });
+                            }
+                            return caches.match('index.html', { ignoreSearch: true });
+                        }
+                        return new Response('', { status: 503, statusText: 'Offline' });
+                    })
+                )
         );
         return;
     }
@@ -80,7 +92,7 @@ self.addEventListener('fetch', (event) => {
             const network = fetch(req).then((resp) => {
                 if (resp && resp.ok && resp.type === 'basic') {
                     const copy = resp.clone();
-                    caches.open(CACHE_VERSION).then((c) => c.put(req, copy));
+                    caches.open(CACHE_VERSION).then((c) => c.put(req, copy)).catch(() => {});
                 }
                 return resp;
             }).catch(() => hit);

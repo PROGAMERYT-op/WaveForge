@@ -14,22 +14,24 @@
             const freqData = data.freq;
             const t = engine.nowSec();
             const sens = engine.config.sensitivity;
+            const resScale = Math.max(0.6, Math.min(w, h) / 500);
+            const bloomMul = (typeof engine.config.bloomIntensity === 'number' ? engine.config.bloomIntensity : 60) / 60;
 
             let bass = 0;
             for (let i = 0; i < 16; i++) bass += freqData[i];
             bass = (bass / 16) / 255;
 
             const pointsCount = 96;
-            const step = Math.floor(waveData.length / pointsCount);
+            const step = Math.max(1, Math.floor(waveData.length / pointsCount));
 
             ctx.save();
             ctx.globalCompositeOperation = 'lighter';
 
             const layers = [
-                { phase: 0, ampMul: 1.0, width: isBeat ? 4.2 : 3.0, alpha: 0.95, colorIdx: 0, fill: true },
-                { phase: 0.8, ampMul: 0.72, width: 2.2, alpha: 0.65, colorIdx: 1, fill: false },
-                { phase: -1.1, ampMul: 0.52, width: 1.6, alpha: 0.45, colorIdx: 2, fill: false },
-                { phase: 2.1, ampMul: 0.35, width: 1.2, alpha: 0.3, colorIdx: 3, fill: false }
+                { phase: 0, ampMul: 1.0, width: (isBeat ? 4.2 : 3.0) * resScale, alpha: 0.95, colorIdx: 0, fill: true },
+                { phase: 0.8, ampMul: 0.72, width: 2.2 * resScale, alpha: 0.65, colorIdx: 1, fill: false },
+                { phase: -1.1, ampMul: 0.52, width: 1.6 * resScale, alpha: 0.45, colorIdx: 2, fill: false },
+                { phase: 2.1, ampMul: 0.35, width: 1.2 * resScale, alpha: 0.3, colorIdx: 3, fill: false }
             ];
 
             layers.forEach((layer) => {
@@ -59,7 +61,7 @@
                 ctx.strokeStyle = col;
                 ctx.lineWidth = layer.width;
                 ctx.globalAlpha = layer.alpha;
-                ctx.shadowBlur = isBeat ? 24 : 12;
+                ctx.shadowBlur = (isBeat ? 24 : 12) * resScale * Math.max(0.2, bloomMul);
                 ctx.shadowColor = col;
                 ctx.stroke();
 
@@ -92,7 +94,7 @@
                     else ctx.lineTo(normX * w, y);
                 }
                 ctx.strokeStyle = engine.getColor(1);
-                ctx.lineWidth = 1.8;
+                ctx.lineWidth = 1.8 * resScale;
                 ctx.stroke();
                 ctx.restore();
             }
