@@ -1,13 +1,11 @@
 /**
- * WaveForge Smart Monetization Engine (Adsterra Suite v3.1)
+ * WaveForge Smart Monetization Engine (Adsterra Suite v7.0)
  * Manages:
  *  1) 728x90 Leaderboard Iframe Banner (key: 6e949de951c462540634a8f7fc05c2a0)
  *  2) 320x50 Compact / Mobile Iframe Banner (key: 369cf7e8ac90c123416f83594ae3d7bf)
  *  3) Native Banner (bauval.org container-7d5620353411eac086d1a38c87043739)
  *  4) Social Bar (constellationexclusion.com 8bb5714d83e974564958f3578034c290)
  *  5) Direct Smartlink Sponsor Slot (https://araplhn.org/4/f28b978e066eac35ed88538faa37500f)
- *
- * 100% transparent ad labeling — no fake gifts or misleading reward buttons.
  */
 (function () {
     'use strict';
@@ -134,11 +132,6 @@
         }
     }
 
-    function maybeTriggerExportSmartlink() {
-        // Disabled automatic pop-under on export so users are never surprised by unexpected tabs
-        return false;
-    }
-
     function injectSocialBar(delayMs) {
         setTimeout(() => {
             if (document.querySelector('script[data-wf-socialbar]')) return;
@@ -156,7 +149,6 @@
         initDeclarativeSlots,
         startModalAdRefresh,
         stopModalAdRefresh,
-        maybeTriggerExportSmartlink,
         injectSocialBar
     };
 

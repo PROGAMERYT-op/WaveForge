@@ -1,6 +1,5 @@
 /*
  * WaveForge — Quantum Constellation & Vortex Field mode (mode 3)
- * Reactive particle field with dynamic Plexus neural connections and bass vortex physics.
  */
 (function (registry) {
     'use strict';
@@ -21,7 +20,6 @@
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
 
-        // Center vortex aura
         const aura = ctx.createRadialGradient(cx, cy, 10, cx, cy, Math.min(w, h) * (0.35 + bass * 0.25));
         aura.addColorStop(0, pList[0] + '26');
         aura.addColorStop(0.6, pList[1 % pList.length] + '0c');
@@ -29,11 +27,9 @@
         ctx.fillStyle = aura;
         ctx.fillRect(0, 0, w, h);
 
-        // Update positions & compute screen coords
         const screenCoords = new Array(pts.length);
         for (let idx = 0; idx < pts.length; idx++) {
             const p = pts[idx];
-            // Add subtle orbital tangential drift around center
             const dx = p.x - engine.width / 2;
             const dy = p.y - engine.height / 2;
             const dist = Math.max(40, Math.hypot(dx, dy));
@@ -57,7 +53,6 @@
             screenCoords[idx] = { x: sx, y: sy, r, col, fVal };
         }
 
-        // Draw Plexus constellation filaments between nearby particles
         ctx.lineWidth = Math.max(0.8, 1.1 * minScale);
         for (let i = 0; i < screenCoords.length; i += 2) {
             const a = screenCoords[i];
@@ -78,7 +73,6 @@
             }
         }
 
-        // Draw luminous nodes
         for (let i = 0; i < screenCoords.length; i++) {
             const sc = screenCoords[i];
             ctx.beginPath();

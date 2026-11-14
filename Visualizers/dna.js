@@ -1,6 +1,5 @@
 /*
  * WaveForge — 3D Quantum Double Helix mode (mode 6)
- * Depth-sorted 3D molecular double helix with glowing base-pair rungs and perspective spheres.
  */
 (function (registry) {
     'use strict';
@@ -35,7 +34,7 @@
                 const ang = phase + i * 0.19;
 
                 const sinA = Math.sin(ang);
-                const cosA = Math.cos(ang); // z-depth (-1 to +1)
+                const cosA = Math.cos(ang);
                 const r = amplitude * (0.45 + freqVal * 0.55);
 
                 const x1 = sinA * r;
@@ -43,7 +42,6 @@
                 const x2 = -sinA * r;
                 const z2 = -cosA;
 
-                // Base-pair connecting rung
                 ctx.beginPath();
                 ctx.moveTo(x1, y);
                 ctx.lineTo(x2, y);
@@ -51,7 +49,6 @@
                 ctx.lineWidth = 1.5 + freqVal * 1.5;
                 ctx.stroke();
 
-                // Depth-sort nucleotides so back sphere draws before front sphere
                 const nodes = [
                     { x: x1, z: z1, col: engine.getColor(0) },
                     { x: x2, z: z2, col: engine.getColor(1) }

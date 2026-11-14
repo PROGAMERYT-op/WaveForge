@@ -20,7 +20,6 @@
             for (let i = 0; i < 16; i++) bass += freqData[i];
             bass = (bass / 16) / 255;
 
-            // Subtle center sub-bass radial aura
             const auraR = Math.min(w, h) * (0.35 + bass * 0.22);
             const aura = ctx.createRadialGradient(cx, cy, 10, cx, cy, auraR);
             aura.addColorStop(0, engine.getColor(0) + '28');
@@ -77,17 +76,14 @@
                 const xL = cx - (i + 1) * step + (step - barW) / 2;
                 const topY = baseY - bh;
 
-                // Upward frequency bars
                 ctx.fillStyle = mainGrad;
                 drawCapsule(xR, topY, barW, bh, 4);
                 drawCapsule(xL, topY, barW, bh, 4);
 
-                // Downward reflection bars
                 ctx.fillStyle = reflGrad;
                 drawCapsule(xR, baseY + 3, barW, bh * 0.34, 3);
                 drawCapsule(xL, baseY + 3, barW, bh * 0.34, 3);
 
-                // Peak-hold cap
                 const pk = Math.max(bh, peaks.bars[i] - fall);
                 peaks.bars[i] = pk;
                 if (pk > bh + 3) {

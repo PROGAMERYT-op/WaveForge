@@ -1,6 +1,5 @@
 /*
  * WaveForge — Bass Nation Ring mode (mode 10)
- * Multi-layered harmonic bass ring with shockwaves, dual mirrored spectrum, and floating embers.
  */
 (function (registry) {
     'use strict';
@@ -21,11 +20,6 @@
             for (let i = 0; i < 18; i++) bass += freqData[i];
             bass = (bass / 18) / 255;
 
-            let mid = 0;
-            for (let i = 18; i < 90; i++) mid += freqData[i];
-            mid = (mid / 72) / 255;
-
-            // Maintain shockwave rings on beats
             if (!state.shockwaves) state.shockwaves = [];
             if (isBeat && state.shockwaves.length < 6) {
                 state.shockwaves.push({ r: 1, alpha: 0.85, color: engine.getColor(Math.floor(t * 2) % engine.palette.length) });
@@ -38,7 +32,6 @@
             ctx.save();
             ctx.translate(cx + jitterX, cy + jitterY);
 
-            // Background radial aura
             const aura = ctx.createRadialGradient(0, 0, baseR * 0.4, 0, 0, baseR * 2.5);
             aura.addColorStop(0, engine.getColor(0) + '44');
             aura.addColorStop(0.5, engine.getColor(1) + '18');
@@ -48,7 +41,6 @@
             ctx.arc(0, 0, baseR * 2.5, 0, Math.PI * 2);
             ctx.fill();
 
-            // Render expanding beat shockwaves
             for (let i = state.shockwaves.length - 1; i >= 0; i--) {
                 const sw = state.shockwaves[i];
                 sw.r += (4.5 + bass * 8);
@@ -66,18 +58,16 @@
             }
             ctx.globalAlpha = 1;
 
-            // Draw 3 layered harmonic smooth spectrum waves around the circle
             const points = 128;
             const layers = [
-                { mul: 1.0, colorIdx: 0, alpha: 0.9, fill: false, width: 3.5 },
-                { mul: 0.72, colorIdx: 1, alpha: 0.65, fill: false, width: 2.2 },
-                { mul: 1.28, colorIdx: 2, alpha: 0.4, fill: false, width: 1.6 }
+                { mul: 1.0, colorIdx: 0, alpha: 0.9, width: 3.5 },
+                { mul: 0.72, colorIdx: 1, alpha: 0.65, width: 2.2 },
+                { mul: 1.28, colorIdx: 2, alpha: 0.4, width: 1.6 }
             ];
 
             layers.forEach((layer, lIdx) => {
                 ctx.beginPath();
                 for (let i = 0; i <= points; i++) {
-                    // Symmetrical mirrored index around the circle
                     const half = points / 2;
                     const mirrorIdx = i <= half ? i : points - i;
                     const fIdx = Math.floor((mirrorIdx / half) * (freqData.length * 0.45));
@@ -94,13 +84,9 @@
                 ctx.strokeStyle = col;
                 ctx.lineWidth = layer.width + (isBeat ? 1.2 : 0);
                 ctx.globalAlpha = layer.alpha;
-                ctx.shadowBlur = isBeat ? 24 : 12;
-                ctx.shadowColor = col;
                 ctx.stroke();
             });
 
-            // Inner dark disc + pulsing emblem
-            ctx.shadowBlur = 0;
             ctx.globalAlpha = 1;
             ctx.beginPath();
             ctx.arc(0, 0, baseR * 0.92, 0, Math.PI * 2);
@@ -110,7 +96,6 @@
             ctx.strokeStyle = engine.getColor(0);
             ctx.stroke();
 
-            // Center emblem bars
             const miniBars = 9;
             const totalW = baseR * 0.85;
             const bw = (totalW / miniBars) * 0.58;

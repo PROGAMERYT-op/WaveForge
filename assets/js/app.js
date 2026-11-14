@@ -1,14 +1,169 @@
 /**
- * WaveForge Music Visualizer v3.0
- * Professional audio visualization studio with 12 modes, 3-band EQ,
- * social aspect ratios (16:9, 9:16, 1:1, 4:5), on-canvas text overlays,
- * post-processing FX, shareable URL presets, and fast WebCodecs MP4 export.
- *
- * Rendering code for each mode lives in Visualizers/<mode>.js and registers
- * itself into window.WaveForgeVisualizers (see Visualizers/README.md).
+ * WaveForge Music Visualizer Studio v7.0
+ * Features:
+ *  - 13 Visualization Modes (including Mode 12: Hardtekk / Phonk Liquid Ring + AirPods Intro)
+ *  - 1-Click Trending Templates Hub (6 viral presets + 3-step guided workflow bar)
+ *  - 3-Band Hardware Equalizer, On-Canvas Typography, Post-FX & 4 Aspect Ratios
+ *  - Zero-Suspend Radix-2 FFT Turbo MP4 Export Engine
+ *  - 8-Second Ad-Timer + Instant Sponsor Unlock Download Gate
  */
 (function () {
     'use strict';
+
+    // ============================================
+    // TRENDING TEMPLATES REGISTRY (v7.0)
+    // ============================================
+    const TRENDING_TEMPLATES = [
+        {
+            id: 'hardtekk-mage',
+            name: 'Hardtekk Purple Mage',
+            tag: '🔥 EXACT VIDEO MATCH',
+            desc: '9:16 Vertical • AirPods 3.5s Volume Intro • Electric Purple Liquid Ring • Dark Mage Backdrop & Kick Zoom-Blur',
+            color: '#a855f7',
+            settings: {
+                mode: 12,
+                aspectRatio: '9:16',
+                waveColor: '#a855f7',
+                palette: 'synthwave',
+                phonkIntroEnabled: true,
+                phonkIntroDuration: 3.5,
+                phonkBgTheme: 'mage',
+                logoShakeIntensity: 18,
+                logoGlowSize: 42,
+                logoParticles: true,
+                eqBass: 8,
+                eqMid: 1,
+                eqTreble: 3,
+                sensitivity: 1.7,
+                fxVignette: true,
+                fxScanlines: false
+            }
+        },
+        {
+            id: 'brazilian-funk',
+            name: 'Brazilian Funk Toxic Green',
+            tag: '⚡ VIRAL REELS / TIKTOK',
+            desc: '9:16 Vertical • Toxic Emerald Liquid Plasma Ring • Heavy Sub-Bass Camera Shake & Radial Warp Sparks',
+            color: '#00ff88',
+            settings: {
+                mode: 12,
+                aspectRatio: '9:16',
+                waveColor: '#00ff88',
+                palette: 'trapneon',
+                phonkIntroEnabled: true,
+                phonkIntroDuration: 3.0,
+                phonkBgTheme: 'mage',
+                logoShakeIntensity: 22,
+                logoGlowSize: 45,
+                logoParticles: true,
+                eqBass: 10,
+                eqMid: 0,
+                eqTreble: 4,
+                sensitivity: 1.85,
+                fxVignette: true,
+                fxScanlines: false
+            }
+        },
+        {
+            id: 'drift-phonk-crimson',
+            name: 'Drift Phonk Blood Crimson',
+            tag: '🩸 PHONK EDIT',
+            desc: '9:16 Vertical • Crimson Neon Plasma Ring • CRT Retro Scanlines • Aggressive Kick-Drum Echo Trail',
+            color: '#ff0055',
+            settings: {
+                mode: 12,
+                aspectRatio: '9:16',
+                waveColor: '#ff0055',
+                palette: 'fire',
+                phonkIntroEnabled: true,
+                phonkIntroDuration: 3.5,
+                phonkBgTheme: 'drift',
+                logoShakeIntensity: 20,
+                logoGlowSize: 40,
+                logoParticles: true,
+                eqBass: 9,
+                eqMid: 2,
+                eqTreble: 2,
+                sensitivity: 1.75,
+                fxVignette: true,
+                fxScanlines: true
+            }
+        },
+        {
+            id: 'ultra-slowed-ice',
+            name: 'Ultra Slowed Glacier Cyan',
+            tag: '❄️ SLOWED + REVERB',
+            desc: '9:16 Vertical • Ice Cyan & White Liquid Ring • AirPods Volume Intro • Deep Atmospheric Sub-Bass Glow',
+            color: '#00f2ff',
+            settings: {
+                mode: 12,
+                aspectRatio: '9:16',
+                waveColor: '#00f2ff',
+                palette: 'cyberpunk',
+                phonkIntroEnabled: true,
+                phonkIntroDuration: 3.5,
+                phonkBgTheme: 'mage',
+                logoShakeIntensity: 14,
+                logoGlowSize: 48,
+                logoParticles: true,
+                eqBass: 7,
+                eqMid: -1,
+                eqTreble: 3,
+                sensitivity: 1.6,
+                fxVignette: true,
+                fxScanlines: false
+            }
+        },
+        {
+            id: 'golden-royalty',
+            name: 'Golden Phonk Royalty',
+            tag: '👑 24K GOLD',
+            desc: '9:16 Vertical • 24K Gold & White Plasma Ring • Crown Emblem • High-Contrast Luxury Vignette',
+            color: '#fbbf24',
+            settings: {
+                mode: 12,
+                aspectRatio: '9:16',
+                waveColor: '#fbbf24',
+                palette: 'gold',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
+                phonkBgTheme: 'mage',
+                logoShakeIntensity: 15,
+                logoGlowSize: 40,
+                logoParticles: true,
+                eqBass: 6,
+                eqMid: 1,
+                eqTreble: 2,
+                sensitivity: 1.65,
+                fxVignette: true,
+                fxScanlines: false
+            }
+        },
+        {
+            id: 'youtube-type-beat',
+            name: 'YouTube Type-Beat 16:9 Master',
+            tag: '📺 16:9 WIDESCREEN',
+            desc: '16:9 Widescreen • Classic Logo Visualizer with Drone Camera Pan, Radial Rays & Lower-Third Title',
+            color: '#6366f1',
+            settings: {
+                mode: 8,
+                aspectRatio: '16:9',
+                waveColor: '#00ff88',
+                palette: 'cyberpunk',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
+                logoShakeIntensity: 12,
+                logoGlowSize: 35,
+                logoParticles: true,
+                eqBass: 4,
+                eqMid: 1,
+                eqTreble: 2,
+                sensitivity: 1.5,
+                fxVignette: true,
+                fxScanlines: false
+            }
+        }
+    ];
 
     // ============================================
     // GLOBAL STATE & CONFIGURATION
@@ -16,8 +171,8 @@
 
     const APP_STATE = {
         isPlaying: false,
-        mode: 8,
-        modesCount: 12,
+        mode: 12,
+        modesCount: 13,
         lastTime: 0,
         fps: 0,
         frames: 0,
@@ -36,19 +191,23 @@
         shakeY: 0,
         shakeTrauma: 0,
         lastLogoT: 0,
+        lastPhonkT: 0,
+        phonkKickEnv: 0,
+        phonkSparks: null,
         bgImg: null,
         logoImg: null,
         logoAngle: 0,
         shockwaves: [],
-        // Fast-export driven render time (seconds). Null = use real wall-clock.
         exportTime: null,
-        // Set to true while a fast WebCodecs export is running
         isFastExporting: false,
         decodedAudioBuffer: null,
-        decodedAudioSrc: null
+        decodedAudioSrc: null,
+        activeTemplateId: 'hardtekk-mage',
+        pendingExportBlobUrl: null,
+        pendingExportFilename: null,
+        unlockTimerId: null
     };
 
-    // Visualization mode registry (populated by Visualizers/*.js)
     const VIS_MODS = window.WaveForgeVisualizers || {};
 
     function nowSec() {
@@ -62,45 +221,43 @@
         smoothing: 0.85,
         minDecibels: -90,
         maxDecibels: -10,
-        sensitivity: 1.5,
+        sensitivity: 1.65,
         bloomIntensity: 60,
         beatThreshold: 1.3,
         beatEnabled: true,
-        palette: 'cyberpunk',
+        palette: 'synthwave',
         highContrast: false,
         mirror: false,
         showFps: true,
-        waveColor: '#00ff88',
-        logoShakeIntensity: 10,
+        waveColor: '#a855f7',
+        logoShakeIntensity: 16,
         logoRayCount: 128,
         logoLineThickness: 2,
-        logoGlowSize: 35,
+        logoGlowSize: 40,
         logoParticles: true,
         logoRotateRing: false,
+        phonkIntroEnabled: true,
+        phonkIntroDuration: 3.5,
+        phonkBgTheme: 'mage',
         watermark: false,
         freqScale: 'log',
         hueCycle: false,
         hueCycleSpeed: 15,
-        // v3.0 — 3-Band Equalizer (dB)
-        eqBass: 0,
+        eqBass: 6,
         eqMid: 0,
-        eqTreble: 0,
-        // v3.0 — On-Canvas Text & Artist Overlay
+        eqTreble: 2,
         overlayTitle: '',
         overlayArtist: '',
         overlayPosition: 'bottom-left',
         overlayBeatPulse: true,
-        // v3.0 — Post-FX & Aspect Ratio
         fxScanlines: false,
-        fxVignette: false,
+        fxVignette: true,
         fxProgressBar: true,
-        aspectRatio: '16:9'
+        aspectRatio: '9:16'
     };
 
-    // Snapshot for "Reset to Defaults" (captured before localStorage hydration)
     const DEFAULT_CONFIG = JSON.parse(JSON.stringify(CONFIG));
 
-    // --- Hue-cycling helpers (rotate palette colors in HSL space) ---
     function hexToHsl(hex) {
         const r = parseInt(hex.slice(1, 3), 16) / 255;
         const g = parseInt(hex.slice(3, 5), 16) / 255;
@@ -151,22 +308,18 @@
         gold: ['#bf953f', '#fcf6ba', '#b38728', '#aa771c'],
         sunset: ['#ff006e', '#fb5607', '#ffbe0b', '#8338ec'],
         arctic: ['#a8dadc', '#457b9d', '#1d3557', '#f1faee'],
-        synthwave: ['#ff2a85', '#00f5d4', '#fee440', '#9b5de5'],
+        synthwave: ['#a855f7', '#00f5d4', '#ff2a85', '#fee440'],
         trapneon: ['#00ff88', '#00c4ff', '#ff0055', '#ffffff'],
         vaporwave: ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff'],
         noir: ['#ffffff', '#cbd5e1', '#64748b', '#94a3b8']
     };
 
-    // ============================================
-    // SETTINGS PERSISTENCE & URL PRESET HYDRATION
-    // ============================================
-
-    const CONFIG_KEY = 'wf-config';
+    const CONFIG_KEY = 'wf-config-v7';
 
     function persistConfig() {
         try {
             localStorage.setItem(CONFIG_KEY, JSON.stringify({ config: CONFIG, mode: APP_STATE.mode }));
-        } catch (e) { /* storage unavailable */ }
+        } catch (e) {}
     }
 
     function hydrateConfig() {
@@ -177,11 +330,18 @@
                 if (data.config && typeof data.config === 'object') Object.assign(CONFIG, data.config);
                 if (typeof data.mode === 'number' && VIS_MODS[data.mode]) APP_STATE.mode = data.mode;
             }
-        } catch (e) { /* corrupted storage — start fresh */ }
+        } catch (e) {}
 
-        // Allow URL query parameters to override config (shareable preset links!)
         try {
             const params = new URLSearchParams(window.location.search);
+            if (params.has('template')) {
+                const tpl = TRENDING_TEMPLATES.find(t => t.id === params.get('template'));
+                if (tpl) {
+                    Object.assign(CONFIG, tpl.settings);
+                    APP_STATE.mode = tpl.settings.mode;
+                    APP_STATE.activeTemplateId = tpl.id;
+                }
+            }
             if (params.has('mode')) {
                 const m = parseInt(params.get('mode'), 10);
                 if (VIS_MODS[m]) APP_STATE.mode = m;
@@ -213,11 +373,9 @@
         persistConfig();
     }
 
-    // Compute pixel dimensions for any quality tier + aspect ratio
     function getExportDimensions(qualityTier, aspectRatio) {
         const baseShort = { '720': 720, '1080': 1080, '1440': 1440, '2160': 2160 }[String(qualityTier)] || 1080;
         const baseLong = { '720': 1280, '1080': 1920, '1440': 2560, '2160': 3840 }[String(qualityTier)] || 1920;
-        // H.264 requires even dimensions
         const even = (n) => Math.round(n / 2) * 2;
         switch (aspectRatio) {
             case '9:16':
@@ -244,7 +402,6 @@
             this.gainNode = this.ctx.createGain();
             this.destinationNode = this.ctx.createMediaStreamDestination();
 
-            // 3-Band EQ nodes
             this.bassFilter = this.ctx.createBiquadFilter();
             this.bassFilter.type = 'lowshelf';
             this.bassFilter.frequency.value = 110;
@@ -260,21 +417,21 @@
 
             this.analyser.fftSize = CONFIG.fftSize;
             this.analyser.smoothingTimeConstant = CONFIG.smoothing;
-            this.gainNode.gain.value = Math.min(parseFloat(document.getElementById('vol-slider').value) || 0.8, 1);
+            const volEl = document.getElementById('vol-slider');
+            this.gainNode.gain.value = Math.min(parseFloat(volEl ? volEl.value : 0.8) || 0.8, 1);
 
             this.micSource = null;
             this.audioElement = new Audio();
             this.audioElement.crossOrigin = 'anonymous';
+            window.__wfAudioElement = this.audioElement;
 
             this.sourceNode = this.ctx.createMediaElementSource(this.audioElement);
-            // Signal chain: source -> bass -> mid -> treble -> analyser -> gain -> speakers
             this.sourceNode.connect(this.bassFilter);
             this.bassFilter.connect(this.midFilter);
             this.midFilter.connect(this.trebleFilter);
             this.trebleFilter.connect(this.analyser);
             this.analyser.connect(this.gainNode);
             this.gainNode.connect(this.ctx.destination);
-            // Recording stream taps analyser directly
             this.analyser.connect(this.destinationNode);
 
             this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
@@ -307,10 +464,11 @@
             if (this.fileURL && this.fileURL !== url) URL.revokeObjectURL(this.fileURL);
             this.fileURL = url;
             this.audioElement.src = url;
+            this.audioElement.currentTime = 0;
             this.audioElement.play().then(() => {
                 APP_STATE.isPlaying = true;
                 UI.updatePlayButton();
-                UI.showToast('Audio loaded successfully', 'success');
+                UI.showToast('🎵 Audio playing — ready to customize or export!', 'success');
             }).catch(e => {
                 UI.showToast('Error: ' + e.message, 'error');
             });
@@ -379,10 +537,10 @@
         updateSettings() {
             this.analyser.fftSize = CONFIG.fftSize;
             this.analyser.smoothingTimeConstant = CONFIG.smoothing;
-            const vol = Math.min(parseFloat(document.getElementById('vol-slider').value) || 0.8, 1);
+            const volEl = document.getElementById('vol-slider');
+            const vol = Math.min(parseFloat(volEl ? volEl.value : 0.8) || 0.8, 1);
             this.gainNode.gain.value = vol;
 
-            // Update 3-band EQ
             this.bassFilter.gain.value = Number(CONFIG.eqBass) || 0;
             this.midFilter.gain.value = Number(CONFIG.eqMid) || 0;
             this.trebleFilter.gain.value = Number(CONFIG.eqTreble) || 0;
@@ -467,7 +625,7 @@
     };
 
     // ============================================
-    // VIDEO EXPORTER
+    // VIDEO EXPORTER + 8-SECOND AD-TIMER UNLOCK GATE
     // ============================================
 
     const Exporter = {
@@ -479,6 +637,24 @@
             document.getElementById('btn-start-export').onclick = () => this.startRecording();
             document.getElementById('btn-cancel-export').onclick = () => this.stop();
 
+            const unlockSponsorBtn = document.getElementById('btn-unlock-sponsor');
+            if (unlockSponsorBtn) {
+                unlockSponsorBtn.onclick = () => {
+                    if (window.WaveForgeAds && window.WaveForgeAds.config.smartlink) {
+                        window.open(window.WaveForgeAds.config.smartlink, '_blank', 'noopener,noreferrer');
+                    }
+                    this.triggerFinalDownload();
+                };
+            }
+
+            const downloadReadyBtn = document.getElementById('btn-download-ready');
+            if (downloadReadyBtn) {
+                downloadReadyBtn.onclick = () => {
+                    if (downloadReadyBtn.disabled) return;
+                    this.triggerFinalDownload();
+                };
+            }
+
             document.querySelectorAll('.export-option').forEach(opt => {
                 opt.addEventListener('click', () => {
                     document.querySelectorAll('.export-option').forEach(o => o.classList.remove('selected'));
@@ -488,7 +664,7 @@
 
             const aspectSelect = document.getElementById('export-aspect');
             if (aspectSelect) {
-                aspectSelect.value = CONFIG.aspectRatio || '16:9';
+                aspectSelect.value = CONFIG.aspectRatio || '9:16';
                 aspectSelect.addEventListener('change', (e) => {
                     CONFIG.aspectRatio = e.target.value;
                     const sAspect = document.getElementById('set-aspect');
@@ -496,6 +672,91 @@
                     persistConfig();
                 });
             }
+        },
+
+        _clearUnlockGate() {
+            if (APP_STATE.unlockTimerId) {
+                clearInterval(APP_STATE.unlockTimerId);
+                APP_STATE.unlockTimerId = null;
+            }
+            const gate = document.getElementById('export-unlock-gate');
+            if (gate) gate.classList.add('hidden');
+            const startBtn = document.getElementById('btn-start-export');
+            if (startBtn) startBtn.style.display = 'inline-flex';
+        },
+
+        _presentAdUnlockGate(blobUrl, filename, summaryText) {
+            if (APP_STATE.pendingExportBlobUrl) {
+                try { URL.revokeObjectURL(APP_STATE.pendingExportBlobUrl); } catch (e) {}
+            }
+            APP_STATE.pendingExportBlobUrl = blobUrl;
+            APP_STATE.pendingExportFilename = filename;
+
+            document.getElementById('btn-start-export').style.display = 'none';
+            document.getElementById('btn-cancel-export').style.display = 'none';
+            document.getElementById('export-progress').classList.remove('active');
+
+            const gate = document.getElementById('export-unlock-gate');
+            const summaryEl = document.getElementById('unlock-gate-summary');
+            const dlBtn = document.getElementById('btn-download-ready');
+            const timerFill = document.getElementById('unlock-timer-fill');
+            if (!gate || !dlBtn) {
+                this.triggerFinalDownload();
+                return;
+            }
+
+            if (summaryEl) summaryEl.textContent = summaryText || '✅ Your video is rendered and ready!';
+            gate.classList.remove('hidden');
+
+            // Refresh modal ad banner right when user enters the 8-second unlock gate
+            if (window.WaveForgeAds) {
+                window.WaveForgeAds.mountResponsiveBanner(document.getElementById('export-ad-slot'), { compact: true, eager: true });
+            }
+
+            let secondsLeft = 8;
+            dlBtn.disabled = true;
+            dlBtn.innerHTML = `<span>⏳ Viewing Sponsor Ad... (${secondsLeft}s)</span>`;
+            if (timerFill) timerFill.style.width = '0%';
+
+            if (APP_STATE.unlockTimerId) clearInterval(APP_STATE.unlockTimerId);
+            APP_STATE.unlockTimerId = setInterval(() => {
+                secondsLeft--;
+                const pct = Math.min(100, ((8 - secondsLeft) / 8) * 100);
+                if (timerFill) timerFill.style.width = pct + '%';
+
+                if (secondsLeft <= 0) {
+                    clearInterval(APP_STATE.unlockTimerId);
+                    APP_STATE.unlockTimerId = null;
+                    dlBtn.disabled = false;
+                    dlBtn.innerHTML = '<span>⬇️ Download Video Now (Unlocked)</span>';
+                    UI.showToast('🔓 Video download unlocked!', 'success');
+                } else {
+                    dlBtn.innerHTML = `<span>⏳ Viewing Sponsor Ad... (${secondsLeft}s)</span>`;
+                }
+            }, 1000);
+        },
+
+        triggerFinalDownload() {
+            if (!APP_STATE.pendingExportBlobUrl) return;
+            if (APP_STATE.unlockTimerId) {
+                clearInterval(APP_STATE.unlockTimerId);
+                APP_STATE.unlockTimerId = null;
+            }
+            const a = document.createElement('a');
+            a.href = APP_STATE.pendingExportBlobUrl;
+            a.download = APP_STATE.pendingExportFilename || `waveforge_${Date.now()}.mp4`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            const urlToRevoke = APP_STATE.pendingExportBlobUrl;
+            setTimeout(() => { try { URL.revokeObjectURL(urlToRevoke); } catch (e) {} }, 60000);
+            APP_STATE.pendingExportBlobUrl = null;
+            APP_STATE.pendingExportFilename = null;
+
+            UI.showToast('🎉 Downloading your video!', 'success');
+            this._clearUnlockGate();
+            this.hideModal();
         },
 
         _hasFastExportApis() {
@@ -509,17 +770,15 @@
         },
 
         _videoCodecCandidates: [
-            // Baseline & Main profiles encode 3x-5x faster on mobile hardware MediaCodec ASICs
-            'avc1.42E028', // Constrained Baseline @ L4.0
-            'avc1.4D4028', // Main @ L4.0
-            'avc1.640028', // High @ L4.0 (1080p60)
-            'avc1.640032', // High @ L5.0
-            'avc1.640033', // High @ L5.1 (4K30)
-            'avc1.640034'  // High @ L5.2 (4K60)
+            'avc1.42E028',
+            'avc1.4D4028',
+            'avc1.640028',
+            'avc1.640032',
+            'avc1.640033',
+            'avc1.640034'
         ],
 
         async _pickVideoCodec(width, height, fps, bitrate) {
-            // Try hardware-accelerated realtime config first for maximum mobile & desktop speed
             const accelModes = ['prefer-hardware', 'no-preference'];
             for (const hardwareAcceleration of accelModes) {
                 for (const codec of this._videoCodecCandidates) {
@@ -536,7 +795,7 @@
                         };
                         const support = await VideoEncoder.isConfigSupported(cfg);
                         if (support && support.supported) return support.config;
-                    } catch (e) { /* keep trying */ }
+                    } catch (e) {}
                 }
             }
             return null;
@@ -547,13 +806,13 @@
                 const cfg = { codec: 'mp4a.40.2', sampleRate, numberOfChannels: channels, bitrate: 192000 };
                 const support = await AudioEncoder.isConfigSupported(cfg);
                 if (support && support.supported) return support.config;
-            } catch (e) { /* unsupported */ }
+            } catch (e) {}
             return null;
         },
 
         async _checkFastExportSupport() {
             if (!this._hasFastExportApis()) return { supported: false, reason: 'apis' };
-            const v = await this._pickVideoCodec(1280, 720, 30, 6_000_000);
+            const v = await this._pickVideoCodec(720, 1280, 30, 5_000_000) || await this._pickVideoCodec(1280, 720, 30, 5_000_000);
             if (!v) return { supported: false, reason: 'video-codec' };
             const a = await this._pickAudioCodec(48000, 2);
             if (!a) return { supported: false, reason: 'audio-codec' };
@@ -565,12 +824,12 @@
             if (!note) return;
             const result = await this._checkFastExportSupport().catch(() => ({ supported: false }));
             if (result.supported) {
-                note.textContent = '⚡ Turbo Zero-Suspend Engine active — hardware H.264 MP4 + Radix-2 FFT (optimized for mobile & desktop).';
+                note.textContent = '⚡ Turbo Zero-Suspend Engine active — hardware H.264 MP4 + Radix-2 FFT.';
                 note.style.background = 'rgba(16, 185, 129, 0.08)';
                 note.style.color = '#34d399';
                 note.style.borderColor = 'rgba(16, 185, 129, 0.25)';
             } else {
-                note.textContent = '⏺ Realtime recording (your browser doesn\'t support WebCodecs). Output: WebM.';
+                note.textContent = '⏺ Realtime recording (WebM).';
                 note.style.background = 'rgba(255, 200, 80, 0.08)';
                 note.style.color = '#ffc850';
                 note.style.borderColor = 'rgba(255, 200, 80, 0.25)';
@@ -579,10 +838,10 @@
 
         showModal() {
             if (!audio.hasAudio()) {
-                UI.showToast('Please load an audio file or click Demo first', 'warning');
-                return;
+                UI.showToast('Loading built-in demo track so you can test export...', 'info');
+                UI.loadDemoTrack();
             }
-            // Smart mobile optimization: default to 30 FPS & 720p/1080p on touch devices if not manually changed
+            this._clearUnlockGate();
             const isMobileDevice = window.innerWidth < 820 || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
             if (isMobileDevice && !this._mobileDefaultApplied) {
                 this._mobileDefaultApplied = true;
@@ -596,7 +855,7 @@
                 }
             }
             const aspectSelect = document.getElementById('export-aspect');
-            if (aspectSelect) aspectSelect.value = CONFIG.aspectRatio || '16:9';
+            if (aspectSelect) aspectSelect.value = CONFIG.aspectRatio || '9:16';
             document.getElementById('export-modal').classList.add('open');
             this._refreshEngineNote();
             if (window.WaveForgeAds) {
@@ -607,6 +866,7 @@
 
         hideModal() {
             if (APP_STATE.isRecording) return;
+            this._clearUnlockGate();
             document.getElementById('export-modal').classList.remove('open');
             if (window.WaveForgeAds) {
                 window.WaveForgeAds.stopModalAdRefresh();
@@ -619,7 +879,6 @@
             return name.toLowerCase().replace(/\s+/g, '_');
         },
 
-        // Precompute Radix-2 Cooley-Tukey FFT tables for ultra-fast (<0.08ms/frame) zero-suspend analysis
         _createFastFftAnalyzer(fftSize) {
             const N = fftSize;
             const halfN = N >> 1;
@@ -632,7 +891,6 @@
             }
             const win = new Float32Array(N);
             for (let i = 0; i < N; i++) {
-                // Blackman window (matches Web Audio API AnalyserNode specification)
                 const a0 = 0.42, a1 = 0.5, a2 = 0.08;
                 const w = 2 * Math.PI * i / (N - 1);
                 win[i] = a0 - a1 * Math.cos(w) + a2 * Math.cos(2 * w);
@@ -655,7 +913,6 @@
             return {
                 extractFrame(monoPcm, sampleIndex, smoothing, freqOut, waveOut) {
                     const pcmLen = monoPcm.length;
-                    // 1. Time-domain wave + windowed bit-reversed FFT input
                     for (let i = 0; i < N; i++) {
                         const idx = sampleIndex + i;
                         const s = (idx >= 0 && idx < pcmLen) ? monoPcm[idx] : 0;
@@ -665,7 +922,6 @@
                         re[rev[i]] = s * win[i];
                         im[rev[i]] = 0;
                     }
-                    // 2. In-place Radix-2 Cooley-Tukey FFT
                     for (let size = 2; size <= N; size <<= 1) {
                         const half = size >> 1;
                         const step = N / size;
@@ -681,7 +937,6 @@
                             }
                         }
                     }
-                    // 3. Magnitude EMA smoothing + dB to Uint8 mapping (exact Web Audio AnalyserNode formula)
                     const outBins = Math.min(halfN, freqOut.length);
                     for (let i = 0; i < outBins; i++) {
                         const mag = Math.hypot(re[i], im[i]) * invN;
@@ -697,6 +952,7 @@
 
         async startRecording() {
             if (APP_STATE.isRecording) return;
+            this._clearUnlockGate();
 
             const aspectSelect = document.getElementById('export-aspect');
             if (aspectSelect) {
@@ -830,11 +1086,6 @@
             document.getElementById('status-text').textContent = 'Processing...';
         },
 
-        // ============================================
-        // TURBO ZERO-SUSPEND FAST EXPORT (v5.1)
-        // Eliminates the 10,800 OfflineAudioContext.suspend() thread locks and
-        // disables slow mobile Canvas2D Gaussian shadowBlur during encoding!
-        // ============================================
         async startFastExport() {
             const quality = document.querySelector('input[name="export-quality"]:checked').value;
             const durationSetting = document.getElementById('export-duration').value;
@@ -868,7 +1119,8 @@
             const audioCfg = await this._pickAudioCodec(decoded.sampleRate, Math.min(2, decoded.numberOfChannels));
             if (!audioCfg) throw new Error('No supported AAC encoder for ' + decoded.sampleRate + 'Hz');
 
-            const startTime = audio.getCurrentTime();
+            // If Phonk Intro is enabled, start export from 0:00 so the 3.5s AirPods Intro is captured!
+            const startTime = (APP_STATE.mode === 12 && CONFIG.phonkIntroEnabled) ? 0 : audio.getCurrentTime();
             let clipDuration = decoded.duration - startTime;
             if (durationSetting !== 'full') clipDuration = Math.min(clipDuration, parseInt(durationSetting));
             if (clipDuration <= 0.05) throw new Error('Nothing to export from current position');
@@ -892,7 +1144,6 @@
 
             const savedState = this._saveAndResetVizState();
 
-            // ---------- STEP 1: Uninterrupted Offline Audio EQ Render (~0.1s total!) ----------
             this._setStatus('Pre-rendering 3-band EQ audio…', 2);
             const numChannels = Math.min(2, decoded.numberOfChannels);
             let audioBuffer;
@@ -927,14 +1178,12 @@
                 offTreble.connect(offlineCtx.destination);
                 offlineSrc.start(0, startTime, clipDuration);
 
-                // Single uninterrupted render (ZERO suspend calls!)
                 audioBuffer = await offlineCtx.startRendering();
             } catch (err) {
                 this._abortFastExport(savedState, null, null, wasPlaying);
                 throw err;
             }
 
-            // Downmix to mono Float32Array for instant Radix-2 FFT slicing
             const sampleRate = audioBuffer.sampleRate;
             const totalSamples = audioBuffer.length;
             const monoPcm = new Float32Array(totalSamples);
@@ -948,7 +1197,6 @@
                 }
             }
 
-            // ---------- STEP 2: Configure Muxer + Hardware Encoders ----------
             const muxer = new Mp4Muxer.Muxer({
                 target: new Mp4Muxer.ArrayBufferTarget(),
                 video: { codec: 'avc', width, height, frameRate: fps },
@@ -970,13 +1218,11 @@
             });
             audioEncoder.configure(audioCfg);
 
-            // ---------- STEP 3: Offscreen / Desynchronized Render Canvas + ShadowBlur Bypass ----------
             const renderCanvas = document.createElement('canvas');
             renderCanvas.width = width;
             renderCanvas.height = height;
             const renderCtx = renderCanvas.getContext('2d', { alpha: false, desynchronized: true, willReadFrequently: false });
 
-            // Bypass slow mobile GPU Gaussian shadowBlur passes during video encoding (boosts mobile FPS 8x-15x!)
             try {
                 Object.defineProperty(renderCtx, 'shadowBlur', {
                     get() { return 0; },
@@ -988,7 +1234,6 @@
             APP_STATE.exportCanvas = renderCanvas;
             APP_STATE.exportCtx = renderCtx;
 
-            // Use 1024-pt FFT during export (maps into 256 visual bands via processData in <0.05ms/frame)
             const exportFftSize = Math.min(CONFIG.fftSize, 1024);
             const fftAnalyzer = this._createFastFftAnalyzer(exportFftSize);
             const freqArr = new Uint8Array(exportFftSize >> 1);
@@ -1000,7 +1245,6 @@
             const startWall = performance.now();
             let lastUiUpdateWall = startWall;
 
-            // Fast zero-delay micro-yield helper using MessageChannel (avoids 4ms-16ms setTimeout clamping on mobile)
             const fastYield = () => new Promise((resolve) => {
                 if (typeof MessageChannel !== 'undefined') {
                     const mc = new MessageChannel();
@@ -1011,7 +1255,6 @@
                 }
             });
 
-            // Wait for hardware encoder queue to drain without polling setTimeout(4)
             const waitForEncoderQueue = () => new Promise((resolve) => {
                 if (videoEncoder.encodeQueueSize <= 14 || this._cancelFast) {
                     resolve();
@@ -1028,7 +1271,6 @@
                 setTimeout(done, 12);
             });
 
-            // ---------- STEP 4: Tight Zero-Suspend Frame Encoding Loop ----------
             try {
                 for (let i = 0; i < totalFrames; i++) {
                     if (this._cancelFast || encodeError) break;
@@ -1052,7 +1294,6 @@
                         vf.close();
                     }
 
-                    // Respect hardware encoder backpressure via dequeue event
                     if (videoEncoder.encodeQueueSize > 14) {
                         await waitForEncoderQueue();
                     }
@@ -1083,7 +1324,6 @@
                 return;
             }
 
-            // ---------- STEP 5: Encode AAC Audio Track ----------
             this._setStatus('Muxing AAC audio…', 94);
 
             const chunkFrames = 4096;
@@ -1136,13 +1376,7 @@
 
             const blob = new Blob([buffer], { type: 'video/mp4' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.mp4`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 60_000);
+            const filename = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.mp4`;
 
             if (wasPlaying) {
                 try {
@@ -1152,14 +1386,15 @@
                 } catch (e) {}
             }
 
-            this._hideProgressUI();
             document.getElementById('status-dot').classList.remove('recording');
             document.getElementById('status-text').textContent = 'Ready';
 
             const totalElapsed = (performance.now() - startWall) / 1000;
             const speedX = clipDuration / Math.max(0.001, totalElapsed);
-            UI.showToast(`✅ Exported MP4 in ${totalElapsed.toFixed(1)}s (${speedX.toFixed(1)}× realtime)`, 'success');
-            this.hideModal();
+            const summaryText = `✅ MP4 Rendered in ${totalElapsed.toFixed(1)}s (${speedX.toFixed(1)}× speed) • ${width}×${height}`;
+
+            // Present the 8-Second Ad-Timer + Sponsor Smartlink Unlock Gate!
+            this._presentAdUnlockGate(url, filename, summaryText);
         },
 
         _abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying) {
@@ -1190,21 +1425,13 @@
                 shakeY: APP_STATE.shakeY,
                 shakeTrauma: APP_STATE.shakeTrauma,
                 lastLogoT: APP_STATE.lastLogoT,
+                lastPhonkT: APP_STATE.lastPhonkT,
+                phonkKickEnv: APP_STATE.phonkKickEnv,
                 logoAngle: APP_STATE.logoAngle,
                 helixAngle: APP_STATE.helixAngle,
                 galaxyAngle: APP_STATE.galaxyAngle,
                 spectrogram: APP_STATE.spectrogramData.slice(),
-                shockwaves: (APP_STATE.shockwaves || []).slice(),
-                bassFloorEMA: APP_STATE.bassFloorEMA,
-                bassEnvelope: APP_STATE.bassEnvelope,
-                lastBass: APP_STATE.lastBass,
-                logoIntensity: APP_STATE.logoIntensity,
-                shakePhaseX: APP_STATE.shakePhaseX,
-                shakePhaseY: APP_STATE.shakePhaseY,
-                dronePhaseX: APP_STATE.dronePhaseX,
-                dronePhaseY: APP_STATE.dronePhaseY,
-                dronePhaseZoom: APP_STATE.dronePhaseZoom,
-                dronePhaseSkew: APP_STATE.dronePhaseSkew
+                shockwaves: (APP_STATE.shockwaves || []).slice()
             };
             BeatDetector.history = [];
             BeatDetector.prevEnergy = 0;
@@ -1214,21 +1441,13 @@
             APP_STATE.shakeY = 0;
             APP_STATE.shakeTrauma = 0;
             APP_STATE.lastLogoT = 0;
+            APP_STATE.lastPhonkT = 0;
+            APP_STATE.phonkKickEnv = 0;
             APP_STATE.logoAngle = 0;
             APP_STATE.helixAngle = 0;
             APP_STATE.galaxyAngle = 0;
             APP_STATE.spectrogramData = [];
             APP_STATE.shockwaves = [];
-            APP_STATE.bassFloorEMA = undefined;
-            APP_STATE.bassEnvelope = undefined;
-            APP_STATE.lastBass = undefined;
-            APP_STATE.logoIntensity = undefined;
-            APP_STATE.shakePhaseX = undefined;
-            APP_STATE.shakePhaseY = undefined;
-            APP_STATE.dronePhaseX = undefined;
-            APP_STATE.dronePhaseY = undefined;
-            APP_STATE.dronePhaseZoom = undefined;
-            APP_STATE.dronePhaseSkew = undefined;
             return snap;
         },
 
@@ -1242,21 +1461,13 @@
             APP_STATE.shakeY = snap.shakeY;
             APP_STATE.shakeTrauma = snap.shakeTrauma;
             APP_STATE.lastLogoT = snap.lastLogoT;
+            APP_STATE.lastPhonkT = snap.lastPhonkT;
+            APP_STATE.phonkKickEnv = snap.phonkKickEnv;
             APP_STATE.logoAngle = snap.logoAngle;
             APP_STATE.helixAngle = snap.helixAngle;
             APP_STATE.galaxyAngle = snap.galaxyAngle;
             APP_STATE.spectrogramData = snap.spectrogram;
             APP_STATE.shockwaves = snap.shockwaves;
-            APP_STATE.bassFloorEMA = snap.bassFloorEMA;
-            APP_STATE.bassEnvelope = snap.bassEnvelope;
-            APP_STATE.lastBass = snap.lastBass;
-            APP_STATE.logoIntensity = snap.logoIntensity;
-            APP_STATE.shakePhaseX = snap.shakePhaseX;
-            APP_STATE.shakePhaseY = snap.shakePhaseY;
-            APP_STATE.dronePhaseX = snap.dronePhaseX;
-            APP_STATE.dronePhaseY = snap.dronePhaseY;
-            APP_STATE.dronePhaseZoom = snap.dronePhaseZoom;
-            APP_STATE.dronePhaseSkew = snap.dronePhaseSkew;
         },
 
         _showProgressUI() {
@@ -1265,7 +1476,7 @@
             document.getElementById('export-progress').classList.add('active');
         },
         _hideProgressUI() {
-            document.getElementById('btn-start-export').style.display = 'block';
+            document.getElementById('btn-start-export').style.display = 'inline-flex';
             document.getElementById('btn-cancel-export').style.display = 'none';
             document.getElementById('export-progress').classList.remove('active');
             document.getElementById('progress-fill').style.width = '0%';
@@ -1284,32 +1495,16 @@
         },
 
         finishRecording() {
-            document.getElementById('progress-status').textContent = 'Processing video...';
             const blob = new Blob(APP_STATE.recordedChunks, { type: 'video/webm' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.webm`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            const filename = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.webm`;
 
             APP_STATE.exportCanvas = null;
             APP_STATE.exportCtx = null;
             APP_STATE.recordedChunks = [];
-
-            document.getElementById('btn-start-export').style.display = 'block';
-            document.getElementById('btn-cancel-export').style.display = 'none';
-            document.getElementById('export-progress').classList.remove('active');
-            document.getElementById('progress-fill').style.width = '0%';
             document.getElementById('status-text').textContent = 'Ready';
 
-            UI.showToast('Video exported successfully!', 'success');
-            if (window.WaveForgeAds) {
-                window.WaveForgeAds.maybeTriggerExportSmartlink();
-            }
-            this.hideModal();
+            this._presentAdUnlockGate(url, filename, '✅ WebM Video Recorded & Ready to Download!');
         },
 
         formatTime(seconds) {
@@ -1332,7 +1527,6 @@
             const renderFn = mod.renderExport || mod.render;
             renderFn(viz, ctx, width, height, width / 2, height / 2, data, isBeat);
 
-            // Apply Post-FX, Text Overlay, and Progress Bar on Exports too!
             if (typeof viz !== 'undefined' && viz) {
                 const prog = typeof progressRatio === 'number'
                     ? progressRatio
@@ -1346,8 +1540,6 @@
                 ctx.font = `600 ${fs}px Inter, -apple-system, 'Segoe UI', sans-serif`;
                 ctx.textBaseline = 'bottom';
                 ctx.textAlign = 'right';
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-                ctx.shadowBlur = 6;
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
                 ctx.fillText('Made with WaveForge', width - Math.max(14, fs * 0.7), height - Math.max(12, fs * 0.6));
                 ctx.restore();
@@ -1464,7 +1656,6 @@
         }
 
         renderPostOverlays(ctx, w, h, isBeat, progressRatio, isExport) {
-            // 1. Cinema Vignette
             if (CONFIG.fxVignette) {
                 const vig = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.28, w / 2, h / 2, Math.max(w, h) * 0.72);
                 vig.addColorStop(0, 'rgba(0,0,0,0)');
@@ -1473,7 +1664,6 @@
                 ctx.fillRect(0, 0, w, h);
             }
 
-            // 2. CRT Scanlines
             if (CONFIG.fxScanlines) {
                 ctx.save();
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
@@ -1483,7 +1673,6 @@
                 ctx.restore();
             }
 
-            // 3. On-Canvas Track Title & Artist Overlay
             const title = (CONFIG.overlayTitle || '').trim();
             const artist = (CONFIG.overlayArtist || '').trim();
             if (title || artist) {
@@ -1531,7 +1720,6 @@
                 ctx.restore();
             }
 
-            // 4. On-Canvas Audio Progress Bar (at bottom edge of export or canvas)
             if (CONFIG.fxProgressBar && progressRatio > 0) {
                 const barH = Math.max(3, Math.round(h * 0.005));
                 ctx.save();
@@ -1545,28 +1733,27 @@
                 ctx.restore();
             }
 
-            // 5. Social Aspect Ratio Frame Guide (live preview only, when non-16:9 is selected)
             if (!isExport && CONFIG.aspectRatio && CONFIG.aspectRatio !== '16:9') {
                 const ratios = { '9:16': 9 / 16, '1:1': 1, '4:5': 4 / 5 };
                 const targetRatio = ratios[CONFIG.aspectRatio];
                 if (targetRatio) {
                     let fw = h * 0.82 * targetRatio;
                     let fh = h * 0.82;
-                    if (fw > w * 0.9) {
-                        fw = w * 0.9;
+                    if (fw > w * 0.92) {
+                        fw = w * 0.92;
                         fh = fw / targetRatio;
                     }
                     const fx = (w - fw) / 2;
                     const fy = (h - fh) / 2;
                     ctx.save();
-                    ctx.strokeStyle = 'rgba(129, 140, 248, 0.45)';
+                    ctx.strokeStyle = 'rgba(168, 85, 247, 0.45)';
                     ctx.lineWidth = 1.5;
                     ctx.setLineDash([6, 6]);
                     ctx.strokeRect(fx, fy, fw, fh);
                     ctx.setLineDash([]);
                     ctx.font = '600 11px Inter, sans-serif';
-                    ctx.fillStyle = 'rgba(129, 140, 248, 0.85)';
-                    ctx.fillText(`Export Crop Guide (${CONFIG.aspectRatio})`, fx + 8, fy + 16);
+                    ctx.fillStyle = 'rgba(168, 85, 247, 0.85)';
+                    ctx.fillText(`Export Frame (${CONFIG.aspectRatio})`, fx + 8, fy + 16);
                     ctx.restore();
                 }
             }
@@ -1584,7 +1771,8 @@
                 APP_STATE.frames = 0;
                 APP_STATE.lastTime = now;
                 if (CONFIG.showFps) {
-                    document.getElementById('fps-display').textContent = `${APP_STATE.fps} FPS`;
+                    const fpsEl = document.getElementById('fps-display');
+                    if (fpsEl) fpsEl.textContent = `${APP_STATE.fps} FPS`;
                 }
             }
 
@@ -1621,7 +1809,7 @@
     }
 
     // ============================================
-    // UI CONTROLLER
+    // UI CONTROLLER & TRENDING TEMPLATES ENGINE
     // ============================================
 
     const UI = {
@@ -1629,6 +1817,7 @@
 
         init() {
             this.cacheElements();
+            this.buildTemplatesGrid();
             this.buildModeGrid();
             this.buildExportModeOptions();
             this.bindEvents();
@@ -1652,6 +1841,7 @@
                 exportModal: document.getElementById('export-modal'),
                 shareModal: document.getElementById('share-modal'),
                 modeSelectorModal: document.getElementById('mode-selector-modal'),
+                templatesModal: document.getElementById('templates-modal'),
                 shortcutsModal: document.getElementById('shortcuts-modal'),
                 uiLayer: document.getElementById('ui-layer'),
                 modeName: document.getElementById('mode-name'),
@@ -1659,11 +1849,88 @@
             };
         },
 
+        buildTemplatesGrid() {
+            const grid = document.getElementById('templates-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            TRENDING_TEMPLATES.forEach((tpl) => {
+                const card = document.createElement('div');
+                card.className = 'template-card' + (APP_STATE.activeTemplateId === tpl.id ? ' active' : '');
+                card.dataset.templateId = tpl.id;
+                card.innerHTML = `
+                    <div class="tpl-preview" style="--tpl-color: ${tpl.color};">
+                        <div class="tpl-ring-demo"></div>
+                        <span class="tpl-badge">${tpl.tag}</span>
+                    </div>
+                    <div class="tpl-body">
+                        <h3>${tpl.name}</h3>
+                        <p>${tpl.desc}</p>
+                        <button type="button" class="tpl-use-btn">✨ Use This Template</button>
+                    </div>
+                `;
+                card.onclick = () => this.applyTemplate(tpl.id);
+                grid.appendChild(card);
+            });
+        },
+
+        applyTemplate(templateId) {
+            const tpl = TRENDING_TEMPLATES.find(t => t.id === templateId);
+            if (!tpl) return;
+
+            APP_STATE.activeTemplateId = tpl.id;
+            Object.assign(CONFIG, tpl.settings);
+            if (VIS_MODS[tpl.settings.mode]) {
+                APP_STATE.mode = tpl.settings.mode;
+            }
+
+            audio.updateSettings();
+            this.applyConfigToUI();
+            this.updateModeDisplay();
+            this.updateModeCards();
+            this.updateSliderLabels();
+            persistConfig();
+
+            document.querySelectorAll('.template-card').forEach(c => {
+                c.classList.toggle('active', c.dataset.templateId === tpl.id);
+            });
+
+            if (this.els.templatesModal) {
+                this.els.templatesModal.classList.remove('open');
+            }
+
+            // Show the 3-Step Guided Template Bar so user knows exactly what to upload next!
+            const wizardBar = document.getElementById('template-wizard-bar');
+            const wizardName = document.getElementById('wizard-template-name');
+            if (wizardBar) {
+                if (wizardName) wizardName.textContent = tpl.name;
+                wizardBar.classList.remove('hidden');
+            }
+
+            // Hide welcome card so user sees the live template immediately
+            const onboard = document.getElementById('studio-onboarding');
+            if (onboard) onboard.classList.add('hidden-card');
+
+            // Auto-start demo track if no audio is loaded yet so template comes alive!
+            if (!audio.hasAudio()) {
+                this.loadDemoTrack();
+            } else if (APP_STATE.mode === 12 && CONFIG.phonkIntroEnabled) {
+                // Restart track at 0:00 so user sees the 3.5s AirPods volume intro!
+                audio.audioElement.currentTime = 0;
+                if (audio.audioElement.paused) audio.togglePlay();
+            }
+
+            this.showToast(`🔥 Applied "${tpl.name}" template!`, 'success');
+        },
+
         buildModeGrid() {
             const grid = document.getElementById('mode-grid');
             if (!grid) return;
             grid.innerHTML = '';
-            Object.keys(VIS_MODS).sort((a, b) => parseInt(a) - parseInt(b)).forEach(key => {
+            // Put Mode 12 (Hardtekk Phonk) and Mode 8 (Logo Viz) right at the top!
+            const order = [12, 8, 10, 9, 11, 0, 1, 2, 3, 4, 5, 6, 7].filter(k => VIS_MODS[k]);
+
+            order.forEach(key => {
                 const mod = VIS_MODS[key];
                 const card = document.createElement('div');
                 card.className = 'mode-card' + (mod.newBadge ? ' new-badge' : '');
@@ -1684,14 +1951,8 @@
                 card.appendChild(desc);
                 card.onclick = () => {
                     setMode(parseInt(key));
-                    this.showToast(mod.name, 'info');
-                    setTimeout(() => this.closeModeSelector(), 260);
-                };
-                card.onkeydown = (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        card.click();
-                    }
+                    this.showToast(mod.icon + ' ' + mod.name, 'info');
+                    setTimeout(() => this.closeModeSelector(), 220);
                 };
                 grid.appendChild(card);
             });
@@ -1699,7 +1960,7 @@
             const qStrip = document.getElementById('quick-mode-strip');
             if (qStrip) {
                 qStrip.innerHTML = '';
-                Object.keys(VIS_MODS).sort((a, b) => parseInt(a) - parseInt(b)).forEach(key => {
+                order.forEach(key => {
                     const mod = VIS_MODS[key];
                     const pill = document.createElement('button');
                     pill.type = 'button';
@@ -1721,7 +1982,7 @@
             select.innerHTML = '';
             const current = document.createElement('option');
             current.value = 'current';
-            current.textContent = 'Current Mode';
+            current.textContent = 'Current Active Mode';
             select.appendChild(current);
             Object.keys(VIS_MODS).sort((a, b) => parseInt(a) - parseInt(b)).forEach(key => {
                 const mod = VIS_MODS[key];
@@ -1734,6 +1995,45 @@
 
         bindEvents() {
             document.getElementById('btn-upload').onclick = () => this.els.fileInput.click();
+            document.getElementById('btn-demo').onclick = () => this.loadDemoTrack();
+            document.getElementById('btn-random').onclick = () => this.randomizeVisual();
+
+            // Templates Modal triggers
+            const openTemplates = () => {
+                if (this.els.templatesModal) this.els.templatesModal.classList.add('open');
+            };
+            const closeTemplates = () => {
+                if (this.els.templatesModal) this.els.templatesModal.classList.remove('open');
+            };
+            ['btn-templates', 'dock-btn-templates', 'onboard-templates-btn'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.onclick = openTemplates;
+            });
+            const closeTplBtn = document.getElementById('btn-close-templates');
+            if (closeTplBtn) closeTplBtn.onclick = closeTemplates;
+            if (this.els.templatesModal) {
+                this.els.templatesModal.onclick = (e) => {
+                    if (e.target === this.els.templatesModal) closeTemplates();
+                };
+            }
+
+            // 3-Step Guided Wizard Bar buttons
+            const wizMusic = document.getElementById('wiz-btn-music');
+            if (wizMusic) wizMusic.onclick = () => this.els.fileInput.click();
+            const wizBg = document.getElementById('wiz-btn-bg');
+            if (wizBg) wizBg.onclick = () => document.getElementById('logo-bg-input').click();
+            const wizLogo = document.getElementById('wiz-btn-logo');
+            if (wizLogo) wizLogo.onclick = () => document.getElementById('logo-img-input').click();
+            const wizExport = document.getElementById('wiz-btn-export');
+            if (wizExport) wizExport.onclick = () => Exporter.showModal();
+            const wizClose = document.getElementById('wiz-btn-close');
+            if (wizClose) {
+                wizClose.onclick = () => {
+                    const bar = document.getElementById('template-wizard-bar');
+                    if (bar) bar.classList.add('hidden');
+                };
+            }
+
             const onboardClose = document.getElementById('onboard-close-btn');
             if (onboardClose) {
                 onboardClose.onclick = () => {
@@ -1745,40 +2045,16 @@
             if (onboardDemo) onboardDemo.onclick = () => this.loadDemoTrack();
             const onboardUpload = document.getElementById('onboard-upload-btn');
             if (onboardUpload) onboardUpload.onclick = () => this.els.fileInput.click();
-            const prevModeBtn = document.getElementById('btn-prev-mode');
-            if (prevModeBtn) {
-                prevModeBtn.onclick = () => {
-                    const keys = Object.keys(VIS_MODS).map(Number).sort((a, b) => a - b);
-                    const idx = keys.indexOf(APP_STATE.mode);
-                    const nextIdx = (idx - 1 + keys.length) % keys.length;
-                    setMode(keys[nextIdx]);
-                    this.showToast(VIS_MODS[keys[nextIdx]].name, 'info');
-                };
-            }
-            const nextModeBtn = document.getElementById('btn-next-mode');
-            if (nextModeBtn) {
-                nextModeBtn.onclick = () => {
-                    const keys = Object.keys(VIS_MODS).map(Number).sort((a, b) => a - b);
-                    const idx = keys.indexOf(APP_STATE.mode);
-                    const nextIdx = (idx + 1) % keys.length;
-                    setMode(keys[nextIdx]);
-                    this.showToast(VIS_MODS[keys[nextIdx]].name, 'info');
-                };
-            }
-            document.getElementById('btn-demo').onclick = () => this.loadDemoTrack();
-            document.getElementById('btn-random').onclick = () => this.randomizeVisual();
+
             this.els.fileInput.onchange = (e) => this.handleFile(e.target.files[0]);
             this.els.playBtn.onclick = () => audio.togglePlay();
             document.getElementById('btn-stop').onclick = () => audio.stop();
             document.getElementById('btn-mic').onclick = () => audio.enableMic();
 
-            document.getElementById('btn-mode').onclick = () => {
-                this.openModeSelector();
-            };
+            document.getElementById('btn-mode').onclick = () => this.openModeSelector();
             const topModePill = document.getElementById('top-mode-pill');
-            if (topModePill) {
-                topModePill.onclick = () => this.openModeSelector();
-            }
+            if (topModePill) topModePill.onclick = () => this.openModeSelector();
+
             document.querySelectorAll('.settings-tab').forEach((tabBtn) => {
                 tabBtn.addEventListener('click', () => {
                     const targetId = tabBtn.getAttribute('data-tab');
@@ -1792,10 +2068,7 @@
                 });
             });
 
-            document.getElementById('btn-close-mode-selector').onclick = () => {
-                this.closeModeSelector();
-            };
-
+            document.getElementById('btn-close-mode-selector').onclick = () => this.closeModeSelector();
             this.els.modeSelectorModal.onclick = (e) => {
                 if (e.target.id === 'mode-selector-modal') this.closeModeSelector();
             };
@@ -1832,10 +2105,8 @@
             };
 
             let hideTimeout;
-            const stickyAd = document.getElementById('app-sticky-ad');
             const revealUI = () => {
                 this.els.uiLayer.style.opacity = '1';
-                if (stickyAd) stickyAd.style.opacity = '1';
                 clearTimeout(hideTimeout);
             };
             document.addEventListener('pointermove', (e) => {
@@ -1844,9 +2115,8 @@
                 hideTimeout = setTimeout(() => {
                     if (APP_STATE.isPlaying && !this.settingsOpen && !APP_STATE.isRecording) {
                         this.els.uiLayer.style.opacity = '0';
-                        if (stickyAd) stickyAd.style.opacity = '0';
                     }
-                }, 3000);
+                }, 3200);
             });
             document.addEventListener('pointerdown', revealUI);
             document.addEventListener('touchstart', revealUI, { passive: true });
@@ -1870,21 +2140,20 @@
             params.set('mode', String(APP_STATE.mode));
             params.set('palette', CONFIG.palette);
             params.set('sens', String(CONFIG.sensitivity));
-            params.set('aspect', CONFIG.aspectRatio || '16:9');
+            params.set('aspect', CONFIG.aspectRatio || '9:16');
             if (CONFIG.overlayTitle) params.set('title', CONFIG.overlayTitle);
             if (CONFIG.overlayArtist) params.set('artist', CONFIG.overlayArtist);
             return `${base}?${params.toString()}`;
         },
 
         setupShare() {
-            const SHARE_TITLE = 'Check out my custom music visualizer preset on WaveForge (Free 4K Export)';
+            const SHARE_TITLE = 'Check out my custom Phonk/Music visualizer preset on WaveForge Studio!';
             const embed = (str) => encodeURIComponent(str);
 
             const openShare = () => {
                 const shareUrl = this.getShareablePresetUrl();
                 if (navigator.share) {
-                    navigator.share({ title: SHARE_TITLE, url: shareUrl })
-                        .catch(() => {});
+                    navigator.share({ title: SHARE_TITLE, url: shareUrl }).catch(() => {});
                     return;
                 }
                 const networks = {
@@ -1912,26 +2181,9 @@
                 const shareUrl = this.getShareablePresetUrl();
                 const done = () => this.showToast('Shareable preset link copied!', 'success');
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(shareUrl).then(done).catch(() => {
-                        this._fallbackCopy(shareUrl);
-                        done();
-                    });
-                } else {
-                    this._fallbackCopy(shareUrl);
-                    done();
+                    navigator.clipboard.writeText(shareUrl).then(done).catch(() => {});
                 }
             };
-        },
-
-        _fallbackCopy(text) {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            try { document.execCommand('copy'); } catch (e) {}
-            document.body.removeChild(ta);
         },
 
         setupDragDrop() {
@@ -1939,13 +2191,11 @@
                 e.preventDefault();
                 this.els.dropOverlay.style.display = 'flex';
             };
-
             window.ondragleave = (e) => {
                 if (e.relatedTarget === null) {
                     this.els.dropOverlay.style.display = 'none';
                 }
             };
-
             window.ondrop = (e) => {
                 e.preventDefault();
                 this.els.dropOverlay.style.display = 'none';
@@ -1970,29 +2220,14 @@
                     case 'KeyM':
                         UI.openModeSelector();
                         break;
+                    case 'KeyT':
+                        if (this.els.templatesModal) this.els.templatesModal.classList.toggle('open');
+                        break;
                     case 'KeyF':
                         document.getElementById('btn-fullscreen').click();
                         break;
                     case 'KeyR':
                         this.randomizeVisual();
-                        break;
-                    case 'BracketLeft':
-                        if (document.getElementById('btn-prev-mode')) document.getElementById('btn-prev-mode').click();
-                        break;
-                    case 'BracketRight':
-                        if (document.getElementById('btn-next-mode')) document.getElementById('btn-next-mode').click();
-                        break;
-                    case 'Digit1': case 'Digit2': case 'Digit3': case 'Digit4': case 'Digit5':
-                    case 'Digit6': case 'Digit7': case 'Digit8': case 'Digit9': {
-                        const mIdx = parseInt(e.code.replace('Digit', ''), 10) - 1;
-                        if (VIS_MODS[mIdx]) {
-                            setMode(mIdx);
-                            this.showToast(VIS_MODS[mIdx].icon + ' ' + VIS_MODS[mIdx].name, 'info');
-                        }
-                        break;
-                    }
-                    case 'Digit0':
-                        if (VIS_MODS[9]) { setMode(9); this.showToast(VIS_MODS[9].name, 'info'); }
                         break;
                     case 'ArrowRight':
                         audio.audioElement.currentTime = Math.min(
@@ -2006,22 +2241,11 @@
                             0
                         );
                         break;
-                    case 'ArrowUp':
-                        e.preventDefault();
-                        const volUp = document.getElementById('vol-slider');
-                        volUp.value = Math.min(parseFloat(volUp.value) + 0.1, 1);
-                        audio.updateSettings();
-                        break;
-                    case 'ArrowDown':
-                        e.preventDefault();
-                        const volDown = document.getElementById('vol-slider');
-                        volDown.value = Math.max(parseFloat(volDown.value) - 0.1, 0);
-                        audio.updateSettings();
-                        break;
                     case 'Escape':
                         this.toggleSettings(false);
                         Exporter.hideModal();
                         this.closeModeSelector();
+                        if (this.els.templatesModal) this.els.templatesModal.classList.remove('open');
                         this.els.shareModal.classList.remove('open');
                         this.els.shortcutsModal.classList.remove('open');
                         break;
@@ -2058,12 +2282,10 @@
             linkSetting('set-hue-cycle', 'hueCycle', 'bool');
             linkSetting('set-hue-speed', 'hueCycleSpeed', 'float');
 
-            // v3.0 — 3-Band EQ bindings
             linkSetting('set-eq-bass', 'eqBass', 'float');
             linkSetting('set-eq-mid', 'eqMid', 'float');
             linkSetting('set-eq-treble', 'eqTreble', 'float');
 
-            // v3.0 — Text Overlay & Post-FX bindings
             linkSetting('set-overlay-title', 'overlayTitle', 'string');
             linkSetting('set-overlay-artist', 'overlayArtist', 'string');
             linkSetting('set-overlay-pos', 'overlayPosition', 'string');
@@ -2072,6 +2294,10 @@
             linkSetting('set-fx-vignette', 'fxVignette', 'bool');
             linkSetting('set-fx-progress', 'fxProgressBar', 'bool');
             linkSetting('set-aspect', 'aspectRatio', 'string');
+
+            // Phonk / Hardtekk Intro bindings
+            linkSetting('set-phonk-intro', 'phonkIntroEnabled', 'bool');
+            linkSetting('set-phonk-intro-dur', 'phonkIntroDuration', 'float');
 
             document.querySelectorAll('#settings-modal input[type="range"]').forEach((input) => {
                 input.addEventListener('input', () => this.updateSliderLabels());
@@ -2111,7 +2337,7 @@
                 a.click();
                 document.body.removeChild(a);
                 setTimeout(() => URL.revokeObjectURL(url), 60_000);
-                this.showToast('Preset exported!', 'success');
+                this.showToast('Preset saved!', 'success');
             };
 
             document.getElementById('btn-screenshot').onclick = () => {
@@ -2124,11 +2350,10 @@
                     document.body.removeChild(a);
                     this.showToast('Screenshot saved!', 'success');
                 } catch (err) {
-                    this.showToast('Screenshot failed on this browser', 'error');
+                    this.showToast('Screenshot failed', 'error');
                 }
             };
 
-            // Logo Viz settings
             document.getElementById('btn-upload-bg').onclick = () => document.getElementById('logo-bg-input').click();
             document.getElementById('btn-upload-logo').onclick = () => document.getElementById('logo-img-input').click();
 
@@ -2142,7 +2367,9 @@
                         APP_STATE.bgImg = img;
                         document.getElementById('btn-upload-bg').classList.add('has-file');
                         document.getElementById('bg-label').textContent = 'BG: ' + file.name.substring(0, 14);
-                        this.showToast('Background loaded!', 'success');
+                        const wizBg = document.getElementById('wiz-btn-bg');
+                        if (wizBg) wizBg.classList.add('done-step');
+                        this.showToast('🖼️ Custom background loaded!', 'success');
                     };
                     img.src = ev.target.result;
                 };
@@ -2160,7 +2387,9 @@
                         APP_STATE.logoImg = img;
                         document.getElementById('btn-upload-logo').classList.add('has-file');
                         document.getElementById('logo-label').textContent = 'Logo: ' + file.name.substring(0, 14);
-                        this.showToast('Logo loaded!', 'success');
+                        const wizLogo = document.getElementById('wiz-btn-logo');
+                        if (wizLogo) wizLogo.classList.add('done-step');
+                        this.showToast('⭕ Custom center logo loaded!', 'success');
                     };
                     img.src = ev.target.result;
                 };
@@ -2222,6 +2451,7 @@
             setVal('set-overlay-pos', CONFIG.overlayPosition);
             setVal('set-aspect', CONFIG.aspectRatio);
             setVal('export-aspect', CONFIG.aspectRatio);
+            setVal('set-phonk-intro-dur', CONFIG.phonkIntroDuration);
 
             setChk('set-beat-enabled', CONFIG.beatEnabled);
             setChk('set-mirror', CONFIG.mirror);
@@ -2235,6 +2465,7 @@
             setChk('set-fx-scanlines', CONFIG.fxScanlines);
             setChk('set-fx-vignette', CONFIG.fxVignette);
             setChk('set-fx-progress', CONFIG.fxProgressBar);
+            setChk('set-phonk-intro', CONFIG.phonkIntroEnabled);
 
             document.body.classList.toggle('high-contrast', CONFIG.highContrast);
             document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
@@ -2256,7 +2487,6 @@
                         if (preset.mode !== undefined && VIS_MODS[preset.mode]) {
                             APP_STATE.mode = preset.mode;
                         }
-
                         audio.updateSettings();
                         this.applyConfigToUI();
                         this.updateModeDisplay();
@@ -2269,13 +2499,10 @@
                 };
                 reader.readAsText(file);
             } else if (file.type.includes('audio') || file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac|webm)$/i)) {
-                const cleanName = file.name.replace(/\.[^.]+$/, '');
-                if (!CONFIG.overlayTitle) {
-                    CONFIG.overlayTitle = cleanName.substring(0, 38);
-                    this.applyConfigToUI();
-                }
+                const wizMusic = document.getElementById('wiz-btn-music');
+                if (wizMusic) wizMusic.classList.add('done-step');
                 audio.playFile(URL.createObjectURL(file));
-                document.getElementById('status-text').textContent = file.name.substring(0, 20) + (file.name.length > 20 ? '...' : '');
+                document.getElementById('status-text').textContent = file.name.substring(0, 18) + (file.name.length > 18 ? '...' : '');
             } else {
                 this.showToast('Unsupported file type', 'error');
             }
@@ -2322,13 +2549,6 @@
         openModeSelector() {
             this.els.modeSelectorModal.classList.add('open');
             this.updateModeCards();
-            if (window.WaveForgeAds) {
-                const slot = document.getElementById('mode-selector-ad-slot');
-                if (slot && !slot.dataset.mounted) {
-                    slot.dataset.mounted = '1';
-                    window.WaveForgeAds.mountResponsiveBanner(slot, { compact: true });
-                }
-            }
         },
 
         closeModeSelector() {
@@ -2346,7 +2566,7 @@
             const mod = VIS_MODS[APP_STATE.mode];
             this.els.modeName.textContent = mod ? mod.name : 'Unknown';
             const logoSettings = document.getElementById('logo-viz-settings');
-            if (logoSettings) logoSettings.classList.toggle('hidden', APP_STATE.mode !== 8);
+            if (logoSettings) logoSettings.classList.toggle('hidden', APP_STATE.mode !== 8 && APP_STATE.mode !== 12);
         },
 
         updateSliderLabels() {
@@ -2367,8 +2587,7 @@
             if (modeKeys.length) APP_STATE.mode = modeKeys[Math.floor(Math.random() * modeKeys.length)];
             const paletteKeys = Object.keys(PALETTES);
             CONFIG.palette = paletteKeys[Math.floor(Math.random() * paletteKeys.length)];
-            CONFIG.sensitivity = Math.round((0.9 + Math.random() * 1.8) * 10) / 10;
-            CONFIG.mirror = Math.random() < 0.5;
+            CONFIG.sensitivity = Math.round((1.1 + Math.random() * 1.4) * 10) / 10;
             audio.updateSettings();
             this.applyConfigToUI();
             this.updateModeDisplay();
@@ -2408,10 +2627,13 @@
 
         viz.loop();
 
-        // Social Bar deferred to Export Modal so creative canvas stays 100% clean
+        // If user launched via ?template=... on index.html, automatically open the 3-step guided bar
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('template')) {
+            UI.applyTemplate(urlParams.get('template'));
+        }
 
-        console.log('%c🎵 WaveForge Studio v6.0.0', 'color: #00f2ff; font-size: 20px; font-weight: bold;');
-        console.log('%cProfessional Music Visualizer Studio', 'color: #ff0099; font-size: 12px;');
+        console.log('%c🎵 WaveForge Studio v7.0.0', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

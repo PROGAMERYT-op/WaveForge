@@ -1,6 +1,5 @@
 /*
  * WaveForge — Supermassive Spiral Nebula & Quasar mode (mode 7)
- * 5-arm logarithmic spiral galaxy with blazing quasar core and additive nebula clouds.
  */
 (function (registry) {
     'use strict';
@@ -28,7 +27,6 @@
             ctx.translate(cx, cy);
             ctx.globalCompositeOperation = 'lighter';
 
-            // 1. Quasar Accretion Core
             const coreR = maxRadius * (0.28 + bass * 0.14);
             const coreGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, coreR);
             coreGrad.addColorStop(0, '#ffffff');
@@ -40,7 +38,6 @@
             ctx.arc(0, 0, coreR, 0, Math.PI * 2);
             ctx.fill();
 
-            // 2. Logarithmic Spiral Arms
             for (let arm = 0; arm < arms; arm++) {
                 const armOffset = (arm / arms) * Math.PI * 2;
                 const col = engine.getColor(arm % engine.palette.length);

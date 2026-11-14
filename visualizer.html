@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '6.0.0';
+            var VER = '7.0.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -34,9 +34,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-    <title>WaveForge Studio 6.0 | Mobile &amp; Desktop 4K Music Visualizer</title>
-    <meta name="description" content="WaveForge Studio 6.0 is a mobile-friendly, studio-grade music visualizer with 12 modes, 3-band hardware EQ, custom text and logo overlays, and fast 16:9 / 9:16 4K MP4 export.">
-    <meta name="keywords" content="music visualizer, free music visualizer, online audio visualizer, tiktok audio visualizer, 9:16 music visualizer, youtube music video maker, trap nation visualizer online, spectrum analyzer, audio waveform, beat detector, mp3 to video converter, logo visualizer, spotify canvas maker">
+    <title>WaveForge Studio 7.0 | Phonk &amp; Hardtekk Template Maker + 4K Music Visualizer</title>
+    <meta name="description" content="WaveForge Studio 7.0 lets you create viral TikTok Hardtekk, Brazilian Funk &amp; Phonk music videos in 1 click. Features AirPods volume intro, liquid plasma rings, custom logo/background uploads, and 4K MP4 export.">
+    <meta name="keywords" content="phonk visualizer, hardtekk visualizer, brazilian funk video maker, tiktok music visualizer, 9:16 audio visualizer, free music visualizer, logo visualizer, avee player online alternative">
     <meta name="author" content="WaveForge">
     <meta name="theme-color" content="#05070f">
 
@@ -48,8 +48,8 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <meta property="og:title" content="WaveForge Studio 6.0 — Free 4K Music Visualizer">
-    <meta property="og:description" content="12 visualization modes, 3-band Bass EQ, text overlays, and 16:9 / 9:16 4K MP4 video export with zero watermarks.">
+    <meta property="og:title" content="WaveForge Studio 7.0 — Phonk &amp; Hardtekk Music Video Templates">
+    <meta property="og:description" content="1-click viral Phonk &amp; Hardtekk templates, AirPods volume intro, 13 modes, 3-band EQ, and 4K MP4 export.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
 
     <link rel="manifest" href="assets/manifest.json">
@@ -58,7 +58,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="assets/css/app.css?v=6.0.0">
+    <link rel="stylesheet" href="assets/css/app.css?v=7.0.0">
 
     <!-- Fast WebCodecs export: mp4-muxer -->
     <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
@@ -66,8 +66,8 @@
 <body>
     <main class="visually-hidden" role="main">
         <article>
-            <h2>WaveForge Studio 6.0 - Mobile &amp; Desktop Online Music Visualizer</h2>
-            <p>Browser-based music visualizer and audio spectrum analyzer with 12 modes, 3-band EQ, custom text overlays, and 16:9, 9:16, 1:1, and 4:5 4K MP4 video exports.</p>
+            <h2>WaveForge Studio 7.0 - Viral Phonk &amp; Hardtekk Music Visualizer Templates</h2>
+            <p>Browser-based music visualizer with 1-click Phonk, Hardtekk, and Brazilian Funk templates, AirPods volume intro, 13 modes, 3-band EQ, and 4K MP4 video exports.</p>
         </article>
     </main>
 
@@ -89,20 +89,39 @@
     <!-- COMPACT QUICK-START ONBOARDING PILL (Auto-hides on play or dismiss) -->
     <div id="studio-onboarding" class="studio-onboarding interactive" role="region" aria-label="Quick start guide">
         <button type="button" class="onboard-dismiss" id="onboard-close-btn" aria-label="Dismiss welcome card">✕</button>
-        <div class="onboard-icon-ring">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+        <div class="onboard-icon-ring">😈</div>
+        <h2>Create Viral Phonk &amp; Music Edits</h2>
+        <p>Pick a 1-click trending Hardtekk / Funk template, upload your music &amp; logo, and export in 9:16 or 16:9 4K.</p>
+        <div class="onboard-actions" style="grid-template-columns: 1fr;">
+            <button type="button" id="onboard-templates-btn" class="btn-studio-primary onboard-btn" style="background:linear-gradient(135deg,#a855f7,#ec4899);">
+                <span>🔥 Browse Trending Templates (6)</span>
+            </button>
         </div>
-        <h2>Load Audio to Start</h2>
-        <p>Upload an audio track from your device or test all 12 visual engines with the built-in synth loop.</p>
-        <div class="onboard-actions">
-            <button type="button" id="onboard-upload-btn" class="btn-studio-primary onboard-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span>Open Audio File</span>
+        <div class="onboard-actions" style="margin-top:8px;">
+            <button type="button" id="onboard-upload-btn" class="onboard-btn-secondary">
+                <span>📁 Upload Music</span>
             </button>
             <button type="button" id="onboard-demo-btn" class="onboard-btn-secondary">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span>Try Demo Track</span>
+                <span>▶ Try Demo Track</span>
             </button>
+        </div>
+    </div>
+
+    <!-- TRENDING TEMPLATES GALLERY MODAL / BOTTOM SHEET -->
+    <div id="templates-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="templates-title">
+        <div class="modal interactive" style="max-width: 760px;">
+            <div class="sheet-handle" aria-hidden="true"></div>
+            <div class="modal-header">
+                <div>
+                    <span class="modal-eyebrow">1-CLICK VIRAL PRESETS</span>
+                    <h2 id="templates-title">🔥 Trending Phonk &amp; Funk Templates</h2>
+                </div>
+                <button id="btn-close-templates" class="close-icon-btn" aria-label="Close templates">✕</button>
+            </div>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 14px;">
+                Tap any template below to automatically configure the AirPods volume intro, liquid neon plasma ring, 9:16 TikTok framing, and Bass Boost EQ — then upload your music, background, and logo!
+            </p>
+            <div class="templates-grid" id="templates-grid"></div>
         </div>
     </div>
 
@@ -112,7 +131,7 @@
             <div class="sheet-handle" aria-hidden="true"></div>
             <div class="mode-selector-header">
                 <div>
-                    <span class="modal-eyebrow">12 VISUAL ENGINES</span>
+                    <span class="modal-eyebrow">13 VISUAL ENGINES</span>
                     <h2>Visualization Mode</h2>
                 </div>
                 <button id="btn-close-mode-selector" class="close-icon-btn" aria-label="Close mode selector">✕</button>
@@ -128,51 +147,72 @@
     <!-- STUDIO UI LAYER -->
     <nav id="ui-layer" role="navigation" aria-label="Visualizer controls">
 
-        <!-- SINGLE-ROW ADAPTIVE TOP STUDIO BAR -->
-        <header class="top-bar interactive">
-            <div class="brand-cluster">
-                <a href="index.html" class="brand-link" aria-label="Back to WaveForge home">
-                    <span class="brand-mark" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
-                    </span>
-                    <h1 class="brand">WaveForge</h1>
-                </a>
+        <!-- TOP CLUSTER: HEADER + 3-STEP TEMPLATE CREATOR BAR -->
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <header class="top-bar interactive">
+                <div class="brand-cluster">
+                    <a href="index.html" class="brand-link" aria-label="Back to WaveForge home">
+                        <span class="brand-mark" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+                        </span>
+                        <h1 class="brand">WaveForge</h1>
+                    </a>
 
-                <div id="status-display" class="status-pills">
-                    <span class="status-pill status-state-pill">
-                        <span class="status-dot" id="status-dot"></span>
-                        <span id="status-text">Ready</span>
-                    </span>
-                    <span class="status-pill mono-pill desktop-only-pill" id="fps-display">60 FPS</span>
-                    <button type="button" class="status-pill mode-indicator-btn" id="top-mode-pill" title="Switch visualization mode">
-                        <span class="mode-name" id="mode-name">Logo Viz</span>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                    <div id="status-display" class="status-pills">
+                        <span class="status-pill status-state-pill">
+                            <span class="status-dot" id="status-dot"></span>
+                            <span id="status-text">Ready</span>
+                        </span>
+                        <span class="status-pill mono-pill desktop-only-pill" id="fps-display">60 FPS</span>
+                        <button type="button" class="status-pill mode-indicator-btn" id="top-mode-pill" title="Switch visualization mode">
+                            <span class="mode-name" id="mode-name">Hardtekk Phonk</span>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="top-actions">
+                    <button id="btn-templates" class="btn-templates-pill" aria-label="Open trending templates" title="1-Click Trending Phonk &amp; Funk Templates (T)">
+                        <span>🔥</span>
+                        <span class="tpl-btn-text">Templates</span>
+                    </button>
+                    <button id="btn-export" class="btn-studio-primary" aria-label="Export video" title="Export 4K MP4 / WebM Video">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span class="export-label">Export</span>
+                    </button>
+                    <button id="btn-settings" class="top-icon-btn" aria-label="Open studio settings" title="Studio Settings, EQ &amp; Overlays">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                        <span class="btn-text">Settings</span>
+                    </button>
+                    <button id="btn-share" class="top-icon-btn icon-only-btn" aria-label="Share preset link" title="Share Custom Preset Link">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    </button>
+                    <button id="btn-fullscreen" class="top-icon-btn icon-only-btn" aria-label="Toggle fullscreen" title="Fullscreen (F)">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
                     </button>
                 </div>
-            </div>
+            </header>
 
-            <div class="top-actions">
-                <button id="btn-export" class="btn-studio-primary" aria-label="Export video" title="Export 4K MP4 / WebM Video">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    <span class="export-label">Export</span>
-                </button>
-                <button id="btn-settings" class="top-icon-btn" aria-label="Open studio settings" title="Studio Settings, EQ &amp; Overlays">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-                    <span class="btn-text">Settings</span>
-                </button>
-                <button id="btn-share" class="top-icon-btn icon-only-btn" aria-label="Share preset link" title="Share Custom Preset Link">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                </button>
-                <button id="btn-fullscreen" class="top-icon-btn icon-only-btn" aria-label="Toggle fullscreen" title="Fullscreen (F)">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-                </button>
+            <!-- 3-STEP GUIDED TEMPLATE CUSTOMIZATION BAR -->
+            <div id="template-wizard-bar" class="template-wizard-bar interactive">
+                <div class="wiz-info">
+                    <span class="wiz-tag">ACTIVE TEMPLATE:</span>
+                    <strong id="wizard-template-name">Hardtekk Purple Mage</strong>
+                </div>
+                <div class="wiz-steps">
+                    <button type="button" id="wiz-btn-music" class="wiz-step-btn">1. 🎵 Upload Music</button>
+                    <button type="button" id="wiz-btn-bg" class="wiz-step-btn">2. 🖼️ Background</button>
+                    <button type="button" id="wiz-btn-logo" class="wiz-step-btn">3. ⭕ Center Logo</button>
+                    <button type="button" id="wiz-btn-export" class="wiz-step-btn wiz-export-cta">4. 🎬 Export Video</button>
+                </div>
+                <button type="button" id="wiz-btn-close" class="wiz-close" aria-label="Hide template bar">✕</button>
             </div>
-        </header>
+        </div>
 
         <!-- MOBILE-FIRST ERGONOMIC BOTTOM TRANSPORT DOCK -->
         <div class="dock-wrapper">
             <div class="control-bar interactive" role="group" aria-label="Playback and visual controls">
-                <!-- Row 1: Touch-Swipeable 12-Mode Pill Ribbon -->
+                <!-- Row 1: Touch-Swipeable 13-Mode Pill Ribbon -->
                 <div class="quick-mode-strip" id="quick-mode-strip" role="toolbar" aria-label="Quick mode switcher"></div>
 
                 <!-- Row 2: Precision Timeline Scrubber -->
@@ -189,25 +229,21 @@
                     <div class="transport-group left-group">
                         <button id="btn-upload" class="dock-btn" aria-label="Upload audio file" title="Upload Audio File">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            <span class="dock-lbl">Open</span>
+                            <span class="dock-lbl">Music</span>
+                        </button>
+
+                        <button id="dock-btn-templates" class="dock-btn" aria-label="Trending templates" title="1-Click Trending Templates (T)">
+                            <span style="font-size:15px;line-height:1;">🔥</span>
+                            <span class="dock-lbl">Templates</span>
                         </button>
 
                         <button id="btn-demo" class="dock-btn" aria-label="Load demo track" title="Play Built-In Demo Track">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                             <span class="dock-lbl">Demo</span>
                         </button>
-
-                        <button id="btn-mic" class="dock-btn" aria-label="Toggle microphone input" title="Live Microphone Input">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                            <span class="dock-lbl">Mic</span>
-                        </button>
                     </div>
 
                     <div class="transport-center">
-                        <button id="btn-prev-mode" class="icon-only-btn desktop-only-btn" aria-label="Previous mode" title="Previous Mode ([)">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                        </button>
-
                         <button id="btn-play" class="play-hero-btn active" aria-label="Play or pause" title="Play / Pause (Space)">
                             <span class="icon" id="play-icon">▶</span>
                         </button>
@@ -215,14 +251,10 @@
                         <button id="btn-stop" class="icon-only-btn desktop-only-btn" aria-label="Stop playback" title="Stop (S)">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
                         </button>
-
-                        <button id="btn-next-mode" class="icon-only-btn desktop-only-btn" aria-label="Next mode" title="Next Mode (])">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                        </button>
                     </div>
 
                     <div class="transport-group right-group">
-                        <button id="btn-mode" class="dock-btn" aria-label="Change visualization mode" title="All 12 Modes Grid (M)">
+                        <button id="btn-mode" class="dock-btn" aria-label="Change visualization mode" title="All 13 Modes Grid (M)">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
                             <span class="dock-lbl">Modes</span>
                         </button>
@@ -230,6 +262,11 @@
                         <button id="btn-random" class="dock-btn" aria-label="Randomize visual style" title="Randomize Mode &amp; Palette (R)">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
                             <span class="dock-lbl">Mix</span>
+                        </button>
+
+                        <button id="btn-mic" class="dock-btn" aria-label="Toggle microphone input" title="Live Microphone Input">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                            <span class="dock-lbl">Mic</span>
                         </button>
 
                         <div class="volume-control desktop-only-flex" title="Output Volume">
@@ -256,21 +293,122 @@
 
             <!-- 4-TAB SEGMENTED CONTROL -->
             <div class="settings-tabs" role="tablist" aria-label="Configuration sections">
-                <button type="button" class="settings-tab active" data-tab="tab-visuals" role="tab" aria-selected="true">Visuals</button>
+                <button type="button" class="settings-tab active" data-tab="tab-branding" role="tab" aria-selected="true">Logo &amp; Phonk</button>
+                <button type="button" class="settings-tab" data-tab="tab-visuals" role="tab" aria-selected="false">Visuals</button>
                 <button type="button" class="settings-tab" data-tab="tab-audio" role="tab" aria-selected="false">Audio &amp; EQ</button>
-                <button type="button" class="settings-tab" data-tab="tab-branding" role="tab" aria-selected="false">Text &amp; Logo</button>
                 <button type="button" class="settings-tab" data-tab="tab-system" role="tab" aria-selected="false">System</button>
             </div>
 
-            <!-- TAB 1: VISUALS & FX -->
-            <div class="settings-pane active" id="tab-visuals" role="tabpanel">
+            <!-- TAB 1: LOGO, PHONK INTRO & BRANDING -->
+            <div class="settings-pane active" id="tab-branding" role="tabpanel">
+                <div class="settings-group" id="logo-viz-settings">
+                    <h3>Custom Background &amp; Logo Upload</h3>
+                    <div class="upload-btn-group" style="margin-bottom:14px;">
+                        <div class="upload-btn" id="btn-upload-bg">
+                            <span class="upload-icon">🖼️</span>
+                            <span id="bg-label">Upload Background</span>
+                        </div>
+                        <div class="upload-btn" id="btn-upload-logo">
+                            <span class="upload-icon">⭕</span>
+                            <span id="logo-label">Upload Center Logo</span>
+                        </div>
+                    </div>
+
+                    <div class="control-row toggle-row">
+                        <label for="set-phonk-intro">🎧 AirPods Volume Charge-Up Intro</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-phonk-intro" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-phonk-intro-dur">Intro Beat-Drop Time (sec)</label>
+                        <input type="range" id="set-phonk-intro-dur" min="0" max="6" step="0.5" value="3.5">
+                    </div>
+
+                    <div class="control-row toggle-row">
+                        <label>Neon Ring Color</label>
+                        <input type="color" id="set-wave-color" value="#a855f7" style="width:44px;height:32px;padding:2px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;cursor:pointer;">
+                    </div>
+                    <div class="color-swatch-row" style="margin-bottom:12px;">
+                        <div class="color-swatch active" style="background:#a855f7;" data-color="#a855f7"></div>
+                        <div class="color-swatch" style="background:#00ff88;" data-color="#00ff88"></div>
+                        <div class="color-swatch" style="background:#00c4ff;" data-color="#00c4ff"></div>
+                        <div class="color-swatch" style="background:#ff0055;" data-color="#ff0055"></div>
+                        <div class="color-swatch" style="background:#ff6600;" data-color="#ff6600"></div>
+                        <div class="color-swatch" style="background:#fbbf24;" data-color="#fbbf24"></div>
+                        <div class="color-swatch" style="background:#ffffff;" data-color="#ffffff"></div>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-shake">Kick-Drum Shake &amp; Zoom</label>
+                        <input type="range" id="set-shake" min="0" max="40" step="1" value="16">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-glow-size">Neon Plasma Glow Size</label>
+                        <input type="range" id="set-glow-size" min="0" max="80" step="5" value="40">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-ray-count">Radial Ray Count (Logo Mode)</label>
+                        <input type="range" id="set-ray-count" min="32" max="256" step="16" value="128">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-line-thick">Ray Line Thickness</label>
+                        <input type="range" id="set-line-thick" min="1" max="6" step="0.5" value="2">
+                    </div>
+                    <div class="control-row toggle-row">
+                        <label for="set-logo-particles">Radial Hyperspace Sparks</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-logo-particles" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row toggle-row">
+                        <label for="set-logo-rotate">Orbital Ring Rotation</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-logo-rotate">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>On-Canvas Track Typography</h3>
+                    <div class="control-row">
+                        <label for="set-overlay-title">Track Title</label>
+                        <input type="text" id="set-overlay-title" class="text-input" placeholder="e.g. AINSI BAS LA VIDA (SLOWED)" maxlength="60">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-overlay-artist">Artist / Producer Name</label>
+                        <input type="text" id="set-overlay-artist" class="text-input" placeholder="e.g. @YourChannelName" maxlength="60">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-overlay-pos">Typography Placement</label>
+                        <select id="set-overlay-pos">
+                            <option value="bottom-left" selected>Bottom Left (Lower Third)</option>
+                            <option value="bottom-center">Bottom Center</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="center">Center Canvas</option>
+                        </select>
+                    </div>
+                    <div class="control-row toggle-row">
+                        <label for="set-overlay-pulse">Beat-Reactive Text Scale</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-overlay-pulse" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: VISUALS & FX -->
+            <div class="settings-pane" id="tab-visuals" role="tabpanel">
                 <div class="settings-group">
                     <h3>Color &amp; Framing</h3>
                     <div class="control-row">
                         <label for="set-palette">Color Palette (12)</label>
                         <select id="set-palette">
+                            <option value="synthwave">Synthwave (Purple / Cyan)</option>
                             <option value="cyberpunk">Cyberpunk (Cyan / Pink)</option>
-                            <option value="synthwave">Synthwave (Neon Magenta / Cyan)</option>
                             <option value="trapneon">Trap Neon (Emerald / Crimson)</option>
                             <option value="vaporwave">Vaporwave (Pastel Neon)</option>
                             <option value="fire">Inferno (Red / Orange)</option>
@@ -286,8 +424,8 @@
                     <div class="control-row">
                         <label for="set-aspect">Aspect Ratio Guide</label>
                         <select id="set-aspect">
-                            <option value="16:9" selected>16:9 Widescreen (YouTube)</option>
-                            <option value="9:16">9:16 Vertical (TikTok / Reels / Shorts)</option>
+                            <option value="9:16" selected>9:16 Vertical (TikTok / Reels / Shorts)</option>
+                            <option value="16:9">16:9 Widescreen (YouTube)</option>
                             <option value="1:1">1:1 Square (Spotify / Instagram)</option>
                             <option value="4:5">4:5 Portrait (Instagram Feed)</option>
                         </select>
@@ -328,7 +466,7 @@
                     <div class="control-row toggle-row">
                         <label for="set-fx-vignette">Cinema Dark Vignette</label>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="set-fx-vignette">
+                            <input type="checkbox" id="set-fx-vignette" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -342,13 +480,13 @@
                 </div>
             </div>
 
-            <!-- TAB 2: AUDIO & 3-BAND EQ -->
+            <!-- TAB 3: AUDIO & 3-BAND EQ -->
             <div class="settings-pane" id="tab-audio" role="tabpanel">
                 <div class="settings-group">
                     <h3>3-Band Hardware Equalizer</h3>
                     <div class="control-row">
                         <label for="set-eq-bass">Low Shelf Bass (110 Hz)</label>
-                        <input type="range" id="set-eq-bass" min="-12" max="15" step="1" value="0">
+                        <input type="range" id="set-eq-bass" min="-12" max="15" step="1" value="6">
                     </div>
                     <div class="control-row">
                         <label for="set-eq-mid">Mid Presence (1 kHz)</label>
@@ -356,7 +494,7 @@
                     </div>
                     <div class="control-row">
                         <label for="set-eq-treble">High Shelf Air (4.2 kHz)</label>
-                        <input type="range" id="set-eq-treble" min="-12" max="12" step="1" value="0">
+                        <input type="range" id="set-eq-treble" min="-12" max="12" step="1" value="2">
                     </div>
                 </div>
 
@@ -386,7 +524,7 @@
                     </div>
                     <div class="control-row">
                         <label for="set-sensitivity">Visual Gain Sensitivity</label>
-                        <input type="range" id="set-sensitivity" min="0.5" max="5.0" step="0.1" value="1.5">
+                        <input type="range" id="set-sensitivity" min="0.5" max="5.0" step="0.1" value="1.65">
                     </div>
                     <div class="control-row toggle-row">
                         <label for="set-beat-enabled">Beat Detection Pulse</label>
@@ -398,94 +536,6 @@
                     <div class="control-row">
                         <label for="set-beat-thresh">Beat Trigger Threshold</label>
                         <input type="range" id="set-beat-thresh" min="1.0" max="2.0" step="0.05" value="1.3">
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 3: TEXT & LOGO BRANDING -->
-            <div class="settings-pane" id="tab-branding" role="tabpanel">
-                <div class="settings-group">
-                    <h3>On-Canvas Track Typography</h3>
-                    <div class="control-row">
-                        <label for="set-overlay-title">Track Title</label>
-                        <input type="text" id="set-overlay-title" class="text-input" placeholder="e.g. Midnight Horizon" maxlength="60">
-                    </div>
-                    <div class="control-row">
-                        <label for="set-overlay-artist">Artist / Producer Name</label>
-                        <input type="text" id="set-overlay-artist" class="text-input" placeholder="e.g. @ProdByWaveForge" maxlength="60">
-                    </div>
-                    <div class="control-row">
-                        <label for="set-overlay-pos">Typography Placement</label>
-                        <select id="set-overlay-pos">
-                            <option value="bottom-left" selected>Bottom Left (Lower Third)</option>
-                            <option value="bottom-center">Bottom Center</option>
-                            <option value="top-center">Top Center</option>
-                            <option value="center">Center Canvas</option>
-                        </select>
-                    </div>
-                    <div class="control-row toggle-row">
-                        <label for="set-overlay-pulse">Beat-Reactive Text Scale</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="set-overlay-pulse" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="settings-group" id="logo-viz-settings">
-                    <h3>Logo Visualizer Mode Assets</h3>
-                    <div class="upload-btn-group" style="margin-bottom:14px;">
-                        <div class="upload-btn" id="btn-upload-bg">
-                            <span class="upload-icon">🖼️</span>
-                            <span id="bg-label">Upload Backdrop</span>
-                        </div>
-                        <div class="upload-btn" id="btn-upload-logo">
-                            <span class="upload-icon">⭕</span>
-                            <span id="logo-label">Upload Center Logo</span>
-                        </div>
-                    </div>
-                    <div class="control-row toggle-row">
-                        <label>Ring Accent Color</label>
-                        <input type="color" id="set-wave-color" value="#00ff88" style="width:44px;height:32px;padding:2px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;cursor:pointer;">
-                    </div>
-                    <div class="color-swatch-row" style="margin-bottom:12px;">
-                        <div class="color-swatch active" style="background:#00ff88;" data-color="#00ff88"></div>
-                        <div class="color-swatch" style="background:#00c4ff;" data-color="#00c4ff"></div>
-                        <div class="color-swatch" style="background:#ff0099;" data-color="#ff0099"></div>
-                        <div class="color-swatch" style="background:#ff6600;" data-color="#ff6600"></div>
-                        <div class="color-swatch" style="background:#7b2dff;" data-color="#7b2dff"></div>
-                        <div class="color-swatch" style="background:#ffffff;" data-color="#ffffff"></div>
-                        <div class="color-swatch" style="background:#ffff00;" data-color="#ffff00"></div>
-                    </div>
-                    <div class="control-row">
-                        <label for="set-shake">Bass Camera Shake</label>
-                        <input type="range" id="set-shake" min="0" max="40" step="1" value="10">
-                    </div>
-                    <div class="control-row">
-                        <label for="set-ray-count">Radial Ray Count</label>
-                        <input type="range" id="set-ray-count" min="32" max="256" step="16" value="128">
-                    </div>
-                    <div class="control-row">
-                        <label for="set-line-thick">Ray Line Thickness</label>
-                        <input type="range" id="set-line-thick" min="1" max="6" step="0.5" value="2">
-                    </div>
-                    <div class="control-row">
-                        <label for="set-glow-size">Ring Halo Size</label>
-                        <input type="range" id="set-glow-size" min="0" max="80" step="5" value="35">
-                    </div>
-                    <div class="control-row toggle-row">
-                        <label for="set-logo-particles">Ambient Particles</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="set-logo-particles" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                    <div class="control-row toggle-row">
-                        <label for="set-logo-rotate">Orbital Ring Rotation</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="set-logo-rotate">
-                            <span class="toggle-slider"></span>
-                        </label>
                     </div>
                 </div>
             </div>
@@ -528,7 +578,7 @@
             </div>
 
             <div class="version-info">
-                WaveForge Studio v6.0 • 12 Modes • 3-Band EQ • Turbo MP4 Engine<br>
+                WaveForge Studio v7.0 • 13 Modes • Trending Phonk Templates • Turbo MP4<br>
                 <a id="btn-shortcuts" role="button" tabindex="0">Keyboard Shortcuts</a> •
                 <a href="index.html">Back to Home</a>
             </div>
@@ -577,9 +627,8 @@
             </div>
             <div class="shortcut-list">
                 <div class="shortcut-row"><span>Play / Pause</span><kbd>Space</kbd></div>
-                <div class="shortcut-row"><span>Stop playback</span><kbd>S</kbd></div>
+                <div class="shortcut-row"><span>Open Trending Templates</span><kbd>T</kbd></div>
                 <div class="shortcut-row"><span>Choose visualization mode</span><kbd>M</kbd></div>
-                <div class="shortcut-row"><span>Direct mode jump</span><kbd>1</kbd>–<kbd>0</kbd></div>
                 <div class="shortcut-row"><span>Randomize mode &amp; palette</span><kbd>R</kbd></div>
                 <div class="shortcut-row"><span>Toggle fullscreen</span><kbd>F</kbd></div>
                 <div class="shortcut-row"><span>Seek 5 seconds</span><kbd>←</kbd> <kbd>→</kbd></div>
@@ -588,7 +637,7 @@
         </div>
     </div>
 
-    <!-- EXPORT VIDEO MODAL / MOBILE BOTTOM SHEET -->
+    <!-- EXPORT VIDEO MODAL + 8-SECOND AD-UNLOCK GATE -->
     <div id="export-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="export-title">
         <div class="modal interactive">
             <div class="sheet-handle" aria-hidden="true"></div>
@@ -614,7 +663,7 @@
                         <input type="radio" name="export-quality" value="1080" checked>
                         <div class="export-option-info">
                             <div class="export-option-title">1080p Full HD <span class="rec-tag">Best</span></div>
-                            <div class="export-option-desc">Crisp YouTube &amp; TikTok</div>
+                            <div class="export-option-desc">Crisp TikTok &amp; YouTube</div>
                         </div>
                     </label>
                     <label class="export-option">
@@ -639,8 +688,8 @@
                 <div class="control-row">
                     <label for="export-aspect">Aspect Ratio</label>
                     <select id="export-aspect">
-                        <option value="16:9" selected>16:9 Widescreen (YouTube)</option>
-                        <option value="9:16">9:16 Vertical (TikTok / Reels / Shorts)</option>
+                        <option value="9:16" selected>9:16 Vertical (TikTok / Reels / Shorts)</option>
+                        <option value="16:9">16:9 Widescreen (YouTube)</option>
                         <option value="1:1">1:1 Square (Spotify / Instagram)</option>
                         <option value="4:5">4:5 Portrait (Instagram Feed)</option>
                     </select>
@@ -649,8 +698,8 @@
                     <label for="export-duration">Clip Duration</label>
                     <select id="export-duration">
                         <option value="full">Full Track</option>
-                        <option value="15">15 seconds (Reels / Shorts)</option>
-                        <option value="30">30 seconds</option>
+                        <option value="15">15 seconds (TikTok / Reels Drop)</option>
+                        <option value="30" selected>30 seconds (Viral Edit Length)</option>
                         <option value="60">1 minute</option>
                         <option value="120">2 minutes</option>
                         <option value="180">3 minutes</option>
@@ -669,6 +718,7 @@
                 </div>
             </div>
 
+            <!-- RENDER PROGRESS BAR -->
             <div class="progress-container" id="export-progress">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress-fill"></div>
@@ -679,10 +729,27 @@
                 </div>
             </div>
 
+            <!-- 8-SECOND AD-TIMER + INSTANT SPONSOR UNLOCK DOWNLOAD GATE -->
+            <div id="export-unlock-gate" class="export-unlock-gate hidden">
+                <div class="unlock-gate-title" id="unlock-gate-summary">✅ Your video is rendered and ready!</div>
+                <p class="unlock-gate-sub">WaveForge is 100% free with no watermarks. View the sponsor ad below for 8 seconds (or visit our sponsor for instant unlock) to download your MP4:</p>
+                <div class="unlock-timer-bar">
+                    <div class="unlock-timer-fill" id="unlock-timer-fill"></div>
+                </div>
+                <div class="unlock-gate-actions">
+                    <button type="button" id="btn-download-ready" class="btn-unlock-timer" disabled>
+                        <span>⏳ Viewing Sponsor Ad... (8s)</span>
+                    </button>
+                    <button type="button" id="btn-unlock-sponsor" class="btn-unlock-instant">
+                        <span>⚡ Visit Sponsor &amp; Download Instantly ↗</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="button-group" style="margin-top: 14px;">
                 <button id="btn-start-export" class="btn-studio-primary" style="padding:12px 20px;font-size:0.9rem;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    <span>Start Video Export</span>
+                    <span>Render Video</span>
                 </button>
                 <button id="btn-cancel-export" class="danger" style="display: none;">
                     <span>⏹ Cancel Render</span>
@@ -693,10 +760,10 @@
                 ⚡ Checking hardware encoder support…
             </p>
 
-            <!-- SPONSORED PLACEMENT (Supports Free 4K Hosting During Render Wait) -->
+            <!-- SPONSORED PLACEMENT (Supports Free 4K Hosting During Render & 8s Unlock Gate) -->
             <div class="modal-ad-box" style="margin-top: 14px;">
                 <div class="modal-ad-header">
-                    <span class="ad-badge">SPONSORED</span>
+                    <span class="ad-badge">SPONSORED AD</span>
                     <a href="https://araplhn.org/4/f28b978e066eac35ed88538faa37500f" data-wf-smartlink target="_blank" rel="noopener sponsored" class="smartlink-inline-cta">Sponsored Partner ↗</a>
                 </div>
                 <div id="export-ad-slot" class="modal-ad-slot"></div>
@@ -708,22 +775,23 @@
         </div>
     </div>
 
-    <!-- VISUALIZER MODE REGISTRY (12 Modes) -->
-    <script src="Visualizers/bars.js?v=6.0.0"></script>
-    <script src="Visualizers/wave.js?v=6.0.0"></script>
-    <script src="Visualizers/radial.js?v=6.0.0"></script>
-    <script src="Visualizers/particles.js?v=6.0.0"></script>
-    <script src="Visualizers/spectrogram.js?v=6.0.0"></script>
-    <script src="Visualizers/3dbars.js?v=6.0.0"></script>
-    <script src="Visualizers/dna.js?v=6.0.0"></script>
-    <script src="Visualizers/galaxy.js?v=6.0.0"></script>
-    <script src="Visualizers/logo.js?v=6.0.0"></script>
-    <script src="Visualizers/tunnel.js?v=6.0.0"></script>
-    <script src="Visualizers/trapnation.js?v=6.0.0"></script>
-    <script src="Visualizers/synthwave.js?v=6.0.0"></script>
+    <!-- VISUALIZER MODE REGISTRY (13 Modes) -->
+    <script src="Visualizers/bars.js?v=7.0.0"></script>
+    <script src="Visualizers/wave.js?v=7.0.0"></script>
+    <script src="Visualizers/radial.js?v=7.0.0"></script>
+    <script src="Visualizers/particles.js?v=7.0.0"></script>
+    <script src="Visualizers/spectrogram.js?v=7.0.0"></script>
+    <script src="Visualizers/3dbars.js?v=7.0.0"></script>
+    <script src="Visualizers/dna.js?v=7.0.0"></script>
+    <script src="Visualizers/galaxy.js?v=7.0.0"></script>
+    <script src="Visualizers/logo.js?v=7.0.0"></script>
+    <script src="Visualizers/tunnel.js?v=7.0.0"></script>
+    <script src="Visualizers/trapnation.js?v=7.0.0"></script>
+    <script src="Visualizers/synthwave.js?v=7.0.0"></script>
+    <script src="Visualizers/phonk.js?v=7.0.0"></script>
 
     <!-- SMART MONETIZATION ENGINE & APPLICATION SCRIPT -->
-    <script src="assets/js/ads.js?v=6.0.0"></script>
-    <script src="assets/js/app.js?v=6.0.0"></script>
+    <script src="assets/js/ads.js?v=7.0.0"></script>
+    <script src="assets/js/app.js?v=7.0.0"></script>
 </body>
 </html>

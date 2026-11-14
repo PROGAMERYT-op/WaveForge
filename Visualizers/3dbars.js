@@ -1,6 +1,5 @@
 /*
  * WaveForge — Isometric 3D Neon Stage mode (mode 5)
- * Multi-tier isometric 3D frequency columns with shaded facets and glowing top caps.
  */
 (function (registry) {
     'use strict';
@@ -15,10 +14,6 @@
             const sens = engine.config.sensitivity;
             const t = engine.nowSec();
 
-            let bass = 0;
-            for (let i = 0; i < 16; i++) bass += freqData[i];
-            bass = (bass / 16) / 255;
-
             const bars = 44;
             const step = Math.max(1, Math.floor((freqData.length * 0.65) / bars));
             const totalW = w * 0.78;
@@ -30,11 +25,9 @@
             const kick = isBeat ? 1.08 : 1.0;
 
             ctx.save();
-            // Subtle dynamic stage sway
             const swayY = Math.sin(t * 1.2) * 8;
             ctx.translate(cx, cy + h * 0.16 + swayY);
 
-            // Perspective stage floor line
             ctx.strokeStyle = engine.getColor(0) + '44';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
@@ -48,14 +41,12 @@
                 const x = (i - bars / 2) * spacing;
                 const y = -barH;
 
-                // Front face
                 const frontGrad = ctx.createLinearGradient(x, 0, x, y);
                 frontGrad.addColorStop(0, engine.getColor(0));
                 frontGrad.addColorStop(1, engine.getColor(1));
                 ctx.fillStyle = frontGrad;
                 ctx.fillRect(x, y, barW, barH);
 
-                // Right extruded side face
                 ctx.fillStyle = engine.getColor(1) + '77';
                 ctx.beginPath();
                 ctx.moveTo(x + barW, y);
@@ -65,7 +56,6 @@
                 ctx.closePath();
                 ctx.fill();
 
-                // Glowing top roof cap
                 ctx.fillStyle = '#ffffff';
                 ctx.globalAlpha = 0.75 + Math.min(0.25, val * 0.25);
                 ctx.beginPath();

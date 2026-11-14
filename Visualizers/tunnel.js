@@ -1,6 +1,5 @@
 /*
  * WaveForge — Cyber Tunnel mode (mode 9)
- * 3D neon geometric wireframe tunnel flying forward at beat-reactive speeds.
  */
 (function (registry) {
     'use strict';
@@ -33,11 +32,9 @@
             ctx.save();
             ctx.translate(cx, cy);
 
-            // Subtle camera sway tied to time and mid energy
             const swayX = Math.sin(t * 1.3) * w * 0.03 * (1 + mid);
             const swayY = Math.cos(t * 0.9) * h * 0.03 * (1 + mid);
 
-            // Draw radial warp spokes from vanishing point
             ctx.lineWidth = 1.2;
             for (let s = 0; s < sides * 2; s++) {
                 const ang = (s / (sides * 2)) * Math.PI * 2 + t * 0.18;
@@ -50,10 +47,8 @@
                 ctx.stroke();
             }
 
-            // Draw flying depth rings from back to front
             for (let i = 0; i < rings; i++) {
                 const depth = ((i / rings) + (t * speed * 0.35)) % 1;
-                // Exponential perspective projection
                 const persp = Math.pow(depth, 2.35);
                 const r = Math.max(4, persp * maxR);
                 const fIdx = Math.floor((1 - depth) * freqData.length * 0.45);
@@ -79,16 +74,9 @@
                 ctx.strokeStyle = color;
                 ctx.lineWidth = Math.max(1, persp * (3.5 + fVal * 2.5));
                 ctx.globalAlpha = Math.min(1, persp * (0.55 + fVal * 0.6));
-                if (isBeat && i > rings - 6) {
-                    ctx.shadowBlur = 22;
-                    ctx.shadowColor = color;
-                } else {
-                    ctx.shadowBlur = 0;
-                }
                 ctx.stroke();
             }
 
-            // Center core waveform ring
             const coreR = Math.min(cx, cy) * (0.09 + bass * 0.08);
             ctx.beginPath();
             const step = Math.max(1, Math.floor(waveData.length / 64));
@@ -105,11 +93,8 @@
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = isBeat ? 3.5 : 2;
             ctx.globalAlpha = 0.9;
-            ctx.shadowBlur = 18;
-            ctx.shadowColor = engine.getColor(0);
             ctx.stroke();
 
-            ctx.shadowBlur = 0;
             ctx.globalAlpha = 1;
             ctx.restore();
         }

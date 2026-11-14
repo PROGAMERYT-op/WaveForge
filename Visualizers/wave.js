@@ -1,6 +1,5 @@
 /*
  * WaveForge — Multi-Harmonic Neon Ribbon Waveform mode (mode 1)
- * 4-layer additive neon oscilloscope ribbons with smooth spline interpolation and aurora fill.
  */
 (function (registry) {
     'use strict';
@@ -26,7 +25,6 @@
             ctx.save();
             ctx.globalCompositeOperation = 'lighter';
 
-            // Render 4 harmonic ribbon layers
             const layers = [
                 { phase: 0, ampMul: 1.0, width: isBeat ? 4.2 : 3.0, alpha: 0.95, colorIdx: 0, fill: true },
                 { phase: 0.8, ampMul: 0.72, width: 2.2, alpha: 0.65, colorIdx: 1, fill: false },
@@ -41,7 +39,6 @@
                 for (let i = 0; i <= pointsCount; i++) {
                     const normX = i / pointsCount;
                     const x = normX * w;
-                    // Sine window tapers wave smoothly at left/right screen edges
                     const windowEnv = Math.sin(normX * Math.PI);
                     const sampleIdx = Math.min(waveData.length - 1, i * step);
                     const rawSample = (waveData[sampleIdx] - 128) / 128.0;
@@ -50,7 +47,6 @@
                     pts.push({ x, y: cy + yOffset });
                 }
 
-                // Draw smooth quadratic spline
                 ctx.beginPath();
                 ctx.moveTo(pts[0].x, pts[0].y);
                 for (let i = 1; i < pts.length - 1; i++) {
@@ -67,7 +63,6 @@
                 ctx.shadowColor = col;
                 ctx.stroke();
 
-                // Soft aurora fill under primary wave
                 if (layer.fill) {
                     ctx.lineTo(w, cy);
                     ctx.lineTo(0, cy);
@@ -82,7 +77,6 @@
                 }
             });
 
-            // Mirror effect if enabled
             if (engine.config.mirror) {
                 ctx.save();
                 ctx.translate(0, h);

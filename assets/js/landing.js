@@ -1,7 +1,6 @@
 (function () {
     'use strict';
 
-    /* ---------- Theme toggle ---------- */
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
@@ -12,7 +11,6 @@
         });
     }
 
-    /* ---------- Mobile menu ---------- */
     const mobileToggle = document.getElementById('mobileToggle');
     const mobileMenu = document.getElementById('mobileMenu');
     if (mobileToggle && mobileMenu) {
@@ -28,18 +26,17 @@
         }));
     }
 
-    /* ---------- Interactive 60 FPS Canvas Studio Showcase ---------- */
     const canvas = document.getElementById('heroPreviewCanvas');
     if (canvas) {
         const ctx = canvas.getContext('2d');
-        let previewMode = 'bars';
-        let previewPalette = 'cyberpunk';
+        let previewMode = 'ring';
+        let previewPalette = 'synthwave';
 
         const PALETTES = {
+            synthwave: ['#a855f7', '#00f5d4', '#ff2a85', '#ffffff'],
             cyberpunk: ['#00f2ff', '#ff0099', '#ffffff', '#7b2dff'],
-            synthwave: ['#ff2a85', '#00f5d4', '#fee440', '#9b5de5'],
-            fire: ['#ff2200', '#ff7700', '#ffbb00', '#ffff44'],
-            matrix: ['#003311', '#00ff66', '#66ffaa', '#ccffdd']
+            fire: ['#ff0055', '#ff6600', '#ffaa00', '#ffffff'],
+            matrix: ['#00ff88', '#00c4ff', '#66ffaa', '#ffffff']
         };
 
         document.querySelectorAll('[data-p-mode]').forEach((btn) => {
@@ -65,59 +62,79 @@
             const cx = w / 2;
             const cy = h / 2;
             const t = performance.now() * 0.001;
-            const pal = PALETTES[previewPalette] || PALETTES.cyberpunk;
+            const pal = PALETTES[previewPalette] || PALETTES.synthwave;
             const beat = Math.pow(Math.max(0, Math.sin(t * 4.2)), 6);
 
-            ctx.fillStyle = 'rgba(6, 9, 20, 0.3)';
+            ctx.fillStyle = 'rgba(5, 7, 17, 0.32)';
             ctx.fillRect(0, 0, w, h);
 
-            if (previewMode === 'bars') {
-                const count = 54;
-                const bw = (w / 2) / count - 3;
-                const grad = ctx.createLinearGradient(0, h, 0, 0);
-                grad.addColorStop(0, pal[0]);
-                grad.addColorStop(0.5, pal[1]);
-                grad.addColorStop(1, pal[2]);
-                ctx.fillStyle = grad;
-
-                for (let i = 0; i < count; i++) {
-                    const n = Math.sin(t * 3.2 + i * 0.3) * 0.5 + 0.5;
-                    const m = Math.cos(t * 5.0 - i * 0.17) * 0.5 + 0.5;
-                    const env = Math.max(0.1, (1 - i / count) * (0.45 + n * 0.55 * m) + beat * 0.28 * (1 - i / count));
-                    const bh = env * h * 0.74;
-                    const xOff = i * (bw + 3);
-                    ctx.fillRect(cx + xOff, cy - bh / 2, bw, bh);
-                    ctx.fillRect(cx - xOff - bw, cy - bh / 2, bw, bh);
-                }
-            } else if (previewMode === 'ring') {
-                const baseR = Math.min(cx, cy) * (0.38 + beat * 0.08);
+            if (previewMode === 'ring') {
+                const baseR = Math.min(cx, cy) * (0.42 + beat * 0.08);
                 ctx.save();
                 ctx.translate(cx, cy);
-                for (let layer = 0; layer < 3; layer++) {
+
+                // Radial sparks
+                ctx.strokeStyle = '#ffffff';
+                for (let s = 0; s < 24; s++) {
+                    const a = (s / 24) * Math.PI * 2 + t * 0.2;
+                    const d = ((t * 0.8 + s * 0.17) % 1) * cx * 0.9;
+                    if (d > baseR) {
+                        ctx.globalAlpha = 0.45;
+                        ctx.beginPath();
+                        ctx.moveTo(Math.cos(a) * d, Math.sin(a) * d);
+                        ctx.lineTo(Math.cos(a) * (d + 12), Math.sin(a) * (d + 12));
+                        ctx.stroke();
+                    }
+                }
+                ctx.globalAlpha = 1;
+
+                // Symmetrical Phonk liquid plasma ring
+                for (let layer = 0; layer < 2; layer++) {
                     ctx.beginPath();
-                    const pts = 110;
+                    const pts = 96;
                     for (let i = 0; i <= pts; i++) {
-                        const a = (i / pts) * Math.PI * 2;
-                        const wave = Math.sin(a * 8 + t * 4 + layer) * Math.cos(a * 4 - t * 3);
-                        const r = baseR + wave * 34 * (1 + beat * 0.6) + layer * 10;
+                        const a = (i / pts) * Math.PI * 2 - Math.PI / 2;
+                        const wave = Math.sin(a * 6 + t * 4 + layer) * Math.cos(a * 3 - t * 3);
+                        const horn = Math.max(0, Math.cos(a)) * 28 * (0.5 + beat);
+                        const r = baseR + Math.abs(wave) * 32 * (1 + beat * 0.7) + horn + layer * 8;
                         const px = Math.cos(a) * r;
                         const py = Math.sin(a) * r;
                         if (i === 0) ctx.moveTo(px, py);
                         else ctx.lineTo(px, py);
                     }
                     ctx.closePath();
-                    ctx.strokeStyle = pal[layer % pal.length];
-                    ctx.lineWidth = 3 - layer * 0.6;
-                    ctx.shadowBlur = 16;
-                    ctx.shadowColor = pal[layer % pal.length];
+                    ctx.strokeStyle = layer === 0 ? pal[0] : '#ffffff';
+                    ctx.lineWidth = layer === 0 ? 7 : 2.5;
+                    ctx.shadowBlur = layer === 0 ? 24 : 10;
+                    ctx.shadowColor = pal[0];
                     ctx.stroke();
                 }
                 ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.arc(0, 0, baseR * 0.92, 0, Math.PI * 2);
+                ctx.fillStyle = '#06040e';
+                ctx.fill();
                 ctx.restore();
+            } else if (previewMode === 'bars') {
+                const count = 54;
+                const bw = (w / 2) / count - 3;
+                const grad = ctx.createLinearGradient(0, h, 0, 0);
+                grad.addColorStop(0, pal[0]);
+                grad.addColorStop(1, pal[1]);
+                ctx.fillStyle = grad;
+
+                for (let i = 0; i < count; i++) {
+                    const n = Math.sin(t * 3.2 + i * 0.3) * 0.5 + 0.5;
+                    const env = Math.max(0.1, (1 - i / count) * (0.45 + n * 0.55) + beat * 0.28 * (1 - i / count));
+                    const bh = env * h * 0.74;
+                    const xOff = i * (bw + 3);
+                    ctx.fillRect(cx + xOff, cy - bh / 2, bw, bh);
+                    ctx.fillRect(cx - xOff - bw, cy - bh / 2, bw, bh);
+                }
             } else if (previewMode === 'tunnel') {
                 ctx.save();
                 ctx.translate(cx, cy);
-                const rings = 15;
+                const rings = 14;
                 const maxR = Math.hypot(cx, cy);
                 for (let i = 0; i < rings; i++) {
                     const depth = ((i / rings) + t * 0.35) % 1;
@@ -142,31 +159,17 @@
             } else if (previewMode === 'synth') {
                 const horY = h * 0.56;
                 const sunR = h * (0.22 + beat * 0.03);
-                const sunGrad = ctx.createLinearGradient(cx, horY - sunR * 1.3, cx, horY);
-                sunGrad.addColorStop(0, pal[2]);
-                sunGrad.addColorStop(1, pal[1]);
-                ctx.fillStyle = sunGrad;
+                ctx.fillStyle = pal[0];
                 ctx.beginPath();
                 ctx.arc(cx, horY - sunR * 0.25, sunR, 0, Math.PI * 2);
                 ctx.fill();
-
                 ctx.fillStyle = '#060914';
                 ctx.fillRect(0, horY, w, h - horY);
-                ctx.strokeStyle = pal[0];
-                ctx.lineWidth = 1.4;
-                for (let i = -16; i <= 16; i++) {
+                ctx.strokeStyle = pal[1];
+                for (let i = -14; i <= 14; i++) {
                     ctx.beginPath();
                     ctx.moveTo(cx + i * 18, horY);
                     ctx.lineTo(cx + i * 120, h);
-                    ctx.stroke();
-                }
-                const scroll = (t * 1.1) % 1;
-                for (let j = 0; j < 10; j++) {
-                    const p = (j + scroll) / 10;
-                    const y = horY + Math.pow(p, 2) * (h - horY);
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(w, y);
                     ctx.stroke();
                 }
             }
@@ -174,40 +177,6 @@
         renderPreview();
     }
 
-    /* ---------- FAQ accordion ---------- */
-    document.querySelectorAll('.faq-q').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const item = btn.parentElement;
-            const open = item.classList.toggle('open');
-            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        });
-    });
-
-    /* ---------- Reveal on scroll ---------- */
-    const io = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-            if (e.isIntersecting) {
-                e.target.classList.add('visible');
-                io.unobserve(e.target);
-            }
-        });
-    }, { threshold: 0.05, rootMargin: '0px 0px -10px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-    setTimeout(() => {
-        document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
-    }, 450);
-
-    
-    /* ---------- Cursor Spotlight Glow on Bento & Mode Cards ---------- */
-    document.querySelectorAll('.bento-card, .mode-showcase-card').forEach((card) => {
-        card.addEventListener('pointermove', (e) => {
-            const rect = card.getBoundingClientRect();
-            card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
-            card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
-        });
-    });
-
-    /* ---------- Live Demo Audio Toggle on Landing Page Showcase ---------- */
     const previewAudioBtn = document.getElementById('previewAudioBtn');
     let demoAudio = null;
     if (previewAudioBtn) {
@@ -229,6 +198,14 @@
             }
         });
     }
+
+    document.querySelectorAll('.faq-q').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const item = btn.parentElement;
+            const open = item.classList.toggle('open');
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    });
 
     const yearEl = document.getElementById('year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();

@@ -1,6 +1,5 @@
 /*
  * WaveForge — 360° Cybernetic Reactor EQ mode (mode 2)
- * Circular spectrum needles, peak-hold crystals, counter-rotating HUD core, and harmonic halo.
  */
 (function (registry) {
     'use strict';
@@ -34,7 +33,6 @@
             ctx.save();
             ctx.translate(cx, cy);
 
-            // 1. Ambient reactor glow
             const glow = ctx.createRadialGradient(0, 0, radius * 0.2, 0, 0, radius * 2.4);
             glow.addColorStop(0, engine.getColor(0) + '44');
             glow.addColorStop(0.5, engine.getColor(1) + '16');
@@ -44,15 +42,13 @@
             ctx.arc(0, 0, radius * 2.4, 0, Math.PI * 2);
             ctx.fill();
 
-            // 2. Counter-rotating inner geometric core
             ctx.save();
             ctx.rotate(-t * 0.45);
             ctx.strokeStyle = engine.getColor(1) + '66';
             ctx.lineWidth = 1.5;
             ctx.beginPath();
-            const polySides = 6;
-            for (let s = 0; s <= polySides; s++) {
-                const a = (s / polySides) * Math.PI * 2;
+            for (let s = 0; s <= 6; s++) {
+                const a = (s / 6) * Math.PI * 2;
                 const r = radius * (0.62 + bass * 0.15);
                 if (s === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
                 else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
@@ -60,7 +56,6 @@
             ctx.stroke();
             ctx.restore();
 
-            // 3. Rotating HUD dashed ring
             ctx.save();
             ctx.rotate(t * 0.25);
             ctx.strokeStyle = engine.getColor(0) + '88';
@@ -72,7 +67,6 @@
             ctx.setLineDash([]);
             ctx.restore();
 
-            // 4. Symmetrical 360° Spectrum Needles + Peak Crystals
             for (let i = 0; i < bars; i++) {
                 const half = bars / 2;
                 const mirrorIdx = i <= half ? i : bars - i;
@@ -87,14 +81,11 @@
                 grad.addColorStop(0, engine.getColor(0));
                 grad.addColorStop(1, engine.getColor(1));
                 ctx.fillStyle = grad;
-
                 ctx.fillRect(-1.8, radius, 3.6, barH);
 
-                // Inner core reflection
                 ctx.fillStyle = engine.getColor(2 % engine.palette.length) + '38';
                 ctx.fillRect(-1.4, radius - 4, 2.8, -barH * 0.22);
 
-                // Peak-hold crystal dot
                 const pk = Math.max(barH, peaks.radial[i] - fall);
                 peaks.radial[i] = pk;
                 if (pk > barH + 4) {
@@ -107,7 +98,6 @@
                 ctx.restore();
             }
 
-            // 5. Crisp base ring
             ctx.beginPath();
             ctx.arc(0, 0, radius, 0, Math.PI * 2);
             ctx.strokeStyle = '#ffffff';
