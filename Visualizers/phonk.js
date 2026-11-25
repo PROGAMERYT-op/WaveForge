@@ -314,14 +314,18 @@
             const dt = state.lastPhonkT ? Math.min(Math.abs(t - state.lastPhonkT), 0.1) : 0.016;
             state.lastPhonkT = t;
 
-            // Smooth kick-drum impact envelope for Hardtekk zoom-blur & shake
+            // Smooth kick-drum impact envelope — driven by Predictive Lookahead Choreographer when available
             if (state.phonkKickEnv === undefined) state.phonkKickEnv = 0;
-            if (isBeat || bass > 0.62) {
+            if (state.hasPredictiveMap && state.isPlaying) {
+                const predKick = Math.min(1.15, (state.predShake || 0) * 1.15 + (state.predFlash || 0) * 0.45);
+                state.phonkKickEnv = Math.max(predKick, state.phonkKickEnv * Math.pow(0.5, dt / 0.10));
+            } else if (isBeat || bass > 0.62) {
                 state.phonkKickEnv = Math.min(1, Math.max(state.phonkKickEnv, bass * 1.25));
             } else {
                 state.phonkKickEnv *= Math.pow(0.5, dt / 0.12);
             }
-            const kickEnv = state.phonkKickEnv;
+            const kickEnv = Math.min(1.15, state.phonkKickEnv);
+            const buildupTension = (state.hasPredictiveMap && state.isPlaying) ? (state.predBuildup || 0) : 0;
 
             // Optional Orbital Ring Rotation (shared with Logo & Phonk settings)
             if (config.logoRotateRing) {
@@ -336,7 +340,7 @@
             const shakeAmp = shakeSetting * kickEnv * kickEnv * 1.35 * resScale;
             const shakeX = Math.sin(t * 42) * shakeAmp;
             const shakeY = Math.cos(t * 37) * shakeAmp * 0.7;
-            const zoomPunch = 1.0 + kickEnv * 0.095 + Math.sin(t * 1.4) * 0.015;
+            const zoomPunch = 1.0 + kickEnv * 0.105 + buildupTension * 0.045 + Math.sin(t * 1.4) * 0.015;
 
             ctx.fillStyle = '#020208';
             ctx.fillRect(0, 0, w, h);

@@ -1,5 +1,5 @@
 /**
- * WaveForge Music Visualizer Studio v8.0
+ * WaveForge Music Visualizer Studio v9.0
  * Features:
  *  - 13 Visualization Modes (including Mode 12: Hardtekk / Phonk Liquid Ring + AirPods Intro)
  *  - 1-Click Trending Templates Hub (6 viral presets + 3-step guided workflow bar)
@@ -17,14 +17,17 @@
         {
             id: 'hardtekk-mage',
             name: 'Hardtekk Purple Mage',
-            tag: '🔥 EXACT VIDEO MATCH',
-            desc: '9:16 Vertical • AirPods 3.5s Volume Intro • Electric Purple Liquid Ring • Dark Mage Backdrop & Kick Zoom-Blur',
+            tag: '😈 PHONK RING',
+            fontLabel: 'Font: New Rocker (Gothic)',
+            desc: '9:16 Vertical • Liquid Neon Plasma Ring • 3.5s AirPods Volume Intro • Dark Mage Backdrop & Predictive Kick Zoom',
             color: '#a855f7',
+            speed: 1,
             settings: {
                 mode: 12,
                 aspectRatio: '9:16',
                 waveColor: '#a855f7',
                 palette: 'synthwave',
+                overlayFont: 'New Rocker',
                 phonkIntroEnabled: true,
                 phonkIntroDuration: 3.5,
                 phonkBgTheme: 'mage',
@@ -35,132 +38,150 @@
                 eqMid: 1,
                 eqTreble: 3,
                 sensitivity: 1.7,
+                bloomIntensity: 68,
+                predictiveIntensity: 1.25,
                 fxVignette: true,
-                fxScanlines: false
+                fxScanlines: false,
+                mirror: false
             }
         },
         {
             id: 'brazilian-funk',
-            name: 'Brazilian Funk Toxic Green',
-            tag: '⚡ VIRAL REELS / TIKTOK',
-            desc: '9:16 Vertical • Toxic Emerald Liquid Plasma Ring • Heavy Sub-Bass Camera Shake & Radial Warp Sparks',
+            name: 'Brazilian Funk Hyper-Tunnel',
+            tag: '⚡ 3D WARP TUNNEL',
+            fontLabel: 'Font: Anton (TikTok Bold)',
+            desc: '9:16 Vertical • Toxic Emerald 3D Hyperspace Octagon Tunnel • +10dB Sub-Bass • Heavy Predictive Drop Shake',
             color: '#00ff88',
+            speed: 1,
             settings: {
-                mode: 12,
+                mode: 9,
                 aspectRatio: '9:16',
                 waveColor: '#00ff88',
                 palette: 'trapneon',
-                phonkIntroEnabled: true,
-                phonkIntroDuration: 3.0,
-                phonkBgTheme: 'mage',
-                logoShakeIntensity: 22,
-                logoGlowSize: 45,
-                logoParticles: true,
+                overlayFont: 'Anton',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
                 eqBass: 10,
                 eqMid: 0,
                 eqTreble: 4,
-                sensitivity: 1.85,
+                sensitivity: 1.9,
+                bloomIntensity: 78,
+                predictiveIntensity: 1.45,
                 fxVignette: true,
-                fxScanlines: false
+                fxScanlines: false,
+                mirror: false
             }
         },
         {
             id: 'drift-phonk-crimson',
-            name: 'Drift Phonk Blood Crimson',
-            tag: '🩸 PHONK EDIT',
-            desc: '9:16 Vertical • Crimson Neon Plasma Ring • CRT Retro Scanlines • Aggressive Kick-Drum Echo Trail',
+            name: 'Drift Phonk Outrun VHS',
+            tag: '🩸 RETRO LASER GRID',
+            fontLabel: 'Font: Orbitron (Cyber Drift)',
+            desc: '9:16 Vertical • Crimson Synthwave Laser Horizon & Mountains • CRT VHS Scanlines • Aggressive Drop Flash',
             color: '#ff0055',
+            speed: 1,
             settings: {
-                mode: 12,
+                mode: 11,
                 aspectRatio: '9:16',
                 waveColor: '#ff0055',
                 palette: 'fire',
-                phonkIntroEnabled: true,
-                phonkIntroDuration: 3.5,
-                phonkBgTheme: 'drift',
-                logoShakeIntensity: 20,
-                logoGlowSize: 40,
-                logoParticles: true,
+                overlayFont: 'Orbitron',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
                 eqBass: 9,
                 eqMid: 2,
                 eqTreble: 2,
-                sensitivity: 1.75,
+                sensitivity: 1.8,
+                bloomIntensity: 75,
+                predictiveIntensity: 1.35,
                 fxVignette: true,
-                fxScanlines: true
+                fxScanlines: true,
+                mirror: false
             }
         },
         {
             id: 'ultra-slowed-ice',
-            name: 'Ultra Slowed Glacier Cyan',
-            tag: '❄️ SLOWED + REVERB',
-            desc: '9:16 Vertical • Ice Cyan & White Liquid Ring • AirPods Volume Intro • Deep Atmospheric Sub-Bass Glow',
+            name: 'Ultra Slowed Bass Shockwave',
+            tag: '❄️ 0.85× SLOWED',
+            fontLabel: 'Font: Syne (Avant-Garde)',
+            desc: '9:16 Vertical • Glacier Cyan Triple Harmonic Bass Nation Rings • 0.85× Slowed Speed • Deep Sub-Bass Glow',
             color: '#00f2ff',
+            speed: 0.85,
             settings: {
-                mode: 12,
+                mode: 10,
                 aspectRatio: '9:16',
                 waveColor: '#00f2ff',
                 palette: 'cyberpunk',
-                phonkIntroEnabled: true,
-                phonkIntroDuration: 3.5,
-                phonkBgTheme: 'cyber',
-                logoShakeIntensity: 14,
-                logoGlowSize: 48,
-                logoParticles: true,
+                overlayFont: 'Syne',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
                 eqBass: 7,
                 eqMid: -1,
                 eqTreble: 3,
-                sensitivity: 1.6,
+                sensitivity: 1.65,
+                bloomIntensity: 82,
+                predictiveIntensity: 1.05,
                 fxVignette: true,
-                fxScanlines: false
+                fxScanlines: false,
+                mirror: false
             }
         },
         {
             id: 'golden-royalty',
-            name: 'Golden Phonk Royalty',
-            tag: '👑 24K GOLD',
-            desc: '9:16 Vertical • 24K Gold & White Plasma Ring • Crown Emblem • High-Contrast Luxury Vignette',
+            name: '24K Gold Luxury Crest',
+            tag: '👑 LOGO SPOTLIGHT',
+            fontLabel: 'Font: Cinzel (Royal Serif)',
+            desc: '9:16 Vertical • Classic Logo Visualizer with 24K Gold Radial Rays, Orbiting Particles & Cinematic Drone Pan',
             color: '#fbbf24',
+            speed: 1,
             settings: {
-                mode: 12,
+                mode: 8,
                 aspectRatio: '9:16',
                 waveColor: '#fbbf24',
                 palette: 'gold',
+                overlayFont: 'Cinzel',
                 phonkIntroEnabled: false,
                 phonkIntroDuration: 0,
-                phonkBgTheme: 'mage',
-                logoShakeIntensity: 15,
-                logoGlowSize: 40,
+                logoShakeIntensity: 14,
+                logoGlowSize: 42,
                 logoParticles: true,
+                logoRotateRing: true,
                 eqBass: 6,
                 eqMid: 1,
                 eqTreble: 2,
                 sensitivity: 1.65,
+                bloomIntensity: 72,
+                predictiveIntensity: 1.1,
                 fxVignette: true,
-                fxScanlines: false
+                fxScanlines: false,
+                mirror: false
             }
         },
         {
             id: 'youtube-type-beat',
-            name: 'YouTube Type-Beat 16:9 Master',
-            tag: '📺 16:9 WIDESCREEN',
-            desc: '16:9 Widescreen • Classic Logo Visualizer with Drone Camera Pan, Radial Rays & Lower-Third Title',
+            name: 'YouTube Type-Beat 16:9',
+            tag: '📺 16:9 STUDIO BARS',
+            fontLabel: 'Font: Bebas Neue (Clean)',
+            desc: '16:9 Widescreen • Studio Bar Spectrum Analyzer with Mirror Floor Reflection, Peak LEDs & Lower-Third Title',
             color: '#6366f1',
+            speed: 1,
             settings: {
-                mode: 8,
+                mode: 0,
                 aspectRatio: '16:9',
-                waveColor: '#00ff88',
+                waveColor: '#00f2ff',
                 palette: 'cyberpunk',
+                overlayFont: 'Bebas Neue',
                 phonkIntroEnabled: false,
                 phonkIntroDuration: 0,
-                logoShakeIntensity: 12,
-                logoGlowSize: 35,
-                logoParticles: true,
                 eqBass: 4,
                 eqMid: 1,
                 eqTreble: 2,
-                sensitivity: 1.5,
+                sensitivity: 1.55,
+                bloomIntensity: 62,
+                predictiveIntensity: 0.85,
                 fxVignette: true,
-                fxScanlines: false
+                fxScanlines: false,
+                mirror: true
             }
         }
     ];
@@ -216,7 +237,15 @@
         prevVolume: 0.8,
         playbackSpeed: 1,
         isZenMode: false,
-        isSeeking: false
+        isSeeking: false,
+        hasPredictiveMap: false,
+        predShake: 0,
+        predZoom: 0,
+        predBuildup: 0,
+        predFlash: 0,
+        predEnergy: 0,
+        predBpm: 0,
+        predDrops: []
     };
 
     const VIS_MODS = window.WaveForgeVisualizers || {};
@@ -259,7 +288,10 @@
         eqTreble: 2,
         overlayTitle: '',
         overlayArtist: '',
+        overlayFont: 'New Rocker',
         overlayPosition: 'bottom-left',
+        predictiveEnabled: true,
+        predictiveIntensity: 1.1,
         overlayBeatPulse: true,
         fxScanlines: false,
         fxVignette: true,
@@ -415,7 +447,11 @@
             this.ctx = new AudioContext();
             this.analyser = this.ctx.createAnalyser();
             this.gainNode = this.ctx.createGain();
-            this.destinationNode = this.ctx.createMediaStreamDestination();
+            try {
+                this.destinationNode = this.ctx.createMediaStreamDestination();
+            } catch (e) {
+                this.destinationNode = null;
+            }
 
             this.bassFilter = this.ctx.createBiquadFilter();
             this.bassFilter.type = 'lowshelf';
@@ -451,7 +487,7 @@
             this.trebleFilter.connect(this.analyser);
             this.analyser.connect(this.gainNode);
             this.gainNode.connect(this.ctx.destination);
-            this.analyser.connect(this.destinationNode);
+            if (this.destinationNode) this.analyser.connect(this.destinationNode);
 
             this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
             this.waveData = new Uint8Array(this.analyser.fftSize);
@@ -479,7 +515,7 @@
             }
         }
 
-        playFile(url, label) {
+        async playFile(url, label) {
             this.resume();
             this.stopMic();
             if (this.fileURL && this.fileURL !== url && this.fileURL.startsWith('blob:')) {
@@ -491,16 +527,35 @@
             }
             this.fileURL = url;
             APP_STATE.trackTitleLabel = label || '';
+            this.audioElement.pause();
             this.audioElement.src = url;
             this.audioElement.currentTime = 0;
+
+            const onboard = document.getElementById('studio-onboarding');
+            if (onboard) onboard.classList.add('hidden-card');
+
+            // Offline Pre-Analysis: Listen to full track first, compute BPM, drops & predictive shake map!
+            if (CONFIG.predictiveEnabled) {
+                try {
+                    await PredictiveChoreographer.analyzeUrl(url, this.ctx);
+                } catch (err) {
+                    PredictiveChoreographer.clear();
+                }
+            } else {
+                PredictiveChoreographer.clear();
+            }
+
+            this.updateSettings();
             this.audioElement.play().then(() => {
                 APP_STATE.isPlaying = true;
                 UI.updatePlayButton();
-                UI.showToast('🎵 Audio playing — ready to customize or export!', 'success');
-            }).catch(e => {
+                const bpmTxt = APP_STATE.predBpm ? ` • ${APP_STATE.predBpm} BPM` : '';
+                const dropTxt = APP_STATE.predDrops.length ? ` • ${APP_STATE.predDrops.length} drops predicted` : '';
+                UI.showToast(`🧠 Synced & playing${bpmTxt}${dropTxt}!`, 'success');
+            }).catch(() => {
                 APP_STATE.isPlaying = false;
                 UI.updatePlayButton();
-                UI.showToast('Tap Play (▶) to start audio playback', 'info');
+                UI.showToast('Track analyzed! Tap Play (▶) to start', 'info');
             });
         }
 
@@ -624,6 +679,312 @@
             return this.audioElement.currentTime || 0;
         }
     }
+
+    // ============================================
+    // PREDICTIVE LOOKAHEAD AUDIO CHOREOGRAPHER (v9.0)
+    // Pre-analyzes entire song before playback to predict BPM,
+    // build-ups, true drops, and mathematically optimal shake/zoom/flash!
+    // ============================================
+
+    const PredictiveChoreographer = {
+        fps: 60,
+        duration: 0,
+        totalFrames: 0,
+        shake: null,
+        zoom: null,
+        buildup: null,
+        flash: null,
+        energy: null,
+        dropTimes: [],
+        bpm: 0,
+
+        clear() {
+            this.duration = 0;
+            this.totalFrames = 0;
+            this.shake = this.zoom = this.buildup = this.flash = this.energy = null;
+            this.dropTimes = [];
+            this.bpm = 0;
+            APP_STATE.hasPredictiveMap = false;
+            APP_STATE.predShake = APP_STATE.predZoom = APP_STATE.predBuildup = APP_STATE.predFlash = APP_STATE.predEnergy = 0;
+            APP_STATE.predBpm = 0;
+            APP_STATE.predDrops = [];
+            const bpmEl = document.getElementById('bpm-badge');
+            if (bpmEl) bpmEl.classList.add('hidden');
+            const markersEl = document.getElementById('seek-markers');
+            if (markersEl) markersEl.innerHTML = '';
+        },
+
+        _setOverlay(show, title, sub, pct) {
+            const ov = document.getElementById('analysis-overlay');
+            if (!ov) return;
+            ov.classList.toggle('hidden', !show);
+            const tEl = document.getElementById('analysis-title');
+            const sEl = document.getElementById('analysis-sub');
+            const fEl = document.getElementById('analysis-fill');
+            if (tEl && title) tEl.textContent = title;
+            if (sEl && sub) sEl.textContent = sub;
+            if (fEl && typeof pct === 'number') fEl.style.width = Math.max(0, Math.min(100, pct)) + '%';
+        },
+
+        async analyzeUrl(url, audioCtx) {
+            this._setOverlay(true, '🧠 Listening to Track...', 'Decoding full audio waveform for mathematical prediction', 18);
+            await new Promise(r => setTimeout(r, 16));
+
+            let decoded = (APP_STATE.decodedAudioSrc === url && APP_STATE.decodedAudioBuffer)
+                ? APP_STATE.decodedAudioBuffer
+                : null;
+
+            if (!decoded) {
+                const resp = await fetch(url);
+                const ab = await resp.arrayBuffer();
+                this._setOverlay(true, '🧠 Computing Bass & Transients...', 'Running full-song sub-bass & onset flux math', 45);
+                await new Promise(r => setTimeout(r, 16));
+                decoded = await audioCtx.decodeAudioData(ab.slice(0));
+                APP_STATE.decodedAudioBuffer = decoded;
+                APP_STATE.decodedAudioSrc = url;
+            }
+
+            this._setOverlay(true, '⚡ Predicting Drops & Shake Map...', 'Calculating lookahead build-ups, BPM & impact physics', 75);
+            await new Promise(r => setTimeout(r, 16));
+
+            this.analyzeBuffer(decoded);
+
+            this._setOverlay(true, '✨ Choreography Ready!', `${this.bpm} BPM • ${this.dropTimes.length} drops locked in`, 100);
+            await new Promise(r => setTimeout(r, 180));
+            this._setOverlay(false);
+        },
+
+        analyzeBuffer(audioBuffer) {
+            const sr = audioBuffer.sampleRate;
+            const len = audioBuffer.length;
+            const duration = audioBuffer.duration;
+            const ch0 = audioBuffer.getChannelData(0);
+            const ch1 = audioBuffer.numberOfChannels > 1 ? audioBuffer.getChannelData(1) : null;
+
+            const fps = this.fps;
+            const totalFrames = Math.max(1, Math.ceil(duration * fps));
+            const hop = Math.max(1, Math.floor(sr / fps));
+
+            const rawBass = new Float32Array(totalFrames);
+            const rawRms = new Float32Array(totalFrames);
+            const rawFlux = new Float32Array(totalFrames);
+
+            // Fast 1-pole low-pass filter (~135Hz) for sub-bass kick isolation
+            const lpAlpha = Math.min(0.25, (2 * Math.PI * 135) / sr);
+            let lp = 0;
+            let prevBass = 0;
+
+            for (let f = 0; f < totalFrames; f++) {
+                const start = f * hop;
+                const end = Math.min(len, start + hop);
+                let sumSq = 0;
+                let bassSq = 0;
+                const stride = hop > 1024 ? 2 : 1;
+                let count = 0;
+                for (let i = start; i < end; i += stride) {
+                    const s = ch1 ? (ch0[i] + ch1[i]) * 0.5 : ch0[i];
+                    lp += lpAlpha * (s - lp);
+                    sumSq += s * s;
+                    bassSq += lp * lp;
+                    count++;
+                }
+                const rms = Math.sqrt(sumSq / Math.max(1, count));
+                const bass = Math.sqrt(bassSq / Math.max(1, count));
+                rawRms[f] = rms;
+                rawBass[f] = bass;
+                rawFlux[f] = Math.max(0, bass - prevBass);
+                prevBass = bass;
+            }
+
+            // Whole-song 95th-percentile normalization so quiet & loud songs both scale accurately
+            const sortedBass = Array.from(rawBass).sort((a, b) => a - b);
+            const sortedFlux = Array.from(rawFlux).sort((a, b) => a - b);
+            const bassRef = Math.max(0.001, sortedBass[Math.floor(sortedBass.length * 0.96)] || 0.1);
+            const fluxRef = Math.max(0.0005, sortedFlux[Math.floor(sortedFlux.length * 0.97)] || 0.05);
+
+            const normBass = new Float32Array(totalFrames);
+            const normFlux = new Float32Array(totalFrames);
+            for (let f = 0; f < totalFrames; f++) {
+                normBass[f] = Math.min(1.4, rawBass[f] / bassRef);
+                normFlux[f] = Math.min(1.5, rawFlux[f] / fluxRef);
+            }
+
+            // Prefix sum of bass energy for O(1) lookback & lookahead window averages
+            const prefix = new Float32Array(totalFrames + 1);
+            for (let f = 0; f < totalFrames; f++) prefix[f + 1] = prefix[f] + normBass[f];
+            const winAvg = (a, b) => {
+                const lo = Math.max(0, a);
+                const hi = Math.min(totalFrames, b);
+                return hi > lo ? (prefix[hi] - prefix[lo]) / (hi - lo) : 0;
+            };
+
+            // Detect True Musical Drops via 2.5s forward lookahead vs 2.0s lookback energy jump
+            const lookBack = Math.round(fps * 2.0);
+            const lookAhead = Math.round(fps * 2.2);
+            const minDropGap = Math.round(fps * 6.0);
+            const dropFrames = [];
+            let lastDropF = -minDropGap;
+
+            for (let f = Math.round(fps * 1.2); f < totalFrames - Math.round(fps * 0.8); f++) {
+                if (f - lastDropF < minDropGap) continue;
+                const before = winAvg(f - lookBack, f);
+                const after = winAvg(f, f + lookAhead);
+                const jump = after - before;
+                if (normFlux[f] > 0.58 && normBass[f] > 0.62 && after > 0.52 && jump > 0.14) {
+                    dropFrames.push(f);
+                    lastDropF = f;
+                }
+            }
+
+            // Fallback: if song is constant energy (e.g. short loop), pick strongest bass transient
+            if (dropFrames.length === 0 && totalFrames > fps * 2) {
+                let bestF = Math.round(fps * 1.5);
+                let bestScore = 0;
+                for (let f = Math.round(fps * 1.0); f < Math.min(totalFrames, fps * 18); f++) {
+                    const sc = normFlux[f] * 0.65 + normBass[f] * 0.35;
+                    if (sc > bestScore) { bestScore = sc; bestF = f; }
+                }
+                if (bestScore > 0.35) dropFrames.push(bestF);
+            }
+
+            // Auto-BPM estimation via autocorrelation on onset flux (75–180 BPM)
+            const sampleLen = Math.min(totalFrames, fps * 35);
+            const minLag = Math.round((fps * 60) / 180);
+            const maxLag = Math.round((fps * 60) / 75);
+            let bestLag = Math.round((fps * 60) / 130);
+            let bestCorr = -1;
+            for (let lag = minLag; lag <= maxLag; lag++) {
+                let corr = 0;
+                for (let i = 0; i < sampleLen - lag; i++) {
+                    corr += normFlux[i] * normFlux[i + lag];
+                }
+                if (corr > bestCorr) { bestCorr = corr; bestLag = lag; }
+            }
+            const estBpm = Math.round((fps * 60) / Math.max(1, bestLag));
+
+            // Precompute predictive choreography curves: buildup, shake, zoom, flash, energy
+            const shakeArr = new Float32Array(totalFrames);
+            const zoomArr = new Float32Array(totalFrames);
+            const buildupArr = new Float32Array(totalFrames);
+            const flashArr = new Float32Array(totalFrames);
+            const energyArr = new Float32Array(totalFrames);
+
+            // 1. Mark 2.5-second pre-drop anticipation build-ups & drop flashes
+            const buildupLen = Math.round(fps * 2.5);
+            const dropSet = new Set(dropFrames);
+            for (const df of dropFrames) {
+                for (let k = 1; k <= buildupLen; k++) {
+                    const idx = df - k;
+                    if (idx >= 0) {
+                        const ramp = Math.pow(1 - k / buildupLen, 1.7);
+                        if (ramp > buildupArr[idx]) buildupArr[idx] = ramp;
+                    }
+                }
+            }
+
+            // 2. Compute spring-damped shake, zoom punch & flash envelopes
+            let shakeEnv = 0;
+            let flashEnv = 0;
+            for (let f = 0; f < totalFrames; f++) {
+                const localE = winAvg(f - 15, f + 15);
+                energyArr[f] = Math.min(1, localE);
+
+                const isDrop = dropSet.has(f);
+                const kickImpact = (normFlux[f] > 0.42 && normBass[f] > 0.48)
+                    ? Math.min(1, normFlux[f] * 0.72 + normBass[f] * 0.35) * (0.45 + 0.65 * energyArr[f])
+                    : 0;
+
+                if (isDrop) {
+                    shakeEnv = 1.25;
+                    flashEnv = 1.0;
+                } else if (kickImpact > shakeEnv) {
+                    shakeEnv = kickImpact;
+                    if (kickImpact > 0.88 && energyArr[f] > 0.62) {
+                        flashEnv = Math.max(flashEnv, 0.38);
+                    }
+                }
+
+                shakeArr[f] = Math.min(1.25, shakeEnv);
+                zoomArr[f] = Math.min(1.2, shakeEnv * 0.85 + buildupArr[f] * 0.45);
+                flashArr[f] = flashEnv;
+
+                shakeEnv *= 0.84;
+                flashEnv *= 0.80;
+            }
+
+            this.duration = duration;
+            this.totalFrames = totalFrames;
+            this.shake = shakeArr;
+            this.zoom = zoomArr;
+            this.buildup = buildupArr;
+            this.flash = flashArr;
+            this.energy = energyArr;
+            this.dropTimes = dropFrames.map(f => f / fps);
+            this.bpm = estBpm;
+
+            APP_STATE.hasPredictiveMap = true;
+            APP_STATE.predBpm = estBpm;
+            APP_STATE.predDrops = this.dropTimes.slice();
+
+            // Auto-sync AirPods intro beat-drop to first detected drop if in 1.5s–6.0s range
+            if (this.dropTimes.length > 0 && this.dropTimes[0] >= 1.5 && this.dropTimes[0] <= 6.0) {
+                const snapped = Math.round(this.dropTimes[0] * 2) / 2;
+                CONFIG.phonkIntroDuration = snapped;
+                const durEl = document.getElementById('set-phonk-intro-dur');
+                if (durEl) durEl.value = snapped;
+                if (typeof UI !== 'undefined' && UI.updateSliderLabels) {
+                    UI.updateSliderLabels();
+                    UI.syncAllRangeTracks();
+                }
+            }
+
+            // Update BPM & Drop Markers UI
+            const bpmEl = document.getElementById('bpm-badge');
+            if (bpmEl) {
+                bpmEl.textContent = `⚡ ${estBpm} BPM${this.dropTimes.length ? ' · ' + this.dropTimes.length + ' Drops' : ''}`;
+                bpmEl.classList.remove('hidden');
+            }
+            const markersEl = document.getElementById('seek-markers');
+            if (markersEl && duration > 0) {
+                markersEl.innerHTML = '';
+                this.dropTimes.forEach((dt, idx) => {
+                    const pct = (dt / duration) * 100;
+                    const pin = document.createElement('button');
+                    pin.type = 'button';
+                    pin.className = 'drop-marker';
+                    pin.style.left = pct + '%';
+                    pin.title = `Predicted Drop #${idx + 1} (${Math.floor(dt / 60)}:${String(Math.floor(dt % 60)).padStart(2, '0')}) — click to jump`;
+                    pin.onclick = (e) => {
+                        e.stopPropagation();
+                        if (audio && audio.audioElement) {
+                            audio.audioElement.currentTime = Math.max(0, dt - 1.5);
+                            if (audio.audioElement.paused) audio.togglePlay();
+                        }
+                    };
+                    markersEl.appendChild(pin);
+                });
+            }
+        },
+
+        sampleAt(timeSec) {
+            if (!this.shake || !this.totalFrames) {
+                APP_STATE.predShake = APP_STATE.predZoom = APP_STATE.predBuildup = APP_STATE.predFlash = APP_STATE.predEnergy = 0;
+                return;
+            }
+            const fFloat = Math.max(0, Math.min(this.totalFrames - 1, timeSec * this.fps));
+            const f0 = Math.floor(fFloat);
+            const f1 = Math.min(this.totalFrames - 1, f0 + 1);
+            const frac = fFloat - f0;
+            const lerp = (arr) => arr[f0] + (arr[f1] - arr[f0]) * frac;
+            const mul = typeof CONFIG.predictiveIntensity === 'number' ? CONFIG.predictiveIntensity : 1.1;
+
+            APP_STATE.predShake = lerp(this.shake) * mul;
+            APP_STATE.predZoom = lerp(this.zoom) * mul;
+            APP_STATE.predBuildup = lerp(this.buildup);
+            APP_STATE.predFlash = lerp(this.flash) * mul;
+            APP_STATE.predEnergy = lerp(this.energy);
+        }
+    };
 
     // ============================================
     // BEAT DETECTOR
@@ -1690,6 +2051,9 @@
         renderFrame(ctx, width, height, data, isBeat, progressRatio) {
             const mod = VIS_MODS[APP_STATE.mode];
             if (!mod) return;
+            if (APP_STATE.hasPredictiveMap && APP_STATE.exportTime !== null) {
+                PredictiveChoreographer.sampleAt(APP_STATE.exportTime);
+            }
 
             if (typeof viz !== 'undefined' && viz) data = viz.processData(data);
 
@@ -1897,6 +2261,27 @@
                 ctx.restore();
             }
 
+            // Predictive Drop Flash & Buildup Aura
+            if (APP_STATE.hasPredictiveMap && (APP_STATE.predFlash > 0.04 || APP_STATE.predBuildup > 0.1)) {
+                ctx.save();
+                if (APP_STATE.predFlash > 0.04) {
+                    ctx.globalCompositeOperation = 'lighter';
+                    ctx.globalAlpha = Math.min(0.24, APP_STATE.predFlash * 0.22);
+                    ctx.fillStyle = this.getColor(0);
+                    ctx.fillRect(0, 0, w, h);
+                }
+                if (APP_STATE.predBuildup > 0.1) {
+                    const aura = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.15, w / 2, h / 2, Math.max(w, h) * 0.65);
+                    aura.addColorStop(0, 'transparent');
+                    aura.addColorStop(1, this.getColor(0));
+                    ctx.globalCompositeOperation = 'lighter';
+                    ctx.globalAlpha = APP_STATE.predBuildup * 0.22;
+                    ctx.fillStyle = aura;
+                    ctx.fillRect(0, 0, w, h);
+                }
+                ctx.restore();
+            }
+
             if (CONFIG.fxVignette) {
                 const vig = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.28, w / 2, h / 2, Math.max(w, h) * 0.72);
                 vig.addColorStop(0, 'rgba(0,0,0,0)');
@@ -1948,9 +2333,12 @@
                 ctx.textBaseline = 'middle';
 
                 if (title) {
-                    ctx.font = `800 ${baseSize}px 'Space Grotesk', Inter, sans-serif`;
+                    const fontFace = CONFIG.overlayFont || 'Space Grotesk';
+                    const fontWeight = (fontFace === 'Anton' || fontFace === 'Bebas Neue' || fontFace === 'New Rocker') ? '400' : '800';
+                    const fontSizeMul = (fontFace === 'Bebas Neue' || fontFace === 'Anton') ? 1.18 : 1.0;
+                    ctx.font = `${fontWeight} ${Math.round(baseSize * fontSizeMul)}px '${fontFace}', 'Space Grotesk', sans-serif`;
                     ctx.shadowColor = this.getColor(0);
-                    ctx.shadowBlur = isBeat ? 22 : 12;
+                    ctx.shadowBlur = (isBeat || APP_STATE.predFlash > 0.25) ? 26 : 12;
                     ctx.fillStyle = '#ffffff';
                     ctx.fillText(title, 0, 0);
                 }
@@ -2030,15 +2418,36 @@
             const mod = VIS_MODS[APP_STATE.mode];
             if (!mod) return;
 
+            if (APP_STATE.hasPredictiveMap && APP_STATE.isPlaying) {
+                PredictiveChoreographer.sampleAt(audio.getCurrentTime());
+            } else if (!APP_STATE.isPlaying) {
+                APP_STATE.predShake = APP_STATE.predZoom = APP_STATE.predBuildup = APP_STATE.predFlash = 0;
+            }
+
             if (!mod.ownBackground) {
-                ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
+                ctx.fillStyle = 'rgba(5, 5, 10, 0.22)';
                 ctx.fillRect(0, 0, w, h);
+            }
+
+            // Apply global Predictive Camera Shake & Buildup Zoom for all non-Phonk/Logo modes
+            const applyGlobalPred = APP_STATE.hasPredictiveMap && APP_STATE.mode !== 12 && APP_STATE.mode !== 8 && (APP_STATE.predShake > 0.02 || APP_STATE.predBuildup > 0.02);
+            ctx.save();
+            if (applyGlobalPred) {
+                const t = nowSec();
+                const sAmp = Math.min(w, h) * 0.014 * APP_STATE.predShake;
+                const sx = Math.sin(t * 46) * sAmp;
+                const sy = Math.cos(t * 39) * sAmp * 0.72;
+                const zScale = 1 + APP_STATE.predZoom * 0.055;
+                ctx.translate(cx + sx, cy + sy);
+                ctx.scale(zScale, zScale);
+                ctx.translate(-cx, -cy);
             }
 
             ctx.lineWidth = 2;
             ctx.lineCap = 'round';
 
             mod.render(this, ctx, w, h, cx, cy, data, isBeat);
+            ctx.restore();
 
             const prog = audio.getDuration() > 0 ? audio.getCurrentTime() / audio.getDuration() : 0;
             this.renderPostOverlays(ctx, w, h, isBeat, prog, false);
@@ -2051,8 +2460,8 @@
 
     const MODE_CATEGORIES = {
         12: 'viral', 8: 'viral', 10: 'viral',
-        9: '3d', 11: '3d', 5: '3d', 6: '3d', 7: '3d',
-        0: 'classic', 1: 'classic', 2: 'classic', 3: 'classic', 4: 'classic'
+        9: '3d', 11: '3d',
+        0: 'classic', 1: 'classic', 2: 'classic', 3: 'classic'
     };
 
     const SPEED_STEPS = [0.75, 0.85, 1, 1.15, 1.25];
@@ -2135,6 +2544,7 @@
             setDisabled('row-phonk-intro-dur', !CONFIG.phonkIntroEnabled);
             setDisabled('row-hue-speed', !CONFIG.hueCycle);
             setDisabled('row-beat-thresh', !CONFIG.beatEnabled);
+            setDisabled('row-pred-intensity', !CONFIG.predictiveEnabled);
         },
 
         syncWizardBar() {
@@ -2215,8 +2625,9 @@
                     </div>
                     <div class="tpl-body">
                         <h3>${tpl.name}</h3>
+                        <span class="tpl-font-tag">${tpl.fontLabel || ''}</span>
                         <p>${tpl.desc}</p>
-                        <button type="button" class="tpl-use-btn">${isActive ? '✓ Active Template' : '✨ Use This Template'}</button>
+                        <button type="button" class="tpl-use-btn" data-use-template="${tpl.id}">${isActive ? '✓ Active Template' : '✨ Use This Template'}</button>
                     </div>
                 `;
                 const activate = () => this.applyTemplate(tpl.id);
@@ -2239,6 +2650,9 @@
             Object.assign(CONFIG, tpl.settings);
             if (VIS_MODS[tpl.settings.mode]) {
                 APP_STATE.mode = tpl.settings.mode;
+            }
+            if (typeof tpl.speed === 'number') {
+                this.setPlaybackSpeed(tpl.speed);
             }
 
             audio.updateSettings();
@@ -2286,7 +2700,7 @@
             const grid = document.getElementById('mode-grid');
             if (!grid) return;
             grid.innerHTML = '';
-            const order = [12, 8, 10, 9, 11, 0, 1, 2, 3, 4, 5, 6, 7].filter(k => VIS_MODS[k]);
+            const order = [12, 8, 10, 9, 11, 0, 1, 2, 3].filter(k => VIS_MODS[k]);
 
             order.forEach(key => {
                 const mod = VIS_MODS[key];
@@ -2460,17 +2874,35 @@
                 };
             }
 
-            const onboardClose = document.getElementById('onboard-close-btn');
-            if (onboardClose) {
-                onboardClose.onclick = () => {
+            // Resilient delegated + direct click handling for Welcome Card & Template Cards
+            document.addEventListener('click', (e) => {
+                const closeBtn = e.target.closest('#onboard-close-btn');
+                if (closeBtn) {
+                    e.preventDefault();
                     const card = document.getElementById('studio-onboarding');
                     if (card) card.classList.add('hidden-card');
-                };
-            }
-            const onboardDemo = document.getElementById('onboard-demo-btn');
-            if (onboardDemo) onboardDemo.onclick = () => this.loadDemoTrack();
-            const onboardUpload = document.getElementById('onboard-upload-btn');
-            if (onboardUpload) onboardUpload.onclick = () => this.els.fileInput.click();
+                    return;
+                }
+                const upBtn = e.target.closest('#onboard-upload-btn');
+                if (upBtn) {
+                    e.preventDefault();
+                    const fi = document.getElementById('file-input');
+                    if (fi) fi.click();
+                    return;
+                }
+                const demoBtn = e.target.closest('#onboard-demo-btn');
+                if (demoBtn) {
+                    e.preventDefault();
+                    this.loadDemoTrack();
+                    return;
+                }
+                const tplBtn = e.target.closest('[data-use-template]');
+                if (tplBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.applyTemplate(tplBtn.getAttribute('data-use-template'));
+                }
+            });
 
             this.els.fileInput.onchange = (e) => {
                 this.handleFile(e.target.files[0]);
@@ -2853,7 +3285,7 @@
                         if (expAspect) expAspect.value = val;
                     }
                     if (el.type === 'range') this.syncRangeTrack(el);
-                    if (configKey === 'phonkIntroEnabled' || configKey === 'hueCycle' || configKey === 'beatEnabled') {
+                    if (configKey === 'phonkIntroEnabled' || configKey === 'hueCycle' || configKey === 'beatEnabled' || configKey === 'predictiveEnabled') {
                         this.syncDependentSettings();
                     }
                     if (configKey === 'eqBass' || configKey === 'eqMid' || configKey === 'eqTreble') {
@@ -2864,7 +3296,6 @@
                 };
             };
 
-            linkSetting('set-fft', 'fftSize', 'int');
             linkSetting('set-smoothing', 'smoothing', 'float');
             linkSetting('set-sensitivity', 'sensitivity', 'float');
             linkSetting('set-bloom', 'bloomIntensity', 'float');
@@ -2873,7 +3304,9 @@
             linkSetting('set-beat-enabled', 'beatEnabled', 'bool');
             linkSetting('set-mirror', 'mirror', 'bool');
             linkSetting('set-watermark', 'watermark', 'bool');
-            linkSetting('set-freq-scale', 'freqScale', 'string');
+            linkSetting('set-overlay-font', 'overlayFont', 'string');
+            linkSetting('set-pred-enabled', 'predictiveEnabled', 'bool');
+            linkSetting('set-pred-intensity', 'predictiveIntensity', 'float');
             linkSetting('set-hue-cycle', 'hueCycle', 'bool');
             linkSetting('set-hue-speed', 'hueCycleSpeed', 'float');
 
@@ -2957,17 +3390,7 @@
                 };
             }
 
-            document.getElementById('set-hc').onchange = (e) => {
-                CONFIG.highContrast = e.target.checked;
-                document.body.classList.toggle('high-contrast', CONFIG.highContrast);
-                persistConfig();
-            };
-
-            document.getElementById('set-show-fps').onchange = (e) => {
-                CONFIG.showFps = e.target.checked;
-                document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
-                persistConfig();
-            };
+            // Streamlined v9.0 settings (removed High Contrast & FPS toggle clutter)
 
             document.getElementById('btn-export-preset').onclick = () => {
                 const preset = { ...CONFIG, mode: APP_STATE.mode };
@@ -3080,7 +3503,9 @@
             setVal('set-eq-treble', CONFIG.eqTreble);
             setVal('set-overlay-title', CONFIG.overlayTitle);
             setVal('set-overlay-artist', CONFIG.overlayArtist);
+            setVal('set-overlay-font', CONFIG.overlayFont || 'New Rocker');
             setVal('set-overlay-pos', CONFIG.overlayPosition);
+            setVal('set-pred-intensity', CONFIG.predictiveIntensity);
             setVal('set-aspect', CONFIG.aspectRatio);
             setVal('export-aspect', CONFIG.aspectRatio);
             setVal('set-phonk-intro-dur', CONFIG.phonkIntroDuration);
@@ -3099,6 +3524,7 @@
             setChk('set-fx-vignette', CONFIG.fxVignette);
             setChk('set-fx-progress', CONFIG.fxProgressBar);
             setChk('set-phonk-intro', CONFIG.phonkIntroEnabled);
+            setChk('set-pred-enabled', CONFIG.predictiveEnabled);
 
             document.body.classList.toggle('high-contrast', CONFIG.highContrast);
             document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
@@ -3286,20 +3712,20 @@
     document.addEventListener('DOMContentLoaded', () => {
         hydrateConfig();
 
-        audio = new AudioEngine();
-        viz = new VisualizerEngine();
+        try { audio = new AudioEngine(); } catch (e) { console.warn('AudioEngine init deferred:', e); }
+        try { viz = new VisualizerEngine(); } catch (e) { console.warn('VisualizerEngine init error:', e); }
 
         UI.init();
-        Exporter.init();
+        try { Exporter.init(); } catch (e) { console.warn('Exporter init error:', e); }
 
-        viz.loop();
+        if (viz) viz.loop();
 
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('template')) {
             UI.applyTemplate(urlParams.get('template'));
         }
 
-        console.log('%c🎵 WaveForge Studio v8.0.0', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+        console.log('%c🧠 WaveForge Studio v9.0.0 — Predictive Audio Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

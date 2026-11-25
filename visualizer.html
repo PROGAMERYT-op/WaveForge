@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '8.0.0';
+            var VER = '9.0.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -34,22 +34,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>WaveForge Studio 8.0 | Phonk &amp; Hardtekk Template Maker + 4K Music Visualizer</title>
-    <meta name="description" content="WaveForge Studio 8.0 lets you create viral TikTok Hardtekk, Brazilian Funk &amp; Phonk music videos in 1 click. Features AirPods volume intro, liquid plasma rings, custom logo/background uploads, and 4K MP4 export.">
-    <meta name="keywords" content="phonk visualizer, hardtekk visualizer, brazilian funk video maker, tiktok music visualizer, 9:16 audio visualizer, free music visualizer, logo visualizer, avee player online alternative">
+    <title>WaveForge Studio 9.0 | Predictive Phonk &amp; Hardtekk Visualizer + 4K MP4 Export</title>
+    <meta name="description" content="WaveForge Studio 9.0 pre-analyzes your song to predict every drop, kick-drum shake, and zoom punch automatically. 6 unique viral templates, trending edit fonts, 9 pro visualizers, and 4K MP4 export.">
+    <meta name="keywords" content="phonk visualizer, hardtekk visualizer, brazilian funk video maker, tiktok music visualizer, 9:16 audio visualizer, free music visualizer, logo visualizer, predictive beat drop visualizer">
     <meta name="author" content="WaveForge">
     <meta name="theme-color" content="#05070f">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&family=New+Rocker&family=Orbitron:wght@700;900&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://progameryt-op.github.io/WaveForge/visualizer.html">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <meta property="og:title" content="WaveForge Studio 8.0 — Phonk &amp; Hardtekk Music Video Templates">
-    <meta property="og:description" content="1-click viral Phonk &amp; Hardtekk templates, AirPods volume intro, 13 modes, 3-band EQ, and 4K MP4 export.">
+    <meta property="og:title" content="WaveForge Studio 9.0 — Predictive Phonk &amp; Hardtekk Visualizer">
+    <meta property="og:description" content="Pre-analyzes your music to predict drops, shakes &amp; flashes automatically. 6 unique templates, trending fonts &amp; 4K MP4 export.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
 
     <link rel="manifest" href="assets/manifest.json">
@@ -58,21 +58,40 @@
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="assets/css/app.css?v=8.0.0">
+    <link rel="stylesheet" href="assets/css/app.css?v=9.0.0">
 
     <!-- Fast WebCodecs export: mp4-muxer -->
     <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- VISUALLY-HIDDEN FILE INPUTS AT BODY ROOT (Guarantees 100% reliable click triggers on Mobile Safari/Android/Desktop) -->
+    <input type="file" id="file-input" accept="audio/*,.mp3,.wav,.ogg,.flac,.m4a,.aac,.json" class="visually-hidden" tabindex="-1">
+    <input type="file" id="logo-bg-input" accept="image/*" class="visually-hidden" tabindex="-1">
+    <input type="file" id="logo-img-input" accept="image/*" class="visually-hidden" tabindex="-1">
+
     <main class="visually-hidden" role="main">
         <article>
-            <h2>WaveForge Studio 8.0 - Viral Phonk &amp; Hardtekk Music Visualizer Templates</h2>
-            <p>Browser-based music visualizer with 1-click Phonk, Hardtekk, and Brazilian Funk templates, AirPods volume intro, 13 modes, 3-band EQ, and 4K MP4 video exports.</p>
+            <h2>WaveForge Studio 9.0 - Predictive Phonk &amp; Hardtekk Music Visualizer</h2>
+            <p>Browser-based music visualizer with offline song pre-analysis, predictive beat-drop choreography, 6 unique viral templates, trending edit fonts, 9 pro visualizers, 3-band EQ, and 4K MP4 exports.</p>
         </article>
     </main>
 
     <!-- MAIN CANVAS -->
     <canvas id="viz-canvas" role="img" aria-label="Music visualization display showing audio reactive graphics"></canvas>
+
+    <!-- PREDICTIVE AUDIO ANALYSIS OVERLAY -->
+    <div id="analysis-overlay" class="analysis-overlay hidden" role="status" aria-live="polite">
+        <div class="analysis-card">
+            <div class="analysis-spinner" aria-hidden="true"></div>
+            <div class="analysis-text">
+                <strong id="analysis-title">🧠 Listening &amp; Analyzing Track...</strong>
+                <span id="analysis-sub">Computing BPM, bass drops &amp; predictive shake map</span>
+            </div>
+            <div class="analysis-bar">
+                <div class="analysis-fill" id="analysis-fill"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- ZEN MODE EXIT PILL -->
     <button type="button" id="btn-exit-zen" class="zen-exit-pill hidden" aria-label="Show studio controls" title="Exit Zen Mode (H)">
@@ -94,12 +113,12 @@
     <!-- COMPACT QUICK-START ONBOARDING CARD (Auto-hides on play or dismiss) -->
     <div id="studio-onboarding" class="studio-onboarding interactive" role="region" aria-label="Quick start guide">
         <button type="button" class="onboard-dismiss" id="onboard-close-btn" aria-label="Dismiss welcome card">✕</button>
-        <div class="onboard-icon-ring" aria-hidden="true">😈</div>
-        <h2>Create Viral Phonk &amp; Music Edits</h2>
-        <p>Pick a 1-click trending Hardtekk / Funk template, upload your music &amp; logo, and export in 9:16 or 16:9 4K.</p>
+        <div class="onboard-icon-ring" aria-hidden="true">🧠</div>
+        <h2>Predictive Phonk &amp; 4K Studio</h2>
+        <p>WaveForge listens to your track first, predicts every drop, BPM &amp; kick shake mathematically, then plays in perfect sync.</p>
         <div class="onboard-actions" style="grid-template-columns: 1fr;">
             <button type="button" id="onboard-templates-btn" class="btn-studio-primary onboard-btn" style="background:linear-gradient(135deg,#a855f7,#ec4899);">
-                <span>🔥 Browse Trending Templates (6)</span>
+                <span>🔥 Browse 6 Unique Templates</span>
             </button>
         </div>
         <div class="onboard-actions" style="margin-top:8px;">
@@ -107,24 +126,24 @@
                 <span>📁 Upload Music</span>
             </button>
             <button type="button" id="onboard-demo-btn" class="onboard-btn-secondary">
-                <span>▶ Try Demo Track</span>
+                <span>▶ Analyze &amp; Play Demo</span>
             </button>
         </div>
     </div>
 
     <!-- TRENDING TEMPLATES GALLERY MODAL / BOTTOM SHEET -->
     <div id="templates-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="templates-title">
-        <div class="modal interactive" style="max-width: 760px;">
+        <div class="modal interactive" style="max-width: 780px;">
             <div class="sheet-handle" aria-hidden="true"></div>
             <div class="modal-header">
                 <div>
-                    <span class="modal-eyebrow">1-CLICK VIRAL PRESETS</span>
-                    <h2 id="templates-title">🔥 Trending Phonk &amp; Funk Templates</h2>
+                    <span class="modal-eyebrow">6 DISTINCT VISUAL ENGINES &amp; TRENDING FONTS</span>
+                    <h2 id="templates-title">🔥 Unique Creator Templates</h2>
                 </div>
                 <button type="button" id="btn-close-templates" class="close-icon-btn" aria-label="Close templates">✕</button>
             </div>
             <p class="modal-lead">
-                Tap any template below to automatically configure the AirPods volume intro, liquid neon plasma ring, 9:16 TikTok framing, and Bass Boost EQ — then upload your music, background, and logo!
+                Each template uses its own unique visualizer engine, trending TikTok/Reels typography font, predictive drop choreography, and Bass EQ.
             </p>
             <div class="templates-grid" id="templates-grid"></div>
         </div>
@@ -136,13 +155,13 @@
             <div class="sheet-handle" aria-hidden="true"></div>
             <div class="mode-selector-header">
                 <div>
-                    <span class="modal-eyebrow">13 VISUAL ENGINES</span>
+                    <span class="modal-eyebrow">9 PRO VISUAL ENGINES</span>
                     <h2 id="mode-selector-title">Visualization Mode</h2>
                 </div>
                 <button type="button" id="btn-close-mode-selector" class="close-icon-btn" aria-label="Close mode selector">✕</button>
             </div>
             <div class="mode-filter-row" id="mode-filter-row" role="group" aria-label="Filter visualization modes">
-                <button type="button" class="mode-filter-pill active" data-cat="all">All (13)</button>
+                <button type="button" class="mode-filter-pill active" data-cat="all">All (9)</button>
                 <button type="button" class="mode-filter-pill" data-cat="viral">🔥 Viral &amp; Logo</button>
                 <button type="button" class="mode-filter-pill" data-cat="3d">🌀 3D &amp; Retro</button>
                 <button type="button" class="mode-filter-pill" data-cat="classic">📊 Spectrum &amp; FX</button>
@@ -150,10 +169,6 @@
             <div class="mode-grid" id="mode-grid"></div>
         </div>
     </div>
-
-    <!-- HIDDEN FILE INPUTS FOR LOGO VIZ -->
-    <input type="file" id="logo-bg-input" accept="image/*" class="hidden" aria-hidden="true">
-    <input type="file" id="logo-img-input" accept="image/*" class="hidden" aria-hidden="true">
 
     <!-- STUDIO UI LAYER -->
     <nav id="ui-layer" role="navigation" aria-label="Visualizer controls">
@@ -174,6 +189,7 @@
                             <span class="status-dot" id="status-dot"></span>
                             <span id="status-text">Ready</span>
                         </span>
+                        <span class="status-pill mono-pill bpm-pill hidden" id="bpm-badge" title="Predicted BPM & detected drops">⚡ -- BPM</span>
                         <span class="status-pill mono-pill desktop-only-pill" id="fps-display">60 FPS</span>
                         <button type="button" class="status-pill mode-indicator-btn" id="top-mode-pill" title="Switch visualization mode (M)">
                             <span class="mode-name" id="mode-name">Hardtekk Phonk</span>
@@ -183,7 +199,7 @@
                 </div>
 
                 <div class="top-actions">
-                    <button type="button" id="btn-templates" class="btn-templates-pill" aria-label="Open trending templates" title="1-Click Trending Phonk &amp; Funk Templates (T)">
+                    <button type="button" id="btn-templates" class="btn-templates-pill" aria-label="Open trending templates" title="6 Unique Viral Templates (T)">
                         <span aria-hidden="true">🔥</span>
                         <span class="tpl-btn-text">Templates</span>
                     </button>
@@ -191,7 +207,7 @@
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         <span class="export-label">Export</span>
                     </button>
-                    <button type="button" id="btn-settings" class="top-icon-btn" aria-label="Open studio settings" title="Studio Settings, EQ &amp; Overlays">
+                    <button type="button" id="btn-settings" class="top-icon-btn" aria-label="Open studio settings" title="Studio Settings, Fonts &amp; EQ">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
                         <span class="btn-text">Settings</span>
                     </button>
@@ -227,14 +243,15 @@
         <!-- MOBILE-FIRST ERGONOMIC BOTTOM TRANSPORT DOCK -->
         <div class="dock-wrapper">
             <div class="control-bar interactive" role="group" aria-label="Playback and visual controls">
-                <!-- Row 1: Touch-Swipeable 13-Mode Pill Ribbon -->
+                <!-- Row 1: Touch-Swipeable 9-Mode Pill Ribbon -->
                 <div class="quick-mode-strip" id="quick-mode-strip" role="toolbar" aria-label="Quick mode switcher"></div>
 
-                <!-- Row 2: Precision Timeline Scrubber with Hover Time Tooltip -->
+                <!-- Row 2: Precision Timeline Scrubber with Predicted Drop Markers & Hover Tooltip -->
                 <div class="scrubber-container">
                     <span id="time-current" class="time-display">0:00</span>
                     <div class="seek-wrap">
                         <div class="seek-tooltip" id="seek-tooltip" aria-hidden="true">0:00</div>
+                        <div class="seek-markers" id="seek-markers" aria-hidden="true"></div>
                         <input type="range" id="seek-bar" value="0" min="0" max="100" step="0.1" aria-label="Seek position">
                     </div>
                     <span id="time-total" class="time-display">0:00</span>
@@ -242,20 +259,18 @@
 
                 <!-- Row 3: Single-Row Ergonomic Transport Controls -->
                 <div class="transport-controls">
-                    <input type="file" id="file-input" accept="audio/*,.json" class="hidden" aria-hidden="true">
-
                     <div class="transport-group left-group">
                         <button type="button" id="btn-upload" class="dock-btn" aria-label="Upload audio file" title="Upload Audio File">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                             <span class="dock-lbl">Music</span>
                         </button>
 
-                        <button type="button" id="dock-btn-templates" class="dock-btn desktop-only-btn" aria-label="Trending templates" title="1-Click Trending Templates (T)">
+                        <button type="button" id="dock-btn-templates" class="dock-btn desktop-only-btn" aria-label="Trending templates" title="6 Unique Viral Templates (T)">
                             <span style="font-size:15px;line-height:1;" aria-hidden="true">🔥</span>
                             <span class="dock-lbl">Templates</span>
                         </button>
 
-                        <button type="button" id="btn-demo" class="dock-btn" aria-label="Load demo track" title="Play Built-In Demo Track">
+                        <button type="button" id="btn-demo" class="dock-btn" aria-label="Load demo track" title="Analyze &amp; Play Demo Track">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                             <span class="dock-lbl">Demo</span>
                         </button>
@@ -278,7 +293,7 @@
                     </div>
 
                     <div class="transport-group right-group">
-                        <button type="button" id="btn-mode" class="dock-btn" aria-label="Change visualization mode" title="All 13 Modes Grid (M)">
+                        <button type="button" id="btn-mode" class="dock-btn" aria-label="Change visualization mode" title="All 9 Pro Modes (M)">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
                             <span class="dock-lbl">Modes</span>
                         </button>
@@ -313,21 +328,61 @@
             <div class="modal-header">
                 <div>
                     <span class="modal-eyebrow">STUDIO CONTROLS</span>
-                    <h2 id="settings-title">Configuration &amp; EQ</h2>
+                    <h2 id="settings-title">Configuration, Fonts &amp; EQ</h2>
                 </div>
                 <button type="button" id="btn-close-settings" class="close-icon-btn" aria-label="Close settings">✕</button>
             </div>
 
             <!-- 4-TAB SEGMENTED CONTROL -->
             <div class="settings-tabs" role="tablist" aria-label="Configuration sections">
-                <button type="button" class="settings-tab active" data-tab="tab-branding" role="tab" aria-selected="true">Logo &amp; Phonk</button>
-                <button type="button" class="settings-tab" data-tab="tab-visuals" role="tab" aria-selected="false">Visuals</button>
+                <button type="button" class="settings-tab active" data-tab="tab-branding" role="tab" aria-selected="true">Fonts &amp; Phonk</button>
+                <button type="button" class="settings-tab" data-tab="tab-visuals" role="tab" aria-selected="false">Visuals &amp; AI</button>
                 <button type="button" class="settings-tab" data-tab="tab-audio" role="tab" aria-selected="false">Audio &amp; EQ</button>
-                <button type="button" class="settings-tab" data-tab="tab-system" role="tab" aria-selected="false">System</button>
+                <button type="button" class="settings-tab" data-tab="tab-system" role="tab" aria-selected="false">Presets</button>
             </div>
 
-            <!-- TAB 1: LOGO, PHONK INTRO & BRANDING -->
+            <!-- TAB 1: FONTS, LOGO & PHONK INTRO -->
             <div class="settings-pane active" id="tab-branding" role="tabpanel">
+                <div class="settings-group">
+                    <h3>On-Canvas Trending Typography</h3>
+                    <div class="control-row">
+                        <label for="set-overlay-title">Track Title</label>
+                        <input type="text" id="set-overlay-title" class="text-input" placeholder="e.g. AINSI BAS LA VIDA (SLOWED)" maxlength="60">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-overlay-artist">Artist / Producer Tag</label>
+                        <input type="text" id="set-overlay-artist" class="text-input" placeholder="e.g. @YourChannelName" maxlength="60">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-overlay-font">Trending Font Style</label>
+                        <select id="set-overlay-font">
+                            <option value="New Rocker">😈 New Rocker (Gothic Phonk)</option>
+                            <option value="Anton">⚡ Anton (TikTok Funk Bold)</option>
+                            <option value="Orbitron">🩸 Orbitron (Cyber Drift)</option>
+                            <option value="Syne">❄️ Syne (Ultra Slowed Wide)</option>
+                            <option value="Cinzel">👑 Cinzel (24K Luxury Serif)</option>
+                            <option value="Bebas Neue">📺 Bebas Neue (Type-Beat)</option>
+                            <option value="Space Grotesk" selected>🎵 Space Grotesk (Studio)</option>
+                        </select>
+                    </div>
+                    <div class="control-row">
+                        <label for="set-overlay-pos">Typography Placement</label>
+                        <select id="set-overlay-pos">
+                            <option value="bottom-left" selected>Bottom Left (Lower Third)</option>
+                            <option value="bottom-center">Bottom Center</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="center">Center Canvas</option>
+                        </select>
+                    </div>
+                    <div class="control-row toggle-row">
+                        <label for="set-overlay-pulse">Beat-Reactive Text Scale</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-overlay-pulse" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
                 <div id="logo-mode-notice" class="mode-notice-banner hidden">
                     <p>Ring, backdrop, and AirPods intro controls apply to <strong>Hardtekk Phonk</strong> and <strong>Logo Visualizer</strong> modes.</p>
                     <button type="button" id="btn-switch-phonk-mode" class="btn-studio-primary" style="padding:7px 12px;font-size:0.74rem;">😈 Switch to Hardtekk Phonk</button>
@@ -415,38 +470,25 @@
                         </label>
                     </div>
                 </div>
+            </div>
 
+            <!-- TAB 2: VISUALS & PREDICTIVE CHOREOGRAPHY -->
+            <div class="settings-pane" id="tab-visuals" role="tabpanel">
                 <div class="settings-group">
-                    <h3>On-Canvas Track Typography</h3>
-                    <div class="control-row">
-                        <label for="set-overlay-title">Track Title</label>
-                        <input type="text" id="set-overlay-title" class="text-input" placeholder="e.g. AINSI BAS LA VIDA (SLOWED)" maxlength="60">
-                    </div>
-                    <div class="control-row">
-                        <label for="set-overlay-artist">Artist / Producer Name</label>
-                        <input type="text" id="set-overlay-artist" class="text-input" placeholder="e.g. @YourChannelName" maxlength="60">
-                    </div>
-                    <div class="control-row">
-                        <label for="set-overlay-pos">Typography Placement</label>
-                        <select id="set-overlay-pos">
-                            <option value="bottom-left" selected>Bottom Left (Lower Third)</option>
-                            <option value="bottom-center">Bottom Center</option>
-                            <option value="top-center">Top Center</option>
-                            <option value="center">Center Canvas</option>
-                        </select>
-                    </div>
+                    <h3>Predictive Lookahead Choreography</h3>
                     <div class="control-row toggle-row">
-                        <label for="set-overlay-pulse">Beat-Reactive Text Scale</label>
+                        <label for="set-pred-enabled">🧠 Pre-Analyze &amp; Auto-Predict Drops</label>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="set-overlay-pulse" checked>
+                            <input type="checkbox" id="set-pred-enabled" checked>
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
+                    <div class="control-row" id="row-pred-intensity">
+                        <label for="set-pred-intensity">Predictive Shake &amp; Drop Intensity</label>
+                        <input type="range" id="set-pred-intensity" min="0" max="2" step="0.1" value="1.1" data-unit="×">
+                    </div>
                 </div>
-            </div>
 
-            <!-- TAB 2: VISUALS & FX -->
-            <div class="settings-pane" id="tab-visuals" role="tabpanel">
                 <div class="settings-group">
                     <h3>Color &amp; Framing</h3>
                     <div class="control-row">
@@ -561,25 +603,7 @@
                 </div>
 
                 <div class="settings-group">
-                    <h3>FFT Spectrum &amp; Beat Detector</h3>
-                    <div class="control-row">
-                        <label for="set-fft">FFT Sample Resolution</label>
-                        <select id="set-fft">
-                            <option value="512">512 (Fast)</option>
-                            <option value="1024">1024</option>
-                            <option value="2048" selected>2048 (Studio Balanced)</option>
-                            <option value="4096">4096 (High Detail)</option>
-                            <option value="8192">8192</option>
-                            <option value="16384">16384 (Mastering Ultra)</option>
-                        </select>
-                    </div>
-                    <div class="control-row">
-                        <label for="set-freq-scale">Frequency Scale</label>
-                        <select id="set-freq-scale">
-                            <option value="linear">Linear (Raw FFT)</option>
-                            <option value="log" selected>Logarithmic (Musical Balanced)</option>
-                        </select>
-                    </div>
+                    <h3>Reactivity &amp; Smoothing</h3>
                     <div class="control-row">
                         <label for="set-smoothing">Temporal Smoothing</label>
                         <input type="range" id="set-smoothing" min="0" max="0.99" step="0.01" value="0.85">
@@ -602,7 +626,7 @@
                 </div>
             </div>
 
-            <!-- TAB 4: SYSTEM & PRESETS -->
+            <!-- TAB 4: PRESETS & SNAPSHOTS -->
             <div class="settings-pane" id="tab-system" role="tabpanel">
                 <div class="settings-group">
                     <h3>Presets &amp; Snapshots</h3>
@@ -614,14 +638,7 @@
                 </div>
 
                 <div class="settings-group">
-                    <h3>Display &amp; Export Options</h3>
-                    <div class="control-row toggle-row">
-                        <label for="set-hc">High Contrast Canvas</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="set-hc">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+                    <h3>Export Options</h3>
                     <div class="control-row toggle-row">
                         <label for="set-watermark">Add “Made with WaveForge” badge</label>
                         <label class="toggle-switch">
@@ -629,18 +646,11 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div class="control-row toggle-row">
-                        <label for="set-show-fps">Show FPS Counter</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="set-show-fps" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
                 </div>
             </div>
 
             <div class="version-info">
-                WaveForge Studio v8.0 • 13 Modes • Trending Phonk Templates • Turbo MP4<br>
+                WaveForge Studio v9.0 • Predictive Audio Engine • 6 Unique Templates • Turbo 4K MP4<br>
                 <button type="button" id="btn-shortcuts" class="inline-link-btn">Keyboard Shortcuts (?)</button> •
                 <a href="index.html">Back to Home</a>
             </div>
@@ -658,7 +668,7 @@
                 </div>
                 <button type="button" id="btn-close-share" class="close-icon-btn" aria-label="Close share dialog">✕</button>
             </div>
-            <p class="share-lead">Your custom preset link saves your active mode, color palette, sensitivity, aspect ratio, and title overlay in the URL.</p>
+            <p class="share-lead">Your custom preset link saves your active mode, color palette, font, sensitivity, aspect ratio, and title overlay in the URL.</p>
             <div class="share-url-preview">
                 <input type="text" id="share-url-input" readonly aria-label="Shareable preset URL">
             </div>
@@ -849,23 +859,19 @@
         </div>
     </div>
 
-    <!-- VISUALIZER MODE REGISTRY (13 Modes) -->
-    <script src="Visualizers/bars.js?v=8.0.0"></script>
-    <script src="Visualizers/wave.js?v=8.0.0"></script>
-    <script src="Visualizers/radial.js?v=8.0.0"></script>
-    <script src="Visualizers/particles.js?v=8.0.0"></script>
-    <script src="Visualizers/spectrogram.js?v=8.0.0"></script>
-    <script src="Visualizers/3dbars.js?v=8.0.0"></script>
-    <script src="Visualizers/dna.js?v=8.0.0"></script>
-    <script src="Visualizers/galaxy.js?v=8.0.0"></script>
-    <script src="Visualizers/logo.js?v=8.0.0"></script>
-    <script src="Visualizers/tunnel.js?v=8.0.0"></script>
-    <script src="Visualizers/trapnation.js?v=8.0.0"></script>
-    <script src="Visualizers/synthwave.js?v=8.0.0"></script>
-    <script src="Visualizers/phonk.js?v=8.0.0"></script>
+    <!-- VISUALIZER MODE REGISTRY (9 Curated Pro Modes) -->
+    <script src="Visualizers/bars.js?v=9.0.0"></script>
+    <script src="Visualizers/wave.js?v=9.0.0"></script>
+    <script src="Visualizers/radial.js?v=9.0.0"></script>
+    <script src="Visualizers/particles.js?v=9.0.0"></script>
+    <script src="Visualizers/logo.js?v=9.0.0"></script>
+    <script src="Visualizers/tunnel.js?v=9.0.0"></script>
+    <script src="Visualizers/trapnation.js?v=9.0.0"></script>
+    <script src="Visualizers/synthwave.js?v=9.0.0"></script>
+    <script src="Visualizers/phonk.js?v=9.0.0"></script>
 
     <!-- SMART MONETIZATION ENGINE & APPLICATION SCRIPT -->
-    <script src="assets/js/ads.js?v=8.0.0"></script>
-    <script src="assets/js/app.js?v=8.0.0"></script>
+    <script src="assets/js/ads.js?v=9.0.0"></script>
+    <script src="assets/js/app.js?v=9.0.0"></script>
 </body>
 </html>
