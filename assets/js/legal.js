@@ -11,4 +11,12 @@
     }
     const yearEl = document.getElementById('year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    const backToTop = document.getElementById('backToTop');
+    if (backToTop) {
+        const onScroll = () => backToTop.classList.toggle('visible', (window.scrollY || 0) > 360);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
 })();

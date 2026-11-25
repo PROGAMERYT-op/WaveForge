@@ -1,5 +1,5 @@
 /**
- * WaveForge Music Visualizer Studio v7.1
+ * WaveForge Music Visualizer Studio v8.0
  * Features:
  *  - 13 Visualization Modes (including Mode 12: Hardtekk / Phonk Liquid Ring + AirPods Intro)
  *  - 1-Click Trending Templates Hub (6 viral presets + 3-step guided workflow bar)
@@ -210,7 +210,13 @@
         pendingExportBlobUrl: null,
         pendingExportFilename: null,
         unlockTimerId: null,
-        trackTitleLabel: ''
+        trackTitleLabel: '',
+        isLooping: false,
+        isMuted: false,
+        prevVolume: 0.8,
+        playbackSpeed: 1,
+        isZenMode: false,
+        isSeeking: false
     };
 
     const VIS_MODS = window.WaveForgeVisualizers || {};
@@ -579,7 +585,12 @@
 
             const volEl = document.getElementById('vol-slider');
             const vol = Math.min(parseFloat(volEl ? volEl.value : 0.8), 1);
-            this.gainNode.gain.value = isNaN(vol) ? 0.8 : vol;
+            const safeVol = isNaN(vol) ? 0.8 : vol;
+            this.gainNode.gain.value = APP_STATE.isMuted ? 0 : safeVol;
+            if (this.audioElement) {
+                this.audioElement.loop = Boolean(APP_STATE.isLooping);
+                this.audioElement.playbackRate = APP_STATE.playbackSpeed || 1;
+            }
 
             this.bassFilter.gain.value = Number(CONFIG.eqBass) || 0;
             this.midFilter.gain.value = Number(CONFIG.eqMid) || 0;
@@ -960,7 +971,10 @@
         },
 
         hideModal() {
-            if (APP_STATE.isRecording) return;
+            if (APP_STATE.isRecording) {
+                UI.showToast('Cancel the active render first to close', 'warning');
+                return;
+            }
             this._clearUnlockGate(true);
             document.getElementById('export-modal').classList.remove('open');
             if (window.WaveForgeAds) {
@@ -1999,6 +2013,8 @@
 
             const data = audio.getAnalysis();
             const isBeat = BeatDetector.update(data.freq);
+            const sDot = document.getElementById('status-dot');
+            if (sDot && !APP_STATE.isRecording) sDot.classList.toggle('beat-hit', Boolean(isBeat && APP_STATE.isPlaying));
 
             this.render(this.ctx, this.width, this.height, this.cx, this.cy, data, isBeat);
 
@@ -2033,8 +2049,18 @@
     // UI CONTROLLER & TRENDING TEMPLATES ENGINE
     // ============================================
 
+    const MODE_CATEGORIES = {
+        12: 'viral', 8: 'viral', 10: 'viral',
+        9: '3d', 11: '3d', 5: '3d', 6: '3d', 7: '3d',
+        0: 'classic', 1: 'classic', 2: 'classic', 3: 'classic', 4: 'classic'
+    };
+
+    const SPEED_STEPS = [0.75, 0.85, 1, 1.15, 1.25];
+
     const UI = {
         settingsOpen: false,
+        _resetConfirmTimer: null,
+        _isHoveringUI: false,
 
         init() {
             this.cacheElements();
@@ -2049,6 +2075,9 @@
             this.updateModeDisplay();
             this.updateModeCards();
             this.updateSliderLabels();
+            this.syncWizardBar();
+            this.syncDependentSettings();
+            this.syncAllRangeTracks();
         },
 
         cacheElements() {
@@ -2057,6 +2086,7 @@
                 playBtn: document.getElementById('btn-play'),
                 playIcon: document.getElementById('play-icon'),
                 seek: document.getElementById('seek-bar'),
+                seekTooltip: document.getElementById('seek-tooltip'),
                 dropOverlay: document.getElementById('drop-overlay'),
                 settingsModal: document.getElementById('settings-modal'),
                 exportModal: document.getElementById('export-modal'),
@@ -2066,8 +2096,104 @@
                 shortcutsModal: document.getElementById('shortcuts-modal'),
                 uiLayer: document.getElementById('ui-layer'),
                 modeName: document.getElementById('mode-name'),
-                toastContainer: document.getElementById('toast-container')
+                toastContainer: document.getElementById('toast-container'),
+                exitZenBtn: document.getElementById('btn-exit-zen')
             };
+        },
+
+        isAnyModalOpen() {
+            return [
+                this.els.settingsModal,
+                this.els.exportModal,
+                this.els.shareModal,
+                this.els.modeSelectorModal,
+                this.els.templatesModal,
+                this.els.shortcutsModal
+            ].some(m => m && m.classList.contains('open'));
+        },
+
+        syncRangeTrack(input) {
+            if (!input) return;
+            const min = parseFloat(input.min || '0');
+            const max = parseFloat(input.max || '100');
+            const val = parseFloat(input.value || '0');
+            const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
+            input.style.setProperty('--pct', Math.max(0, Math.min(100, pct)) + '%');
+        },
+
+        syncAllRangeTracks() {
+            document.querySelectorAll('input[type="range"]').forEach(inp => this.syncRangeTrack(inp));
+        },
+
+        syncDependentSettings() {
+            const setDisabled = (rowId, disabled) => {
+                const row = document.getElementById(rowId);
+                if (!row) return;
+                row.classList.toggle('is-disabled', disabled);
+                row.querySelectorAll('input, select').forEach(el => { el.disabled = disabled; });
+            };
+            setDisabled('row-phonk-intro-dur', !CONFIG.phonkIntroEnabled);
+            setDisabled('row-hue-speed', !CONFIG.hueCycle);
+            setDisabled('row-beat-thresh', !CONFIG.beatEnabled);
+        },
+
+        syncWizardBar() {
+            const wizardBar = document.getElementById('template-wizard-bar');
+            const wizardName = document.getElementById('wizard-template-name');
+            if (!wizardBar) return;
+            const tpl = TRENDING_TEMPLATES.find(t => t.id === APP_STATE.activeTemplateId);
+            if (wizardName && tpl) wizardName.textContent = tpl.name;
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('mode') && !params.has('template') && APP_STATE.mode !== 12 && APP_STATE.mode !== 8) {
+                wizardBar.classList.add('hidden');
+            }
+        },
+
+        setZenMode(enabled) {
+            APP_STATE.isZenMode = Boolean(enabled);
+            if (this.els.uiLayer) {
+                this.els.uiLayer.classList.toggle('ui-hidden', APP_STATE.isZenMode);
+                if (!APP_STATE.isZenMode) this.els.uiLayer.style.opacity = '1';
+            }
+            if (this.els.exitZenBtn) {
+                this.els.exitZenBtn.classList.toggle('hidden', !APP_STATE.isZenMode);
+            }
+            if (APP_STATE.isZenMode) {
+                const onboard = document.getElementById('studio-onboarding');
+                if (onboard) onboard.classList.add('hidden-card');
+                this.showToast('👁 Zen Mode active — press H or tap Show Controls', 'info');
+            }
+        },
+
+        setPlaybackSpeed(speed) {
+            APP_STATE.playbackSpeed = speed;
+            audio.updateSettings();
+            const btn = document.getElementById('btn-speed');
+            if (btn) {
+                btn.textContent = speed.toFixed(speed === 1 ? 1 : 2).replace(/0$/, '') + '×';
+                btn.classList.toggle('modified', speed !== 1);
+            }
+            const sel = document.getElementById('set-playback-speed');
+            if (sel) sel.value = String(speed);
+        },
+
+        syncMuteUI() {
+            const muteBtn = document.getElementById('btn-mute');
+            const onIcon = document.getElementById('icon-vol-on');
+            const offIcon = document.getElementById('icon-vol-off');
+            if (muteBtn) {
+                muteBtn.classList.toggle('muted', APP_STATE.isMuted);
+                muteBtn.setAttribute('aria-pressed', APP_STATE.isMuted ? 'true' : 'false');
+            }
+            if (onIcon) onIcon.classList.toggle('hidden', APP_STATE.isMuted);
+            if (offIcon) offIcon.classList.toggle('hidden', !APP_STATE.isMuted);
+        },
+
+        syncEqPresetButtons() {
+            const cur = `${CONFIG.eqBass},${CONFIG.eqMid},${CONFIG.eqTreble}`;
+            document.querySelectorAll('.eq-preset-btn').forEach(btn => {
+                btn.classList.toggle('active-eq', btn.dataset.eq === cur);
+            });
         },
 
         buildTemplatesGrid() {
@@ -2076,9 +2202,12 @@
             grid.innerHTML = '';
 
             TRENDING_TEMPLATES.forEach((tpl) => {
+                const isActive = APP_STATE.activeTemplateId === tpl.id;
                 const card = document.createElement('div');
-                card.className = 'template-card' + (APP_STATE.activeTemplateId === tpl.id ? ' active' : '');
+                card.className = 'template-card' + (isActive ? ' active' : '');
                 card.dataset.templateId = tpl.id;
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
                 card.innerHTML = `
                     <div class="tpl-preview" style="--tpl-color: ${tpl.color};">
                         <div class="tpl-ring-demo"></div>
@@ -2087,10 +2216,17 @@
                     <div class="tpl-body">
                         <h3>${tpl.name}</h3>
                         <p>${tpl.desc}</p>
-                        <button type="button" class="tpl-use-btn">✨ Use This Template</button>
+                        <button type="button" class="tpl-use-btn">${isActive ? '✓ Active Template' : '✨ Use This Template'}</button>
                     </div>
                 `;
-                card.onclick = () => this.applyTemplate(tpl.id);
+                const activate = () => this.applyTemplate(tpl.id);
+                card.onclick = activate;
+                card.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        activate();
+                    }
+                };
                 grid.appendChild(card);
             });
         },
@@ -2110,10 +2246,16 @@
             this.updateModeDisplay();
             this.updateModeCards();
             this.updateSliderLabels();
+            this.syncDependentSettings();
+            this.syncEqPresetButtons();
+            this.syncAllRangeTracks();
             persistConfig();
 
             document.querySelectorAll('.template-card').forEach(c => {
-                c.classList.toggle('active', c.dataset.templateId === tpl.id);
+                const active = c.dataset.templateId === tpl.id;
+                c.classList.toggle('active', active);
+                const btn = c.querySelector('.tpl-use-btn');
+                if (btn) btn.textContent = active ? '✓ Active Template' : '✨ Use This Template';
             });
 
             if (this.els.templatesModal) {
@@ -2151,6 +2293,7 @@
                 const card = document.createElement('div');
                 card.className = 'mode-card' + (mod.newBadge ? ' new-badge' : '');
                 card.dataset.mode = key;
+                card.dataset.cat = MODE_CATEGORIES[key] || 'classic';
                 card.setAttribute('role', 'button');
                 card.setAttribute('tabindex', '0');
                 const icon = document.createElement('span');
@@ -2165,10 +2308,18 @@
                 card.appendChild(icon);
                 card.appendChild(name);
                 card.appendChild(desc);
-                card.onclick = () => {
+
+                const selectMode = () => {
                     setMode(parseInt(key, 10));
                     this.showToast(mod.icon + ' ' + mod.name, 'info');
-                    setTimeout(() => this.closeModeSelector(), 220);
+                    setTimeout(() => this.closeModeSelector(), 180);
+                };
+                card.onclick = selectMode;
+                card.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectMode();
+                    }
                 };
                 grid.appendChild(card);
             });
@@ -2232,6 +2383,66 @@
                 };
             }
 
+            // Mode Category Filter Pills
+            document.querySelectorAll('.mode-filter-pill').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cat = btn.dataset.cat;
+                    document.querySelectorAll('.mode-filter-pill').forEach(b => b.classList.toggle('active', b === btn));
+                    document.querySelectorAll('.mode-card').forEach(c => {
+                        c.classList.toggle('filtered-out', cat !== 'all' && c.dataset.cat !== cat);
+                    });
+                });
+            });
+
+            // Switch to Phonk Mode button inside Settings Tab 1 notice
+            const switchPhonkBtn = document.getElementById('btn-switch-phonk-mode');
+            if (switchPhonkBtn) {
+                switchPhonkBtn.onclick = () => {
+                    setMode(12);
+                    this.showToast('😈 Switched to Hardtekk Phonk mode', 'success');
+                };
+            }
+
+            // Zen Mode controls
+            const zenBtn = document.getElementById('btn-zen');
+            if (zenBtn) zenBtn.onclick = () => this.setZenMode(!APP_STATE.isZenMode);
+            if (this.els.exitZenBtn) this.els.exitZenBtn.onclick = () => this.setZenMode(false);
+
+            // Loop toggle
+            const loopBtn = document.getElementById('btn-loop');
+            if (loopBtn) {
+                loopBtn.onclick = () => {
+                    APP_STATE.isLooping = !APP_STATE.isLooping;
+                    audio.updateSettings();
+                    loopBtn.classList.toggle('active', APP_STATE.isLooping);
+                    loopBtn.setAttribute('aria-pressed', APP_STATE.isLooping ? 'true' : 'false');
+                    this.showToast(APP_STATE.isLooping ? '🔁 Loop enabled' : 'Loop disabled', 'info');
+                };
+            }
+
+            // Playback Speed cycle button
+            const speedBtn = document.getElementById('btn-speed');
+            if (speedBtn) {
+                speedBtn.onclick = () => {
+                    const idx = SPEED_STEPS.indexOf(APP_STATE.playbackSpeed);
+                    const next = SPEED_STEPS[(idx + 1) % SPEED_STEPS.length];
+                    this.setPlaybackSpeed(next);
+                    const label = next < 1 ? 'Slowed' : (next > 1 ? 'Sped Up' : 'Normal');
+                    this.showToast(`⚡ Speed: ${next}× (${label})`, 'info');
+                };
+            }
+
+            // Mute button
+            const muteBtn = document.getElementById('btn-mute');
+            if (muteBtn) {
+                muteBtn.onclick = () => {
+                    APP_STATE.isMuted = !APP_STATE.isMuted;
+                    audio.updateSettings();
+                    this.syncMuteUI();
+                    this.showToast(APP_STATE.isMuted ? '🔇 Audio muted' : '🔊 Audio unmuted', 'info');
+                };
+            }
+
             // 3-Step Guided Wizard Bar buttons
             const wizMusic = document.getElementById('wiz-btn-music');
             if (wizMusic) wizMusic.onclick = () => this.els.fileInput.click();
@@ -2291,24 +2502,80 @@
                 if (e.target.id === 'mode-selector-modal') this.closeModeSelector();
             };
 
-            this.els.seek.oninput = (e) => {
+            // Smooth Seek Bar Scrubbing + Hover Time Tooltip
+            const formatSeekTime = (s) => {
+                if (!s || isNaN(s)) return '0:00';
+                const m = Math.floor(s / 60);
+                const sec = Math.floor(s % 60);
+                return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+            };
+            this.els.seek.addEventListener('pointerdown', () => { APP_STATE.isSeeking = true; });
+            const endSeek = () => {
+                if (!APP_STATE.isSeeking) return;
+                APP_STATE.isSeeking = false;
                 if (audio.audioElement.duration) {
-                    audio.audioElement.currentTime = (e.target.value / 100) * audio.audioElement.duration;
+                    audio.audioElement.currentTime = (parseFloat(this.els.seek.value) / 100) * audio.audioElement.duration;
                 }
             };
+            window.addEventListener('pointerup', endSeek);
+            this.els.seek.oninput = (e) => {
+                this.syncRangeTrack(e.target);
+                if (audio.audioElement.duration) {
+                    const targetTime = (parseFloat(e.target.value) / 100) * audio.audioElement.duration;
+                    document.getElementById('time-current').textContent = formatSeekTime(targetTime);
+                    if (!APP_STATE.isSeeking) {
+                        audio.audioElement.currentTime = targetTime;
+                    }
+                }
+            };
+            this.els.seek.addEventListener('pointermove', (e) => {
+                if (!this.els.seekTooltip || !audio.audioElement.duration) return;
+                const rect = this.els.seek.getBoundingClientRect();
+                const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / Math.max(1, rect.width)));
+                this.els.seekTooltip.textContent = formatSeekTime(ratio * audio.audioElement.duration);
+                this.els.seekTooltip.style.left = (ratio * 100) + '%';
+                this.els.seekTooltip.classList.add('visible');
+            });
+            this.els.seek.addEventListener('pointerleave', () => {
+                if (this.els.seekTooltip) this.els.seekTooltip.classList.remove('visible');
+            });
 
-            document.getElementById('vol-slider').oninput = () => audio.updateSettings();
+            const volSlider = document.getElementById('vol-slider');
+            if (volSlider) {
+                volSlider.oninput = (e) => {
+                    APP_STATE.isMuted = parseFloat(e.target.value) === 0;
+                    this.syncMuteUI();
+                    this.syncRangeTrack(e.target);
+                    audio.updateSettings();
+                };
+            }
 
             document.getElementById('btn-settings').onclick = () => this.toggleSettings(true);
             document.getElementById('btn-close-settings').onclick = () => this.toggleSettings(false);
 
-            document.getElementById('btn-fullscreen').onclick = () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                } else {
-                    document.exitFullscreen().catch(() => {});
-                }
+            // Fullscreen with icon sync & iOS Safari Zen Mode fallback
+            const fsBtn = document.getElementById('btn-fullscreen');
+            const syncFsIcon = () => {
+                const isFs = Boolean(document.fullscreenElement);
+                const enterIcon = document.getElementById('icon-fs-enter');
+                const exitIcon = document.getElementById('icon-fs-exit');
+                if (enterIcon) enterIcon.classList.toggle('hidden', isFs);
+                if (exitIcon) exitIcon.classList.toggle('hidden', !isFs);
             };
+            document.addEventListener('fullscreenchange', syncFsIcon);
+            if (fsBtn) {
+                fsBtn.onclick = () => {
+                    if (!document.documentElement.requestFullscreen) {
+                        this.setZenMode(!APP_STATE.isZenMode);
+                        return;
+                    }
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen().catch(() => this.setZenMode(!APP_STATE.isZenMode));
+                    } else {
+                        document.exitFullscreen().catch(() => {});
+                    }
+                };
+            }
 
             document.getElementById('btn-shortcuts').onclick = () => {
                 this.els.shortcutsModal.classList.add('open');
@@ -2322,19 +2589,28 @@
                 }
             };
 
+            // Smart UI Auto-Hide (never hides while hovering controls, when any modal is open, or in onboarding)
+            document.querySelectorAll('.top-bar, .template-wizard-bar, .control-bar').forEach(el => {
+                el.addEventListener('pointerenter', () => { this._isHoveringUI = true; });
+                el.addEventListener('pointerleave', () => { this._isHoveringUI = false; });
+            });
+
             let hideTimeout;
             const revealUI = () => {
+                if (APP_STATE.isZenMode) return;
                 this.els.uiLayer.style.opacity = '1';
                 clearTimeout(hideTimeout);
             };
             document.addEventListener('pointermove', (e) => {
-                if (e.pointerType === 'touch') return;
+                if (e.pointerType === 'touch' || APP_STATE.isZenMode) return;
                 revealUI();
                 hideTimeout = setTimeout(() => {
-                    if (APP_STATE.isPlaying && !this.settingsOpen && !APP_STATE.isRecording) {
+                    const onboard = document.getElementById('studio-onboarding');
+                    const onboardVisible = onboard && !onboard.classList.contains('hidden-card');
+                    if (APP_STATE.isPlaying && !this._isHoveringUI && !this.isAnyModalOpen() && !APP_STATE.isRecording && !onboardVisible) {
                         this.els.uiLayer.style.opacity = '0';
                     }
-                }, 3200);
+                }, 3800);
             });
             document.addEventListener('pointerdown', revealUI);
             document.addEventListener('touchstart', revealUI, { passive: true });
@@ -2344,7 +2620,7 @@
             };
 
             this.els.exportModal.onclick = (e) => {
-                if (e.target === this.els.exportModal && !APP_STATE.isRecording) {
+                if (e.target === this.els.exportModal) {
                     Exporter.hideModal();
                 }
             };
@@ -2367,13 +2643,19 @@
         setupShare() {
             const SHARE_TITLE = 'Check out my custom Phonk/Music visualizer preset on WaveForge Studio!';
             const embed = (str) => encodeURIComponent(str);
+            const urlInput = document.getElementById('share-url-input');
+            const nativeBtn = document.getElementById('btn-native-share');
+
+            if (nativeBtn && navigator.share) {
+                nativeBtn.classList.remove('hidden');
+                nativeBtn.onclick = () => {
+                    navigator.share({ title: SHARE_TITLE, url: this.getShareablePresetUrl() }).catch(() => {});
+                };
+            }
 
             const openShare = () => {
                 const shareUrl = this.getShareablePresetUrl();
-                if (navigator.share) {
-                    navigator.share({ title: SHARE_TITLE, url: shareUrl }).catch(() => {});
-                    return;
-                }
+                if (urlInput) urlInput.value = shareUrl;
                 const networks = {
                     x: `https://twitter.com/intent/tweet?text=${embed(SHARE_TITLE)}&url=${embed(shareUrl)}`,
                     reddit: `https://www.reddit.com/submit?url=${embed(shareUrl)}&title=${embed(SHARE_TITLE)}`,
@@ -2397,9 +2679,27 @@
 
             document.getElementById('btn-copy-link').onclick = () => {
                 const shareUrl = this.getShareablePresetUrl();
-                const done = () => this.showToast('Shareable preset link copied!', 'success');
+                const done = () => this.showToast('🔗 Shareable preset link copied!', 'success');
+                const fallbackCopy = () => {
+                    try {
+                        const ta = document.createElement('textarea');
+                        ta.value = shareUrl;
+                        ta.style.position = 'fixed';
+                        ta.style.opacity = '0';
+                        document.body.appendChild(ta);
+                        ta.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        done();
+                    } catch (err) {
+                        if (urlInput) { urlInput.focus(); urlInput.select(); }
+                        this.showToast('Press Ctrl+C to copy the link above', 'info');
+                    }
+                };
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(shareUrl).then(done).catch(() => {});
+                    navigator.clipboard.writeText(shareUrl).then(done).catch(fallbackCopy);
+                } else {
+                    fallbackCopy();
                 }
             };
         },
@@ -2425,10 +2725,18 @@
 
         setupKeyboard() {
             document.addEventListener('keydown', (e) => {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+                const tag = e.target.tagName;
+                if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+
+                if (e.key === '?') {
+                    e.preventDefault();
+                    this.els.shortcutsModal.classList.toggle('open');
+                    return;
+                }
 
                 switch (e.code) {
                     case 'Space':
+                        if (tag === 'BUTTON' || tag === 'A') return;
                         e.preventDefault();
                         audio.togglePlay();
                         break;
@@ -2436,13 +2744,24 @@
                         audio.stop();
                         break;
                     case 'KeyM':
-                        UI.openModeSelector();
+                        this.openModeSelector();
                         break;
                     case 'KeyT':
                         if (this.els.templatesModal) this.els.templatesModal.classList.toggle('open');
                         break;
                     case 'KeyF':
                         document.getElementById('btn-fullscreen').click();
+                        break;
+                    case 'KeyH':
+                        this.setZenMode(!APP_STATE.isZenMode);
+                        break;
+                    case 'KeyL': {
+                        const loopBtn = document.getElementById('btn-loop');
+                        if (loopBtn) loopBtn.click();
+                        break;
+                    }
+                    case 'KeyC':
+                        document.getElementById('btn-screenshot').click();
                         break;
                     case 'KeyR':
                         this.randomizeVisual();
@@ -2459,13 +2778,31 @@
                             0
                         );
                         break;
+                    case 'ArrowUp':
+                    case 'ArrowDown': {
+                        e.preventDefault();
+                        const volEl = document.getElementById('vol-slider');
+                        if (volEl) {
+                            const delta = e.code === 'ArrowUp' ? 0.1 : -0.1;
+                            const next = Math.max(0, Math.min(1, parseFloat(volEl.value) + delta));
+                            volEl.value = next.toFixed(2);
+                            APP_STATE.isMuted = next === 0;
+                            this.syncMuteUI();
+                            this.syncRangeTrack(volEl);
+                            audio.updateSettings();
+                        }
+                        break;
+                    }
                     case 'Escape':
+                        if (APP_STATE.isZenMode) this.setZenMode(false);
                         this.toggleSettings(false);
-                        Exporter.hideModal();
+                        if (!APP_STATE.isRecording) Exporter.hideModal();
                         this.closeModeSelector();
                         if (this.els.templatesModal) this.els.templatesModal.classList.remove('open');
                         this.els.shareModal.classList.remove('open');
                         this.els.shortcutsModal.classList.remove('open');
+                        const onboard = document.getElementById('studio-onboarding');
+                        if (onboard) onboard.classList.add('hidden-card');
                         break;
                 }
             });
@@ -2515,6 +2852,13 @@
                         const expAspect = document.getElementById('export-aspect');
                         if (expAspect) expAspect.value = val;
                     }
+                    if (el.type === 'range') this.syncRangeTrack(el);
+                    if (configKey === 'phonkIntroEnabled' || configKey === 'hueCycle' || configKey === 'beatEnabled') {
+                        this.syncDependentSettings();
+                    }
+                    if (configKey === 'eqBass' || configKey === 'eqMid' || configKey === 'eqTreble') {
+                        this.syncEqPresetButtons();
+                    }
                     audio.updateSettings();
                     persistConfig();
                 };
@@ -2551,20 +2895,67 @@
             linkSetting('set-phonk-intro-dur', 'phonkIntroDuration', 'float');
             linkSetting('set-phonk-bg', 'phonkBgTheme', 'string');
 
-            document.querySelectorAll('#settings-modal input[type="range"]').forEach((input) => {
-                input.addEventListener('input', () => this.updateSliderLabels());
+            // 1-Click EQ Presets
+            document.querySelectorAll('.eq-preset-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const [b, m, t] = btn.dataset.eq.split(',').map(Number);
+                    CONFIG.eqBass = b;
+                    CONFIG.eqMid = m;
+                    CONFIG.eqTreble = t;
+                    this.applyConfigToUI();
+                    this.updateSliderLabels();
+                    this.syncAllRangeTracks();
+                    this.syncEqPresetButtons();
+                    audio.updateSettings();
+                    persistConfig();
+                    this.showToast(`🎛️ EQ Preset: ${btn.textContent}`, 'success');
+                };
             });
 
-            document.getElementById('btn-reset-settings').onclick = () => {
-                Object.assign(CONFIG, DEFAULT_CONFIG);
-                audio.updateSettings();
-                document.body.classList.toggle('high-contrast', CONFIG.highContrast);
-                document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
-                this.applyConfigToUI();
-                this.updateSliderLabels();
-                persistConfig();
-                this.showToast('Settings reset to defaults', 'success');
-            };
+            // Playback speed dropdown inside Settings
+            const speedSel = document.getElementById('set-playback-speed');
+            if (speedSel) {
+                speedSel.onchange = (e) => this.setPlaybackSpeed(parseFloat(e.target.value));
+            }
+
+            document.querySelectorAll('#settings-modal input[type="range"]').forEach((input) => {
+                input.addEventListener('input', () => {
+                    this.updateSliderLabels();
+                    this.syncRangeTrack(input);
+                });
+            });
+
+            // Safe 2-Step Reset Button
+            const resetBtn = document.getElementById('btn-reset-settings');
+            if (resetBtn) {
+                resetBtn.onclick = () => {
+                    if (!resetBtn.classList.contains('confirming')) {
+                        resetBtn.classList.add('confirming');
+                        resetBtn.textContent = '⚠ Click Again to Reset';
+                        clearTimeout(this._resetConfirmTimer);
+                        this._resetConfirmTimer = setTimeout(() => {
+                            resetBtn.classList.remove('confirming');
+                            resetBtn.textContent = '↺ Reset';
+                        }, 3500);
+                        return;
+                    }
+                    clearTimeout(this._resetConfirmTimer);
+                    resetBtn.classList.remove('confirming');
+                    resetBtn.textContent = '↺ Reset';
+                    Object.assign(CONFIG, DEFAULT_CONFIG);
+                    this.setPlaybackSpeed(1);
+                    audio.updateSettings();
+                    document.body.classList.toggle('high-contrast', CONFIG.highContrast);
+                    document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
+                    this.applyConfigToUI();
+                    this.updateSliderLabels();
+                    this.syncDependentSettings();
+                    this.syncEqPresetButtons();
+                    this.syncAllRangeTracks();
+                    persistConfig();
+                    this.showToast('↺ Settings reset to studio defaults', 'success');
+                };
+            }
 
             document.getElementById('set-hc').onchange = (e) => {
                 CONFIG.highContrast = e.target.checked;
@@ -2589,7 +2980,7 @@
                 a.click();
                 document.body.removeChild(a);
                 setTimeout(() => URL.revokeObjectURL(url), 60_000);
-                this.showToast('Preset saved!', 'success');
+                this.showToast('💾 Preset saved!', 'success');
             };
 
             document.getElementById('btn-screenshot').onclick = () => {
@@ -2600,7 +2991,7 @@
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-                    this.showToast('Screenshot saved!', 'success');
+                    this.showToast('📷 Screenshot saved!', 'success');
                 } catch (err) {
                     this.showToast('Screenshot failed', 'error');
                 }
@@ -2654,10 +3045,10 @@
                 };
             });
 
-            document.getElementById('set-shake').oninput = (e) => { CONFIG.logoShakeIntensity = parseFloat(e.target.value); persistConfig(); };
-            document.getElementById('set-ray-count').oninput = (e) => { CONFIG.logoRayCount = parseInt(e.target.value, 10); persistConfig(); };
-            document.getElementById('set-line-thick').oninput = (e) => { CONFIG.logoLineThickness = parseFloat(e.target.value); persistConfig(); };
-            document.getElementById('set-glow-size').oninput = (e) => { CONFIG.logoGlowSize = parseFloat(e.target.value); persistConfig(); };
+            document.getElementById('set-shake').oninput = (e) => { CONFIG.logoShakeIntensity = parseFloat(e.target.value); this.syncRangeTrack(e.target); persistConfig(); };
+            document.getElementById('set-ray-count').oninput = (e) => { CONFIG.logoRayCount = parseInt(e.target.value, 10); this.syncRangeTrack(e.target); persistConfig(); };
+            document.getElementById('set-line-thick').oninput = (e) => { CONFIG.logoLineThickness = parseFloat(e.target.value); this.syncRangeTrack(e.target); persistConfig(); };
+            document.getElementById('set-glow-size').oninput = (e) => { CONFIG.logoGlowSize = parseFloat(e.target.value); this.syncRangeTrack(e.target); persistConfig(); };
             document.getElementById('set-logo-particles').onchange = (e) => { CONFIG.logoParticles = e.target.checked; persistConfig(); };
             document.getElementById('set-logo-rotate').onchange = (e) => { CONFIG.logoRotateRing = e.target.checked; persistConfig(); };
         },
@@ -2715,6 +3106,7 @@
             document.querySelectorAll('.color-swatch').forEach(s => {
                 s.classList.toggle('active', s.dataset.color === CONFIG.waveColor);
             });
+            this.syncEqPresetButtons();
         },
 
         handleFile(file) {
@@ -2736,8 +3128,10 @@
                         this.updateModeDisplay();
                         this.updateModeCards();
                         this.updateSliderLabels();
+                        this.syncDependentSettings();
+                        this.syncAllRangeTracks();
                         persistConfig();
-                        this.showToast('Preset loaded!', 'success');
+                        this.showToast('✅ Preset loaded!', 'success');
                     } catch (err) {
                         this.showToast('Invalid preset file', 'error');
                     }
@@ -2757,17 +3151,24 @@
         },
 
         loadDemoTrack() {
+            const wizMusic = document.getElementById('wiz-btn-music');
+            if (wizMusic) wizMusic.classList.add('done-step');
             audio.playFile('assets/audio/demo-track.wav', 'Demo Track');
         },
 
         toggleSettings(show) {
             this.settingsOpen = show;
             this.els.settingsModal.classList.toggle('open', show);
+            if (show) {
+                this.updateSliderLabels();
+                this.syncDependentSettings();
+                this.syncAllRangeTracks();
+            }
         },
 
         updatePlayButton() {
             this.els.playIcon.textContent = APP_STATE.isPlaying ? '⏸' : '▶';
-            this.els.playBtn.classList.toggle('active', APP_STATE.isPlaying);
+            this.els.playBtn.classList.toggle('is-playing', APP_STATE.isPlaying);
             const labelSuffix = APP_STATE.trackTitleLabel ? ` · ${APP_STATE.trackTitleLabel}` : '';
             document.getElementById('status-text').textContent = (APP_STATE.isPlaying ? 'Playing' : 'Paused') + labelSuffix;
             const onboard = document.getElementById('studio-onboarding');
@@ -2781,7 +3182,10 @@
             if (!el.duration || isNaN(el.duration)) return;
 
             const pct = (el.currentTime / el.duration) * 100;
-            this.els.seek.value = pct;
+            if (!APP_STATE.isSeeking) {
+                this.els.seek.value = pct;
+                this.syncRangeTrack(this.els.seek);
+            }
 
             const formatTime = (s) => {
                 if (isNaN(s)) return '0:00';
@@ -2790,7 +3194,9 @@
                 return `${m}:${sec < 10 ? '0' : ''}${sec}`;
             };
 
-            document.getElementById('time-current').textContent = formatTime(el.currentTime);
+            if (!APP_STATE.isSeeking) {
+                document.getElementById('time-current').textContent = formatTime(el.currentTime);
+            }
             document.getElementById('time-total').textContent = formatTime(el.duration);
         },
 
@@ -2813,8 +3219,11 @@
         updateModeDisplay() {
             const mod = VIS_MODS[APP_STATE.mode];
             this.els.modeName.textContent = mod ? mod.name : 'Unknown';
+            const isLogoOrPhonk = APP_STATE.mode === 8 || APP_STATE.mode === 12;
             const logoSettings = document.getElementById('logo-viz-settings');
-            if (logoSettings) logoSettings.classList.toggle('hidden', APP_STATE.mode !== 8 && APP_STATE.mode !== 12);
+            const logoNotice = document.getElementById('logo-mode-notice');
+            if (logoSettings) logoSettings.classList.toggle('hidden', !isLogoOrPhonk);
+            if (logoNotice) logoNotice.classList.toggle('hidden', isLogoOrPhonk);
         },
 
         updateSliderLabels() {
@@ -2826,7 +3235,11 @@
                     input.insertAdjacentElement('afterend', label);
                 }
                 const v = parseFloat(input.value);
-                label.textContent = Number.isInteger(v) ? String(v) : v.toFixed(2).replace(/0$/, '');
+                const unit = input.dataset.unit || '';
+                const signed = input.dataset.signed === 'true';
+                const numStr = Number.isInteger(v) ? String(v) : v.toFixed(2).replace(/0$/, '');
+                const prefix = signed && v > 0 ? '+' : '';
+                label.textContent = prefix + numStr + unit;
             });
         },
 
@@ -2841,20 +3254,26 @@
             this.updateModeDisplay();
             this.updateModeCards();
             this.updateSliderLabels();
+            this.syncAllRangeTracks();
             persistConfig();
             const mod = VIS_MODS[APP_STATE.mode];
             this.showToast('🎲 ' + (mod ? mod.name : 'Randomized') + ' · ' + CONFIG.palette, 'success');
         },
 
         showToast(message, type = 'info') {
+            if (!this.els.toastContainer) return;
+            while (this.els.toastContainer.children.length >= 3) {
+                this.els.toastContainer.firstElementChild.remove();
+            }
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;
             this.els.toastContainer.appendChild(toast);
 
             setTimeout(() => {
-                toast.remove();
-            }, 3000);
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 240);
+            }, 2800);
         }
     };
 
@@ -2880,7 +3299,7 @@
             UI.applyTemplate(urlParams.get('template'));
         }
 
-        console.log('%c🎵 WaveForge Studio v7.1.0', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+        console.log('%c🎵 WaveForge Studio v8.0.0', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

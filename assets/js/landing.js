@@ -1,6 +1,7 @@
 (function () {
     'use strict';
 
+    // Theme Toggle
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
@@ -11,22 +12,72 @@
         });
     }
 
+    // Fixed Mobile Drawer Menu + Backdrop + Escape
     const mobileToggle = document.getElementById('mobileToggle');
     const mobileMenu = document.getElementById('mobileMenu');
-    if (mobileToggle && mobileMenu) {
-        mobileToggle.addEventListener('click', () => {
-            const open = mobileMenu.classList.toggle('open');
-            mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-            mobileMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
-        });
-        mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
-            mobileToggle.setAttribute('aria-expanded', 'false');
-            mobileMenu.setAttribute('aria-hidden', 'true');
-        }));
+    const mobileBackdrop = document.getElementById('mobileBackdrop');
+
+    function setMobileMenu(open) {
+        if (!mobileToggle || !mobileMenu) return;
+        mobileMenu.classList.toggle('open', open);
+        mobileToggle.classList.toggle('open', open);
+        mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        mobileMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+        if (mobileBackdrop) {
+            mobileBackdrop.classList.toggle('open', open);
+            mobileBackdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
+        }
+        document.body.classList.toggle('menu-open', open);
     }
 
-    // Smooth scroll-reveal observer for .reveal elements
+    if (mobileToggle && mobileMenu) {
+        mobileToggle.addEventListener('click', () => {
+            setMobileMenu(!mobileMenu.classList.contains('open'));
+        });
+        mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMobileMenu(false)));
+        if (mobileBackdrop) mobileBackdrop.addEventListener('click', () => setMobileMenu(false));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+                setMobileMenu(false);
+                mobileToggle.focus();
+            }
+        });
+    }
+
+    // Scroll Progress Bar, Back-to-Top & Active Nav Link Highlight
+    const scrollProgress = document.getElementById('scrollProgress');
+    const backToTop = document.getElementById('backToTop');
+    const navLinks = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+    const sections = navLinks.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+
+    function onScroll() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        if (scrollProgress) {
+            scrollProgress.style.width = Math.min(100, (scrollTop / maxScroll) * 100) + '%';
+        }
+        if (backToTop) {
+            backToTop.classList.toggle('visible', scrollTop > 420);
+        }
+        let activeId = '';
+        for (const sec of sections) {
+            const top = sec.getBoundingClientRect().top;
+            if (top <= 140) activeId = sec.id;
+        }
+        navLinks.forEach(a => {
+            a.classList.toggle('active-link', a.getAttribute('href') === '#' + activeId);
+        });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    if (backToTop) {
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // Smooth Scroll-Reveal Observer with Safety Fallback
     const revealEls = document.querySelectorAll('.reveal');
     if ('IntersectionObserver' in window && revealEls.length > 0) {
         const io = new IntersectionObserver((entries) => {
@@ -36,12 +87,41 @@
                     io.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+        }, { threshold: 0.05, rootMargin: '0px 0px -16px 0px' });
         revealEls.forEach((el) => io.observe(el));
+        // Safety fallback so elements never stay hidden on deep-link jumps
+        setTimeout(() => {
+            revealEls.forEach((el) => {
+                const r = el.getBoundingClientRect();
+                if (r.top < window.innerHeight + 120) el.classList.add('in-view');
+            });
+        }, 700);
     } else {
         revealEls.forEach((el) => el.classList.add('in-view'));
     }
 
+    // Mode Category Filter on Landing Page
+    const filterBtns = document.querySelectorAll('.mode-filter-btn');
+    const modeCards = document.querySelectorAll('.mode-showcase-card');
+    if (filterBtns.length && modeCards.length) {
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cat = btn.dataset.filter;
+                filterBtns.forEach(b => {
+                    b.classList.toggle('active', b === btn);
+                    b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+                });
+                modeCards.forEach(card => {
+                    const cardCat = card.dataset.category || 'all';
+                    const show = cat === 'all' || cardCat === cat;
+                    card.classList.toggle('filtered-out', !show);
+                    if (show) card.classList.add('in-view');
+                });
+            });
+        });
+    }
+
+    // Interactive Preview Canvas (pauses when off-screen or tab hidden to save battery)
     let demoAudio = null;
     let demoCtx = null;
     let demoAnalyser = null;
@@ -54,6 +134,8 @@
         let previewPalette = 'synthwave';
         let logicalW = 1120;
         let logicalH = 340;
+        let canvasVisible = true;
+        let rafId = null;
 
         function resizePreviewCanvas() {
             const rect = canvas.getBoundingClientRect();
@@ -92,7 +174,11 @@
         });
 
         function renderPreview() {
-            requestAnimationFrame(renderPreview);
+            if (!canvasVisible || document.hidden) {
+                rafId = null;
+                return;
+            }
+            rafId = requestAnimationFrame(renderPreview);
             const w = logicalW;
             const h = logicalH;
             const cx = w / 2;
@@ -121,7 +207,6 @@
                 ctx.save();
                 ctx.translate(cx, cy);
 
-                // Radial sparks
                 ctx.strokeStyle = '#ffffff';
                 for (let s = 0; s < 24; s++) {
                     const a = (s / 24) * Math.PI * 2 + t * 0.2;
@@ -136,7 +221,6 @@
                 }
                 ctx.globalAlpha = 1;
 
-                // Symmetrical Phonk liquid plasma ring
                 for (let layer = 0; layer < 2; layer++) {
                     ctx.beginPath();
                     const pts = 96;
@@ -213,26 +297,70 @@
                 ctx.globalAlpha = 1;
                 ctx.restore();
             } else if (previewMode === 'synth') {
-                const horY = h * 0.56;
-                const sunR = h * (0.22 + beat * 0.03);
-                ctx.fillStyle = pal[0];
+                const horY = h * 0.55;
+                const sunR = h * (0.23 + beat * 0.035);
+                const sunGrad = ctx.createLinearGradient(cx, horY - sunR * 1.25, cx, horY + sunR * 0.2);
+                sunGrad.addColorStop(0, pal[2] || pal[0]);
+                sunGrad.addColorStop(1, pal[0]);
+                ctx.fillStyle = sunGrad;
                 ctx.beginPath();
-                ctx.arc(cx, horY - sunR * 0.25, sunR, 0, Math.PI * 2);
+                ctx.arc(cx, horY - sunR * 0.22, sunR, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Retro sun scanline slices
+                ctx.fillStyle = '#060914';
+                for (let s = 0; s < 5; s++) {
+                    const sy = horY - sunR * 0.12 - s * (sunR * 0.14);
+                    ctx.fillRect(cx - sunR - 2, sy, sunR * 2 + 4, 2 + s * 0.7);
+                }
+
+                // Ground plane
                 ctx.fillStyle = '#060914';
                 ctx.fillRect(0, horY, w, h - horY);
                 ctx.strokeStyle = pal[1];
+                ctx.lineWidth = 1.2;
+
+                // Perspective vertical lines
                 for (let i = -14; i <= 14; i++) {
                     ctx.beginPath();
                     ctx.moveTo(cx + i * 18, horY);
                     ctx.lineTo(cx + i * 120, h);
                     ctx.stroke();
                 }
+
+                // Animated horizontal perspective grid lines
+                const speed = (t * (0.7 + beat * 0.2)) % 1;
+                for (let r = 0; r < 10; r++) {
+                    const p = Math.pow((r + speed) / 10, 2.1);
+                    const gy = horY + p * (h - horY);
+                    ctx.globalAlpha = 0.25 + p * 0.75;
+                    ctx.beginPath();
+                    ctx.moveTo(0, gy);
+                    ctx.lineTo(w, gy);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
             }
         }
-        renderPreview();
+
+        function startPreviewLoop() {
+            if (!rafId && canvasVisible && !document.hidden) {
+                rafId = requestAnimationFrame(renderPreview);
+            }
+        }
+
+        if ('IntersectionObserver' in window) {
+            const canvasObs = new IntersectionObserver((entries) => {
+                canvasVisible = entries[0].isIntersecting;
+                if (canvasVisible) startPreviewLoop();
+            }, { threshold: 0.02 });
+            canvasObs.observe(canvas);
+        }
+        document.addEventListener('visibilitychange', startPreviewLoop);
+        startPreviewLoop();
     }
 
+    // Built-in Demo Audio Toggle
     const previewAudioBtn = document.getElementById('previewAudioBtn');
     if (previewAudioBtn) {
         previewAudioBtn.addEventListener('click', () => {
@@ -270,6 +398,7 @@
         });
     }
 
+    // Smooth FAQ Accordion
     document.querySelectorAll('.faq-q').forEach(btn => {
         btn.addEventListener('click', () => {
             const item = btn.parentElement;

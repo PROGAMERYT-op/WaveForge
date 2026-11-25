@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '7.1.0';
+            var VER = '8.0.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -32,10 +32,10 @@
     </script>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>WaveForge Studio 7.1 | Phonk &amp; Hardtekk Template Maker + 4K Music Visualizer</title>
-    <meta name="description" content="WaveForge Studio 7.1 lets you create viral TikTok Hardtekk, Brazilian Funk &amp; Phonk music videos in 1 click. Features AirPods volume intro, liquid plasma rings, custom logo/background uploads, and 4K MP4 export.">
+    <title>WaveForge Studio 8.0 | Phonk &amp; Hardtekk Template Maker + 4K Music Visualizer</title>
+    <meta name="description" content="WaveForge Studio 8.0 lets you create viral TikTok Hardtekk, Brazilian Funk &amp; Phonk music videos in 1 click. Features AirPods volume intro, liquid plasma rings, custom logo/background uploads, and 4K MP4 export.">
     <meta name="keywords" content="phonk visualizer, hardtekk visualizer, brazilian funk video maker, tiktok music visualizer, 9:16 audio visualizer, free music visualizer, logo visualizer, avee player online alternative">
     <meta name="author" content="WaveForge">
     <meta name="theme-color" content="#05070f">
@@ -48,7 +48,7 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <meta property="og:title" content="WaveForge Studio 7.1 — Phonk &amp; Hardtekk Music Video Templates">
+    <meta property="og:title" content="WaveForge Studio 8.0 — Phonk &amp; Hardtekk Music Video Templates">
     <meta property="og:description" content="1-click viral Phonk &amp; Hardtekk templates, AirPods volume intro, 13 modes, 3-band EQ, and 4K MP4 export.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
 
@@ -58,7 +58,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="assets/css/app.css?v=7.1.0">
+    <link rel="stylesheet" href="assets/css/app.css?v=8.0.0">
 
     <!-- Fast WebCodecs export: mp4-muxer -->
     <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
@@ -66,13 +66,18 @@
 <body>
     <main class="visually-hidden" role="main">
         <article>
-            <h2>WaveForge Studio 7.1 - Viral Phonk &amp; Hardtekk Music Visualizer Templates</h2>
+            <h2>WaveForge Studio 8.0 - Viral Phonk &amp; Hardtekk Music Visualizer Templates</h2>
             <p>Browser-based music visualizer with 1-click Phonk, Hardtekk, and Brazilian Funk templates, AirPods volume intro, 13 modes, 3-band EQ, and 4K MP4 video exports.</p>
         </article>
     </main>
 
     <!-- MAIN CANVAS -->
     <canvas id="viz-canvas" role="img" aria-label="Music visualization display showing audio reactive graphics"></canvas>
+
+    <!-- ZEN MODE EXIT PILL -->
+    <button type="button" id="btn-exit-zen" class="zen-exit-pill hidden" aria-label="Show studio controls" title="Exit Zen Mode (H)">
+        <span>👁 Show Controls</span>
+    </button>
 
     <!-- DRAG & DROP OVERLAY -->
     <div id="drop-overlay" aria-hidden="true">
@@ -84,12 +89,12 @@
     </div>
 
     <!-- TOAST NOTIFICATIONS -->
-    <div id="toast-container" role="alert" aria-live="polite"></div>
+    <div id="toast-container" role="status" aria-live="polite"></div>
 
-    <!-- COMPACT QUICK-START ONBOARDING PILL (Auto-hides on play or dismiss) -->
+    <!-- COMPACT QUICK-START ONBOARDING CARD (Auto-hides on play or dismiss) -->
     <div id="studio-onboarding" class="studio-onboarding interactive" role="region" aria-label="Quick start guide">
         <button type="button" class="onboard-dismiss" id="onboard-close-btn" aria-label="Dismiss welcome card">✕</button>
-        <div class="onboard-icon-ring">😈</div>
+        <div class="onboard-icon-ring" aria-hidden="true">😈</div>
         <h2>Create Viral Phonk &amp; Music Edits</h2>
         <p>Pick a 1-click trending Hardtekk / Funk template, upload your music &amp; logo, and export in 9:16 or 16:9 4K.</p>
         <div class="onboard-actions" style="grid-template-columns: 1fr;">
@@ -116,9 +121,9 @@
                     <span class="modal-eyebrow">1-CLICK VIRAL PRESETS</span>
                     <h2 id="templates-title">🔥 Trending Phonk &amp; Funk Templates</h2>
                 </div>
-                <button id="btn-close-templates" class="close-icon-btn" aria-label="Close templates">✕</button>
+                <button type="button" id="btn-close-templates" class="close-icon-btn" aria-label="Close templates">✕</button>
             </div>
-            <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 14px;">
+            <p class="modal-lead">
                 Tap any template below to automatically configure the AirPods volume intro, liquid neon plasma ring, 9:16 TikTok framing, and Bass Boost EQ — then upload your music, background, and logo!
             </p>
             <div class="templates-grid" id="templates-grid"></div>
@@ -126,15 +131,21 @@
     </div>
 
     <!-- MODE SELECTOR MODAL / MOBILE BOTTOM SHEET -->
-    <div id="mode-selector-modal" role="dialog" aria-modal="true" aria-label="Choose visualization mode">
+    <div id="mode-selector-modal" role="dialog" aria-modal="true" aria-labelledby="mode-selector-title">
         <div class="mode-selector-panel">
             <div class="sheet-handle" aria-hidden="true"></div>
             <div class="mode-selector-header">
                 <div>
                     <span class="modal-eyebrow">13 VISUAL ENGINES</span>
-                    <h2>Visualization Mode</h2>
+                    <h2 id="mode-selector-title">Visualization Mode</h2>
                 </div>
-                <button id="btn-close-mode-selector" class="close-icon-btn" aria-label="Close mode selector">✕</button>
+                <button type="button" id="btn-close-mode-selector" class="close-icon-btn" aria-label="Close mode selector">✕</button>
+            </div>
+            <div class="mode-filter-row" id="mode-filter-row" role="group" aria-label="Filter visualization modes">
+                <button type="button" class="mode-filter-pill active" data-cat="all">All (13)</button>
+                <button type="button" class="mode-filter-pill" data-cat="viral">🔥 Viral &amp; Logo</button>
+                <button type="button" class="mode-filter-pill" data-cat="3d">🌀 3D &amp; Retro</button>
+                <button type="button" class="mode-filter-pill" data-cat="classic">📊 Spectrum &amp; FX</button>
             </div>
             <div class="mode-grid" id="mode-grid"></div>
         </div>
@@ -148,7 +159,7 @@
     <nav id="ui-layer" role="navigation" aria-label="Visualizer controls">
 
         <!-- TOP CLUSTER: HEADER + 3-STEP TEMPLATE CREATOR BAR -->
-        <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="top-cluster">
             <header class="top-bar interactive">
                 <div class="brand-cluster">
                     <a href="index.html" class="brand-link" aria-label="Back to WaveForge home">
@@ -164,31 +175,35 @@
                             <span id="status-text">Ready</span>
                         </span>
                         <span class="status-pill mono-pill desktop-only-pill" id="fps-display">60 FPS</span>
-                        <button type="button" class="status-pill mode-indicator-btn" id="top-mode-pill" title="Switch visualization mode">
+                        <button type="button" class="status-pill mode-indicator-btn" id="top-mode-pill" title="Switch visualization mode (M)">
                             <span class="mode-name" id="mode-name">Hardtekk Phonk</span>
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                     </div>
                 </div>
 
                 <div class="top-actions">
-                    <button id="btn-templates" class="btn-templates-pill" aria-label="Open trending templates" title="1-Click Trending Phonk &amp; Funk Templates (T)">
-                        <span>🔥</span>
+                    <button type="button" id="btn-templates" class="btn-templates-pill" aria-label="Open trending templates" title="1-Click Trending Phonk &amp; Funk Templates (T)">
+                        <span aria-hidden="true">🔥</span>
                         <span class="tpl-btn-text">Templates</span>
                     </button>
-                    <button id="btn-export" class="btn-studio-primary" aria-label="Export video" title="Export 4K MP4 / WebM Video">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <button type="button" id="btn-export" class="btn-studio-primary" aria-label="Export video" title="Export 4K MP4 / WebM Video">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         <span class="export-label">Export</span>
                     </button>
-                    <button id="btn-settings" class="top-icon-btn" aria-label="Open studio settings" title="Studio Settings, EQ &amp; Overlays">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                    <button type="button" id="btn-settings" class="top-icon-btn" aria-label="Open studio settings" title="Studio Settings, EQ &amp; Overlays">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
                         <span class="btn-text">Settings</span>
                     </button>
-                    <button id="btn-share" class="top-icon-btn icon-only-btn" aria-label="Share preset link" title="Share Custom Preset Link">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    <button type="button" id="btn-share" class="top-icon-btn icon-only-btn" aria-label="Share preset link" title="Share Custom Preset Link">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                     </button>
-                    <button id="btn-fullscreen" class="top-icon-btn icon-only-btn" aria-label="Toggle fullscreen" title="Fullscreen (F)">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                    <button type="button" id="btn-zen" class="top-icon-btn icon-only-btn desktop-only-btn" aria-label="Hide UI controls" title="Zen Mode — Hide UI (H)">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <button type="button" id="btn-fullscreen" class="top-icon-btn icon-only-btn" aria-label="Toggle fullscreen" title="Fullscreen (F)">
+                        <svg id="icon-fs-enter" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                        <svg id="icon-fs-exit" class="hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
                     </button>
                 </div>
             </header>
@@ -200,12 +215,12 @@
                     <strong id="wizard-template-name">Hardtekk Purple Mage</strong>
                 </div>
                 <div class="wiz-steps">
-                    <button type="button" id="wiz-btn-music" class="wiz-step-btn">1. 🎵 Upload Music</button>
-                    <button type="button" id="wiz-btn-bg" class="wiz-step-btn">2. 🖼️ Background</button>
-                    <button type="button" id="wiz-btn-logo" class="wiz-step-btn">3. ⭕ Center Logo</button>
-                    <button type="button" id="wiz-btn-export" class="wiz-step-btn wiz-export-cta">4. 🎬 Export Video</button>
+                    <button type="button" id="wiz-btn-music" class="wiz-step-btn">1. 🎵 Music</button>
+                    <button type="button" id="wiz-btn-bg" class="wiz-step-btn">2. 🖼️ Backdrop</button>
+                    <button type="button" id="wiz-btn-logo" class="wiz-step-btn">3. ⭕ Logo</button>
+                    <button type="button" id="wiz-btn-export" class="wiz-step-btn wiz-export-cta">4. 🎬 Export</button>
                 </div>
-                <button type="button" id="wiz-btn-close" class="wiz-close" aria-label="Hide template bar">✕</button>
+                <button type="button" id="wiz-btn-close" class="wiz-close" aria-label="Hide template bar" title="Hide template bar">✕</button>
             </div>
         </div>
 
@@ -215,10 +230,13 @@
                 <!-- Row 1: Touch-Swipeable 13-Mode Pill Ribbon -->
                 <div class="quick-mode-strip" id="quick-mode-strip" role="toolbar" aria-label="Quick mode switcher"></div>
 
-                <!-- Row 2: Precision Timeline Scrubber -->
+                <!-- Row 2: Precision Timeline Scrubber with Hover Time Tooltip -->
                 <div class="scrubber-container">
                     <span id="time-current" class="time-display">0:00</span>
-                    <input type="range" id="seek-bar" value="0" min="0" max="100" step="0.1" aria-label="Seek position">
+                    <div class="seek-wrap">
+                        <div class="seek-tooltip" id="seek-tooltip" aria-hidden="true">0:00</div>
+                        <input type="range" id="seek-bar" value="0" min="0" max="100" step="0.1" aria-label="Seek position">
+                    </div>
                     <span id="time-total" class="time-display">0:00</span>
                 </div>
 
@@ -227,50 +245,59 @@
                     <input type="file" id="file-input" accept="audio/*,.json" class="hidden" aria-hidden="true">
 
                     <div class="transport-group left-group">
-                        <button id="btn-upload" class="dock-btn" aria-label="Upload audio file" title="Upload Audio File">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <button type="button" id="btn-upload" class="dock-btn" aria-label="Upload audio file" title="Upload Audio File">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                             <span class="dock-lbl">Music</span>
                         </button>
 
-                        <button id="dock-btn-templates" class="dock-btn" aria-label="Trending templates" title="1-Click Trending Templates (T)">
-                            <span style="font-size:15px;line-height:1;">🔥</span>
+                        <button type="button" id="dock-btn-templates" class="dock-btn desktop-only-btn" aria-label="Trending templates" title="1-Click Trending Templates (T)">
+                            <span style="font-size:15px;line-height:1;" aria-hidden="true">🔥</span>
                             <span class="dock-lbl">Templates</span>
                         </button>
 
-                        <button id="btn-demo" class="dock-btn" aria-label="Load demo track" title="Play Built-In Demo Track">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                        <button type="button" id="btn-demo" class="dock-btn" aria-label="Load demo track" title="Play Built-In Demo Track">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                             <span class="dock-lbl">Demo</span>
                         </button>
+
+                        <button type="button" id="btn-loop" class="icon-only-btn desktop-only-btn" aria-label="Toggle track loop" aria-pressed="false" title="Loop Track (L)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+                        </button>
+
+                        <button type="button" id="btn-speed" class="speed-pill-btn desktop-only-btn" aria-label="Playback speed" title="Cycle Speed (Slowed / Normal / Sped Up)">1.0×</button>
                     </div>
 
                     <div class="transport-center">
-                        <button id="btn-play" class="play-hero-btn active" aria-label="Play or pause" title="Play / Pause (Space)">
+                        <button type="button" id="btn-play" class="play-hero-btn" aria-label="Play or pause" title="Play / Pause (Space)">
                             <span class="icon" id="play-icon">▶</span>
                         </button>
 
-                        <button id="btn-stop" class="icon-only-btn desktop-only-btn" aria-label="Stop playback" title="Stop (S)">
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+                        <button type="button" id="btn-stop" class="icon-only-btn desktop-only-btn" aria-label="Stop playback" title="Stop (S)">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
                         </button>
                     </div>
 
                     <div class="transport-group right-group">
-                        <button id="btn-mode" class="dock-btn" aria-label="Change visualization mode" title="All 13 Modes Grid (M)">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+                        <button type="button" id="btn-mode" class="dock-btn" aria-label="Change visualization mode" title="All 13 Modes Grid (M)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
                             <span class="dock-lbl">Modes</span>
                         </button>
 
-                        <button id="btn-random" class="dock-btn" aria-label="Randomize visual style" title="Randomize Mode &amp; Palette (R)">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                        <button type="button" id="btn-random" class="dock-btn" aria-label="Randomize visual style" title="Randomize Mode &amp; Palette (R)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
                             <span class="dock-lbl">Mix</span>
                         </button>
 
-                        <button id="btn-mic" class="dock-btn" aria-label="Toggle microphone input" title="Live Microphone Input">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                        <button type="button" id="btn-mic" class="dock-btn" aria-label="Toggle microphone input" title="Live Microphone Input">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                             <span class="dock-lbl">Mic</span>
                         </button>
 
-                        <div class="volume-control desktop-only-flex" title="Output Volume">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                        <div class="volume-control desktop-only-flex" title="Output Volume (↑ / ↓)">
+                            <button type="button" id="btn-mute" class="mute-icon-btn" aria-label="Mute or unmute audio" aria-pressed="false" title="Mute / Unmute">
+                                <svg id="icon-vol-on" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                                <svg id="icon-vol-off" class="hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
                             <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="0.8" aria-label="Volume">
                         </div>
                     </div>
@@ -288,7 +315,7 @@
                     <span class="modal-eyebrow">STUDIO CONTROLS</span>
                     <h2 id="settings-title">Configuration &amp; EQ</h2>
                 </div>
-                <button id="btn-close-settings" class="close-icon-btn" aria-label="Close settings">✕</button>
+                <button type="button" id="btn-close-settings" class="close-icon-btn" aria-label="Close settings">✕</button>
             </div>
 
             <!-- 4-TAB SEGMENTED CONTROL -->
@@ -301,17 +328,22 @@
 
             <!-- TAB 1: LOGO, PHONK INTRO & BRANDING -->
             <div class="settings-pane active" id="tab-branding" role="tabpanel">
+                <div id="logo-mode-notice" class="mode-notice-banner hidden">
+                    <p>Ring, backdrop, and AirPods intro controls apply to <strong>Hardtekk Phonk</strong> and <strong>Logo Visualizer</strong> modes.</p>
+                    <button type="button" id="btn-switch-phonk-mode" class="btn-studio-primary" style="padding:7px 12px;font-size:0.74rem;">😈 Switch to Hardtekk Phonk</button>
+                </div>
+
                 <div class="settings-group" id="logo-viz-settings">
                     <h3>Custom Background &amp; Logo Upload</h3>
                     <div class="upload-btn-group" style="margin-bottom:10px;">
-                        <div class="upload-btn" id="btn-upload-bg">
-                            <span class="upload-icon">🖼️</span>
+                        <button type="button" class="upload-btn" id="btn-upload-bg">
+                            <span class="upload-icon" aria-hidden="true">🖼️</span>
                             <span id="bg-label">Upload Background</span>
-                        </div>
-                        <div class="upload-btn" id="btn-upload-logo">
-                            <span class="upload-icon">⭕</span>
+                        </button>
+                        <button type="button" class="upload-btn" id="btn-upload-logo">
+                            <span class="upload-icon" aria-hidden="true">⭕</span>
                             <span id="logo-label">Upload Center Logo</span>
-                        </div>
+                        </button>
                     </div>
                     <div id="clear-branding-row" class="hidden" style="margin-bottom:12px;">
                         <button type="button" id="btn-clear-branding" style="width:100%;font-size:0.74rem;padding:6px 10px;">✕ Clear Custom Background / Logo</button>
@@ -334,31 +366,31 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div class="control-row">
-                        <label for="set-phonk-intro-dur">Intro Beat-Drop Time (sec)</label>
-                        <input type="range" id="set-phonk-intro-dur" min="0" max="6" step="0.5" value="3.5">
+                    <div class="control-row" id="row-phonk-intro-dur">
+                        <label for="set-phonk-intro-dur">Intro Beat-Drop Time</label>
+                        <input type="range" id="set-phonk-intro-dur" min="0" max="6" step="0.5" value="3.5" data-unit="s">
                     </div>
 
                     <div class="control-row toggle-row">
                         <label for="set-wave-color">Neon Ring Color</label>
                         <input type="color" id="set-wave-color" value="#a855f7" style="width:44px;height:32px;padding:2px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;cursor:pointer;">
                     </div>
-                    <div class="color-swatch-row" style="margin-bottom:12px;">
-                        <div class="color-swatch active" style="background:#a855f7;" data-color="#a855f7"></div>
-                        <div class="color-swatch" style="background:#00ff88;" data-color="#00ff88"></div>
-                        <div class="color-swatch" style="background:#00c4ff;" data-color="#00c4ff"></div>
-                        <div class="color-swatch" style="background:#ff0055;" data-color="#ff0055"></div>
-                        <div class="color-swatch" style="background:#ff6600;" data-color="#ff6600"></div>
-                        <div class="color-swatch" style="background:#fbbf24;" data-color="#fbbf24"></div>
-                        <div class="color-swatch" style="background:#ffffff;" data-color="#ffffff"></div>
+                    <div class="color-swatch-row" role="group" aria-label="Quick ring color swatches" style="margin-bottom:12px;">
+                        <button type="button" class="color-swatch active" style="background:#a855f7;" data-color="#a855f7" aria-label="Electric Purple"></button>
+                        <button type="button" class="color-swatch" style="background:#00ff88;" data-color="#00ff88" aria-label="Toxic Green"></button>
+                        <button type="button" class="color-swatch" style="background:#00c4ff;" data-color="#00c4ff" aria-label="Glacier Cyan"></button>
+                        <button type="button" class="color-swatch" style="background:#ff0055;" data-color="#ff0055" aria-label="Blood Crimson"></button>
+                        <button type="button" class="color-swatch" style="background:#ff6600;" data-color="#ff6600" aria-label="Inferno Orange"></button>
+                        <button type="button" class="color-swatch" style="background:#fbbf24;" data-color="#fbbf24" aria-label="24K Gold"></button>
+                        <button type="button" class="color-swatch" style="background:#ffffff;" data-color="#ffffff" aria-label="Pure White"></button>
                     </div>
                     <div class="control-row">
                         <label for="set-shake">Kick-Drum Shake &amp; Zoom</label>
-                        <input type="range" id="set-shake" min="0" max="40" step="1" value="16">
+                        <input type="range" id="set-shake" min="0" max="40" step="1" value="16" data-unit="px">
                     </div>
                     <div class="control-row">
                         <label for="set-glow-size">Neon Plasma Glow Size</label>
-                        <input type="range" id="set-glow-size" min="0" max="80" step="5" value="40">
+                        <input type="range" id="set-glow-size" min="0" max="80" step="5" value="40" data-unit="px">
                     </div>
                     <div class="control-row">
                         <label for="set-ray-count">Ring Detail / Radial Rays</label>
@@ -366,7 +398,7 @@
                     </div>
                     <div class="control-row">
                         <label for="set-line-thick">Ring / Ray Line Thickness</label>
-                        <input type="range" id="set-line-thick" min="1" max="6" step="0.5" value="2">
+                        <input type="range" id="set-line-thick" min="1" max="6" step="0.5" value="2" data-unit="px">
                     </div>
                     <div class="control-row toggle-row">
                         <label for="set-logo-particles">Radial Hyperspace Sparks</label>
@@ -445,7 +477,7 @@
                     </div>
                     <div class="control-row">
                         <label for="set-bloom">Glow Intensity</label>
-                        <input type="range" id="set-bloom" min="0" max="100" value="60">
+                        <input type="range" id="set-bloom" min="0" max="100" value="60" data-unit="%">
                     </div>
                     <div class="control-row toggle-row">
                         <label for="set-hue-cycle">Dynamic Hue Cycling</label>
@@ -454,9 +486,9 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div class="control-row">
-                        <label for="set-hue-speed">Hue Cycle Speed (°/s)</label>
-                        <input type="range" id="set-hue-speed" min="3" max="60" step="1" value="15">
+                    <div class="control-row" id="row-hue-speed">
+                        <label for="set-hue-speed">Hue Cycle Speed</label>
+                        <input type="range" id="set-hue-speed" min="3" max="60" step="1" value="15" data-unit="°/s">
                     </div>
                 </div>
 
@@ -497,17 +529,34 @@
             <div class="settings-pane" id="tab-audio" role="tabpanel">
                 <div class="settings-group">
                     <h3>3-Band Hardware Equalizer</h3>
+                    <div class="eq-preset-row" id="eq-presets" role="group" aria-label="Quick EQ Presets">
+                        <button type="button" class="eq-preset-btn" data-eq="0,0,0">Flat</button>
+                        <button type="button" class="eq-preset-btn" data-eq="8,1,3">😈 Phonk Bass</button>
+                        <button type="button" class="eq-preset-btn" data-eq="10,-1,4">⚡ Hardtekk</button>
+                        <button type="button" class="eq-preset-btn" data-eq="13,-2,2">💥 Sub Destroyer</button>
+                        <button type="button" class="eq-preset-btn" data-eq="2,4,3">🎙️ Vocal</button>
+                    </div>
                     <div class="control-row">
                         <label for="set-eq-bass">Low Shelf Bass (110 Hz)</label>
-                        <input type="range" id="set-eq-bass" min="-12" max="15" step="1" value="6">
+                        <input type="range" id="set-eq-bass" min="-12" max="15" step="1" value="6" data-unit=" dB" data-signed="true">
                     </div>
                     <div class="control-row">
                         <label for="set-eq-mid">Mid Presence (1 kHz)</label>
-                        <input type="range" id="set-eq-mid" min="-12" max="12" step="1" value="0">
+                        <input type="range" id="set-eq-mid" min="-12" max="12" step="1" value="0" data-unit=" dB" data-signed="true">
                     </div>
                     <div class="control-row">
                         <label for="set-eq-treble">High Shelf Air (4.2 kHz)</label>
-                        <input type="range" id="set-eq-treble" min="-12" max="12" step="1" value="2">
+                        <input type="range" id="set-eq-treble" min="-12" max="12" step="1" value="2" data-unit=" dB" data-signed="true">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-playback-speed">Playback Speed (Preview)</label>
+                        <select id="set-playback-speed">
+                            <option value="0.75">0.75× (Ultra Slowed)</option>
+                            <option value="0.85">0.85× (Slowed)</option>
+                            <option value="1" selected>1.0× (Original)</option>
+                            <option value="1.15">1.15× (Sped Up)</option>
+                            <option value="1.25">1.25× (Nightcore)</option>
+                        </select>
                     </div>
                 </div>
 
@@ -537,7 +586,7 @@
                     </div>
                     <div class="control-row">
                         <label for="set-sensitivity">Visual Gain Sensitivity</label>
-                        <input type="range" id="set-sensitivity" min="0.5" max="5.0" step="0.1" value="1.65">
+                        <input type="range" id="set-sensitivity" min="0.5" max="5.0" step="0.1" value="1.65" data-unit="×">
                     </div>
                     <div class="control-row toggle-row">
                         <label for="set-beat-enabled">Beat Detection Pulse</label>
@@ -546,9 +595,9 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div class="control-row">
+                    <div class="control-row" id="row-beat-thresh">
                         <label for="set-beat-thresh">Beat Trigger Threshold</label>
-                        <input type="range" id="set-beat-thresh" min="1.0" max="2.0" step="0.05" value="1.3">
+                        <input type="range" id="set-beat-thresh" min="1.0" max="2.0" step="0.05" value="1.3" data-unit="×">
                     </div>
                 </div>
             </div>
@@ -558,9 +607,9 @@
                 <div class="settings-group">
                     <h3>Presets &amp; Snapshots</h3>
                     <div class="button-group">
-                        <button id="btn-export-preset">💾 Save Preset</button>
-                        <button id="btn-screenshot">📷 Screenshot</button>
-                        <button id="btn-reset-settings">↺ Reset</button>
+                        <button type="button" id="btn-export-preset">💾 Save Preset</button>
+                        <button type="button" id="btn-screenshot">📷 Screenshot</button>
+                        <button type="button" id="btn-reset-settings" class="danger">↺ Reset</button>
                     </div>
                 </div>
 
@@ -591,8 +640,8 @@
             </div>
 
             <div class="version-info">
-                WaveForge Studio v7.1 • 13 Modes • Trending Phonk Templates • Turbo MP4<br>
-                <a id="btn-shortcuts" role="button" tabindex="0">Keyboard Shortcuts</a> •
+                WaveForge Studio v8.0 • 13 Modes • Trending Phonk Templates • Turbo MP4<br>
+                <button type="button" id="btn-shortcuts" class="inline-link-btn">Keyboard Shortcuts (?)</button> •
                 <a href="index.html">Back to Home</a>
             </div>
         </div>
@@ -607,10 +656,16 @@
                     <span class="modal-eyebrow">COLLABORATE &amp; SHARE</span>
                     <h2 id="share-title">Share Studio Preset</h2>
                 </div>
-                <button id="btn-close-share" class="close-icon-btn" aria-label="Close share dialog">✕</button>
+                <button type="button" id="btn-close-share" class="close-icon-btn" aria-label="Close share dialog">✕</button>
             </div>
             <p class="share-lead">Your custom preset link saves your active mode, color palette, sensitivity, aspect ratio, and title overlay in the URL.</p>
+            <div class="share-url-preview">
+                <input type="text" id="share-url-input" readonly aria-label="Shareable preset URL">
+            </div>
             <div class="share-buttons" id="share-buttons">
+                <button type="button" class="share-btn share-native hidden" id="btn-native-share">
+                    <span class="share-icon">📤</span><span>Share via Device</span>
+                </button>
                 <a class="share-btn share-x" href="#" target="_blank" rel="noopener" data-share-network="x">
                     <span class="share-icon">𝕏</span><span>Post on X</span>
                 </a>
@@ -636,15 +691,21 @@
                     <span class="modal-eyebrow">HOTKEYS</span>
                     <h2 id="shortcuts-title">Keyboard Shortcuts</h2>
                 </div>
-                <button id="btn-close-shortcuts" class="close-icon-btn" aria-label="Close shortcuts">✕</button>
+                <button type="button" id="btn-close-shortcuts" class="close-icon-btn" aria-label="Close shortcuts">✕</button>
             </div>
             <div class="shortcut-list">
                 <div class="shortcut-row"><span>Play / Pause</span><kbd>Space</kbd></div>
+                <div class="shortcut-row"><span>Stop playback</span><kbd>S</kbd></div>
                 <div class="shortcut-row"><span>Open Trending Templates</span><kbd>T</kbd></div>
                 <div class="shortcut-row"><span>Choose visualization mode</span><kbd>M</kbd></div>
                 <div class="shortcut-row"><span>Randomize mode &amp; palette</span><kbd>R</kbd></div>
+                <div class="shortcut-row"><span>Toggle Loop</span><kbd>L</kbd></div>
+                <div class="shortcut-row"><span>Zen Mode (Hide / Show UI)</span><kbd>H</kbd></div>
+                <div class="shortcut-row"><span>Save PNG Screenshot</span><kbd>C</kbd></div>
                 <div class="shortcut-row"><span>Toggle fullscreen</span><kbd>F</kbd></div>
-                <div class="shortcut-row"><span>Seek 5 seconds</span><kbd>←</kbd> <kbd>→</kbd></div>
+                <div class="shortcut-row"><span>Seek ±5 seconds</span><span><kbd>←</kbd> <kbd>→</kbd></span></div>
+                <div class="shortcut-row"><span>Adjust volume ±10%</span><span><kbd>↑</kbd> <kbd>↓</kbd></span></div>
+                <div class="shortcut-row"><span>Show this shortcuts guide</span><kbd>?</kbd></div>
                 <div class="shortcut-row"><span>Close dialogs</span><kbd>Esc</kbd></div>
             </div>
         </div>
@@ -659,7 +720,7 @@
                     <span class="modal-eyebrow">TURBO RENDER ENGINE</span>
                     <h2 id="export-title">Export Video</h2>
                 </div>
-                <button id="btn-close-export" class="close-icon-btn" aria-label="Close export dialog">✕</button>
+                <button type="button" id="btn-close-export" class="close-icon-btn" aria-label="Close export dialog">✕</button>
             </div>
 
             <div class="settings-group">
@@ -760,11 +821,11 @@
             </div>
 
             <div class="button-group" style="margin-top: 14px;">
-                <button id="btn-start-export" class="btn-studio-primary" style="padding:12px 20px;font-size:0.9rem;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <button type="button" id="btn-start-export" class="btn-studio-primary" style="padding:12px 20px;font-size:0.9rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     <span>Render Video</span>
                 </button>
-                <button id="btn-cancel-export" class="danger" style="display: none;">
+                <button type="button" id="btn-cancel-export" class="danger" style="display: none;">
                     <span>⏹ Cancel Render</span>
                 </button>
             </div>
@@ -789,22 +850,22 @@
     </div>
 
     <!-- VISUALIZER MODE REGISTRY (13 Modes) -->
-    <script src="Visualizers/bars.js?v=7.1.0"></script>
-    <script src="Visualizers/wave.js?v=7.1.0"></script>
-    <script src="Visualizers/radial.js?v=7.1.0"></script>
-    <script src="Visualizers/particles.js?v=7.1.0"></script>
-    <script src="Visualizers/spectrogram.js?v=7.1.0"></script>
-    <script src="Visualizers/3dbars.js?v=7.1.0"></script>
-    <script src="Visualizers/dna.js?v=7.1.0"></script>
-    <script src="Visualizers/galaxy.js?v=7.1.0"></script>
-    <script src="Visualizers/logo.js?v=7.1.0"></script>
-    <script src="Visualizers/tunnel.js?v=7.1.0"></script>
-    <script src="Visualizers/trapnation.js?v=7.1.0"></script>
-    <script src="Visualizers/synthwave.js?v=7.1.0"></script>
-    <script src="Visualizers/phonk.js?v=7.1.0"></script>
+    <script src="Visualizers/bars.js?v=8.0.0"></script>
+    <script src="Visualizers/wave.js?v=8.0.0"></script>
+    <script src="Visualizers/radial.js?v=8.0.0"></script>
+    <script src="Visualizers/particles.js?v=8.0.0"></script>
+    <script src="Visualizers/spectrogram.js?v=8.0.0"></script>
+    <script src="Visualizers/3dbars.js?v=8.0.0"></script>
+    <script src="Visualizers/dna.js?v=8.0.0"></script>
+    <script src="Visualizers/galaxy.js?v=8.0.0"></script>
+    <script src="Visualizers/logo.js?v=8.0.0"></script>
+    <script src="Visualizers/tunnel.js?v=8.0.0"></script>
+    <script src="Visualizers/trapnation.js?v=8.0.0"></script>
+    <script src="Visualizers/synthwave.js?v=8.0.0"></script>
+    <script src="Visualizers/phonk.js?v=8.0.0"></script>
 
     <!-- SMART MONETIZATION ENGINE & APPLICATION SCRIPT -->
-    <script src="assets/js/ads.js?v=7.1.0"></script>
-    <script src="assets/js/app.js?v=7.1.0"></script>
+    <script src="assets/js/ads.js?v=8.0.0"></script>
+    <script src="assets/js/app.js?v=8.0.0"></script>
 </body>
 </html>
