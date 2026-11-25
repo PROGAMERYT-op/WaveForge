@@ -2620,7 +2620,17 @@
                 card.setAttribute('tabindex', '0');
                 card.innerHTML = `
                     <div class="tpl-preview" style="--tpl-color: ${tpl.color};">
-                        <div class="tpl-ring-demo"></div>
+                        ${tpl.id === 'brazilian-funk'
+                            ? '<div class="tpl-vis-tunnel"></div>'
+                            : tpl.id === 'drift-phonk-crimson'
+                            ? '<div class="tpl-vis-synth"><div class="tpl-vis-sun"></div><div class="tpl-vis-grid"></div></div>'
+                            : tpl.id === 'ultra-slowed-ice'
+                            ? '<div class="tpl-vis-shock"></div>'
+                            : tpl.id === 'golden-royalty'
+                            ? '<div class="tpl-vis-gold">👑</div>'
+                            : tpl.id === 'youtube-type-beat'
+                            ? '<div class="tpl-vis-bars"><span style="height:36%"></span><span style="height:72%"></span><span style="height:100%"></span><span style="height:64%"></span><span style="height:88%"></span><span style="height:48%"></span><span style="height:78%"></span></div>'
+                            : '<div class="tpl-ring-demo"></div>'}
                         <span class="tpl-badge">${tpl.tag}</span>
                     </div>
                     <div class="tpl-body">
@@ -3725,7 +3735,7 @@
             UI.applyTemplate(urlParams.get('template'));
         }
 
-        console.log('%c🧠 WaveForge Studio v9.0.0 — Predictive Audio Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+        console.log('%c🧠 WaveForge Studio v9.1.0 — Predictive Audio Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
