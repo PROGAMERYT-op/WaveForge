@@ -1,5 +1,5 @@
 /**
- * WaveForge Music Visualizer Studio v9.0
+ * WaveForge Music Visualizer Studio v10.0
  * Features:
  *  - 13 Visualization Modes (including Mode 12: Hardtekk / Phonk Liquid Ring + AirPods Intro)
  *  - 1-Click Trending Templates Hub (6 viral presets + 3-step guided workflow bar)
@@ -42,7 +42,11 @@
                 predictiveIntensity: 1.25,
                 fxVignette: true,
                 fxScanlines: false,
-                mirror: false
+                mirror: false,
+                fxChromatic: 30,
+                fxGlitch: 10,
+                fxVhs: 0,
+                fxZoomBlur: 40
             }
         },
         {
@@ -69,7 +73,11 @@
                 predictiveIntensity: 1.45,
                 fxVignette: true,
                 fxScanlines: false,
-                mirror: false
+                mirror: false,
+                fxChromatic: 45,
+                fxGlitch: 35,
+                fxVhs: 0,
+                fxZoomBlur: 45
             }
         },
         {
@@ -96,7 +104,11 @@
                 predictiveIntensity: 1.35,
                 fxVignette: true,
                 fxScanlines: true,
-                mirror: false
+                mirror: false,
+                fxChromatic: 35,
+                fxGlitch: 20,
+                fxVhs: 45,
+                fxZoomBlur: 25
             }
         },
         {
@@ -220,6 +232,8 @@
         phonkKickEnv: 0,
         phonkSparks: null,
         bgImg: null,
+        bgVideo: null,
+        bgVideoUrl: null,
         logoImg: null,
         logoAngle: 0,
         shockwaves: [],
@@ -296,6 +310,12 @@
         fxScanlines: false,
         fxVignette: true,
         fxProgressBar: true,
+        fxChromatic: 25,
+        fxGlitch: 0,
+        fxVhs: 0,
+        fxZoomBlur: 30,
+        bgOpacity: 80,
+        bgVideoSpeed: 1.0,
         aspectRatio: '9:16'
     };
 
@@ -408,6 +428,21 @@
             }
             if (params.has('artist')) {
                 CONFIG.overlayArtist = params.get('artist').slice(0, 60);
+            }
+            if (window.location.hash && window.location.hash.startsWith('#p=')) {
+                try {
+                    const b64 = window.location.hash.slice(3).replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonStr = decodeURIComponent(escape(atob(b64)));
+                    const parsed = JSON.parse(jsonStr);
+                    if (parsed && typeof parsed === 'object') {
+                        Object.keys(CONFIG).forEach((k) => {
+                            if (parsed[k] !== undefined) CONFIG[k] = parsed[k];
+                        });
+                        if (typeof parsed.mode === 'number' && VIS_MODS[parsed.mode]) {
+                            APP_STATE.mode = parsed.mode;
+                        }
+                    }
+                } catch (e) {}
             }
         } catch (e) {}
     }
@@ -1077,6 +1112,57 @@
                 });
             });
 
+            const spotifyBtn = document.getElementById('btn-spotify-canvas-preset');
+            if (spotifyBtn) {
+                spotifyBtn.onclick = () => {
+                    CONFIG.aspectRatio = '9:16';
+                    const expAspect = document.getElementById('export-aspect');
+                    const sAspect = document.getElementById('set-aspect');
+                    if (expAspect) expAspect.value = '9:16';
+                    if (sAspect) sAspect.value = '9:16';
+                    const durEl = document.getElementById('export-duration');
+                    if (durEl) durEl.value = '8';
+                    const silentEl = document.getElementById('export-silent');
+                    if (silentEl) silentEl.checked = true;
+                    const q1080 = document.querySelector('input[name="export-quality"][value="1080"]');
+                    if (q1080) {
+                        q1080.checked = true;
+                        document.querySelectorAll('.export-option').forEach(o => o.classList.remove('selected'));
+                        q1080.closest('.export-option').classList.add('selected');
+                    }
+                    const startEl = document.getElementById('export-start-time');
+                    if (startEl && APP_STATE.predDrops && APP_STATE.predDrops.length > 0) {
+                        startEl.value = Math.max(0, (APP_STATE.predDrops[0] - 0.5)).toFixed(1);
+                    }
+                    spotifyBtn.classList.add('active-canvas');
+                    persistConfig();
+                    UI.showToast('🟢 Spotify Canvas ready: 1080×1920 • 8s • Silent MP4', 'success');
+                };
+            }
+            const muteTestBtn = document.getElementById('btn-canvas-mute-test');
+            if (muteTestBtn) {
+                muteTestBtn.onclick = () => {
+                    APP_STATE.isMuted = !APP_STATE.isMuted;
+                    audio.updateSettings();
+                    UI.syncMuteUI();
+                    muteTestBtn.textContent = APP_STATE.isMuted ? '🔊 Unmute Preview' : '🔇 Test Muted';
+                    UI.showToast(APP_STATE.isMuted ? '🔇 Muted Preview active (Spotify Canvas check)' : '🔊 Preview unmuted', 'info');
+                };
+            }
+            const drop1Btn = document.getElementById('btn-export-drop1');
+            if (drop1Btn) {
+                drop1Btn.onclick = () => {
+                    const startEl = document.getElementById('export-start-time');
+                    if (!startEl) return;
+                    if (APP_STATE.predDrops && APP_STATE.predDrops.length > 0) {
+                        startEl.value = Math.max(0, APP_STATE.predDrops[0] - 1.0).toFixed(1);
+                        UI.showToast(`⚡ Clip start set to Drop #1 (${startEl.value}s)`, 'success');
+                    } else {
+                        UI.showToast('Load a track first to detect Drop #1', 'info');
+                    }
+                };
+            }
+
             const aspectSelect = document.getElementById('export-aspect');
             if (aspectSelect) {
                 aspectSelect.value = CONFIG.aspectRatio || '9:16';
@@ -1620,12 +1706,12 @@
             const audioCfg = await this._pickAudioCodec(targetAudioRate, Math.min(2, decoded.numberOfChannels));
             if (!audioCfg) throw new Error('No supported AAC encoder for ' + targetAudioRate + 'Hz');
 
-            // Start from 0:00 if Phonk Intro is enabled, Full Track is chosen, or playhead is near the end
-            const curPos = audio.getCurrentTime();
-            const startFromZero = (APP_STATE.mode === 12 && CONFIG.phonkIntroEnabled)
-                || durationSetting === 'full'
-                || (decoded.duration - curPos < 2.0);
-            const startTime = startFromZero ? 0 : curPos;
+            const isSilentExport = Boolean(document.getElementById('export-silent') && document.getElementById('export-silent').checked);
+            const startInputEl = document.getElementById('export-start-time');
+            const requestedStart = startInputEl ? Math.max(0, parseFloat(startInputEl.value) || 0) : 0;
+            const startTime = durationSetting === 'full'
+                ? 0
+                : Math.min(Math.max(0, decoded.duration - 1.0), requestedStart);
 
             let clipDuration = decoded.duration - startTime;
             if (durationSetting !== 'full') clipDuration = Math.min(clipDuration, parseInt(durationSetting, 10));
@@ -1704,13 +1790,16 @@
                 }
             }
 
-            const muxer = new Mp4Muxer.Muxer({
+            const muxerOpts = {
                 target: new Mp4Muxer.ArrayBufferTarget(),
                 video: { codec: 'avc', width, height, frameRate: fps },
-                audio: { codec: 'aac', numberOfChannels: numChannels, sampleRate },
                 fastStart: 'in-memory',
                 firstTimestampBehavior: 'offset'
-            });
+            };
+            if (!isSilentExport) {
+                muxerOpts.audio = { codec: 'aac', numberOfChannels: numChannels, sampleRate };
+            }
+            const muxer = new Mp4Muxer.Muxer(muxerOpts);
 
             let encodeError = null;
             const videoEncoder = new VideoEncoder({
@@ -1719,11 +1808,14 @@
             });
             videoEncoder.configure(videoCfg);
 
-            const audioEncoder = new AudioEncoder({
-                output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
-                error: (e) => { encodeError = e; }
-            });
-            audioEncoder.configure(audioCfg);
+            let audioEncoder = null;
+            if (!isSilentExport) {
+                audioEncoder = new AudioEncoder({
+                    output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+                    error: (e) => { encodeError = e; }
+                });
+                audioEncoder.configure(audioCfg);
+            }
 
             const renderCanvas = document.createElement('canvas');
             renderCanvas.width = width;
@@ -1836,40 +1928,42 @@
                 return;
             }
 
-            this._setStatus('Muxing AAC audio…', 94);
+            if (!isSilentExport && audioEncoder) {
+                this._setStatus('Muxing AAC audio…', 94);
 
-            const chunkFrames = 4096;
-            const planar = new Float32Array(numChannels * chunkFrames);
-            const chans = [];
-            for (let c = 0; c < numChannels; c++) chans.push(audioBuffer.getChannelData(c));
+                const chunkFrames = 4096;
+                const planar = new Float32Array(numChannels * chunkFrames);
+                const chans = [];
+                for (let c = 0; c < numChannels; c++) chans.push(audioBuffer.getChannelData(c));
 
-            for (let offset = 0; offset < totalSamples; offset += chunkFrames) {
-                if (this._cancelFast) {
-                    this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying);
-                    UI.showToast('Export cancelled', 'warning');
-                    return;
+                for (let offset = 0; offset < totalSamples; offset += chunkFrames) {
+                    if (this._cancelFast) {
+                        this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying);
+                        UI.showToast('Export cancelled', 'warning');
+                        return;
+                    }
+                    const len = Math.min(chunkFrames, totalSamples - offset);
+                    const buf = len === chunkFrames ? planar : new Float32Array(numChannels * len);
+                    for (let c = 0; c < numChannels; c++) {
+                        buf.set(chans[c].subarray(offset, offset + len), c * len);
+                    }
+                    const ad = new AudioData({
+                        format: 'f32-planar',
+                        sampleRate,
+                        numberOfFrames: len,
+                        numberOfChannels: numChannels,
+                        timestamp: Math.round(offset * 1_000_000 / sampleRate),
+                        data: buf
+                    });
+                    try { audioEncoder.encode(ad); } finally { ad.close(); }
                 }
-                const len = Math.min(chunkFrames, totalSamples - offset);
-                const buf = len === chunkFrames ? planar : new Float32Array(numChannels * len);
-                for (let c = 0; c < numChannels; c++) {
-                    buf.set(chans[c].subarray(offset, offset + len), c * len);
-                }
-                const ad = new AudioData({
-                    format: 'f32-planar',
-                    sampleRate,
-                    numberOfFrames: len,
-                    numberOfChannels: numChannels,
-                    timestamp: Math.round(offset * 1_000_000 / sampleRate),
-                    data: buf
-                });
-                try { audioEncoder.encode(ad); } finally { ad.close(); }
             }
 
-            this._setStatus('Finalizing MP4 container…', 98);
+            this._setStatus(isSilentExport ? 'Finalizing Silent Spotify Canvas MP4…' : 'Finalizing MP4 container…', 98);
             await videoEncoder.flush();
-            await audioEncoder.flush();
+            if (audioEncoder) await audioEncoder.flush();
             videoEncoder.close();
-            audioEncoder.close();
+            if (audioEncoder) audioEncoder.close();
 
             if (encodeError) {
                 this._abortFastExport(savedState, null, null, wasPlaying);
@@ -1888,7 +1982,7 @@
 
             const blob = new Blob([buffer], { type: 'video/mp4' });
             const url = URL.createObjectURL(blob);
-            const filename = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.mp4`;
+            const filename = isSilentExport ? `waveforge_spotify_canvas_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.mp4` : `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.mp4`;
 
             if (wasPlaying) {
                 try {
@@ -2058,8 +2152,25 @@
             if (typeof viz !== 'undefined' && viz) data = viz.processData(data);
 
             if (!mod.ownBackground) {
-                ctx.fillStyle = CONFIG.highContrast ? '#000000' : 'rgba(5, 5, 5, 0.2)';
-                ctx.fillRect(0, 0, width, height);
+                const bgMedia = (APP_STATE.bgVideo && APP_STATE.bgVideo.readyState >= 2 && APP_STATE.bgVideo.videoWidth > 0)
+                    ? APP_STATE.bgVideo
+                    : APP_STATE.bgImg;
+                if (bgMedia) {
+                    const mw = bgMedia.videoWidth || bgMedia.width || 1;
+                    const mh = bgMedia.videoHeight || bgMedia.height || 1;
+                    const scale = Math.max(width / mw, height / mh);
+                    const bw = mw * scale;
+                    const bh = mh * scale;
+                    ctx.fillStyle = '#03040a';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0.2, Math.min(1, (CONFIG.bgOpacity || 80) / 100));
+                    ctx.drawImage(bgMedia, (width - bw) / 2, (height - bh) / 2, bw, bh);
+                    ctx.restore();
+                } else {
+                    ctx.fillStyle = 'rgba(5, 5, 10, 0.22)';
+                    ctx.fillRect(0, 0, width, height);
+                }
             }
 
             const renderFn = mod.renderExport || mod.render;
@@ -2231,6 +2342,22 @@
         }
 
         renderPostOverlays(ctx, w, h, isBeat, progressRatio, isExport) {
+            // WebGL2 GPU Beat-Synced Post-FX Shader Pass (Chromatic Aberration, Glitch, VHS, Radial Kick Zoom-Blur)
+            if (window.WaveForgeFX && window.WaveForgeFX.supported && (CONFIG.fxChromatic > 0 || CONFIG.fxGlitch > 0 || CONFIG.fxVhs > 0 || CONFIG.fxZoomBlur > 0)) {
+                const srcCanvas = isExport ? APP_STATE.exportCanvas : this.canvas;
+                const kickVal = APP_STATE.hasPredictiveMap
+                    ? Math.max(APP_STATE.predShake || 0, APP_STATE.predFlash || 0)
+                    : (isBeat ? 1.0 : 0.15);
+                window.WaveForgeFX.apply(ctx, srcCanvas, w, h, {
+                    time: nowSec(),
+                    chromatic: CONFIG.fxChromatic,
+                    glitch: CONFIG.fxGlitch,
+                    vhs: CONFIG.fxVhs,
+                    zoomBlur: CONFIG.fxZoomBlur,
+                    kick: kickVal
+                });
+            }
+
             // Stereo Mirror Reflection FX across modes (when enabled and not Mode 1 which handles its own wave mirror)
             if (CONFIG.mirror && APP_STATE.mode !== 1) {
                 try {
@@ -2425,8 +2552,25 @@
             }
 
             if (!mod.ownBackground) {
-                ctx.fillStyle = 'rgba(5, 5, 10, 0.22)';
-                ctx.fillRect(0, 0, w, h);
+                const bgMedia = (APP_STATE.bgVideo && APP_STATE.bgVideo.readyState >= 2 && APP_STATE.bgVideo.videoWidth > 0)
+                    ? APP_STATE.bgVideo
+                    : APP_STATE.bgImg;
+                if (bgMedia) {
+                    const mw = bgMedia.videoWidth || bgMedia.width || 1;
+                    const mh = bgMedia.videoHeight || bgMedia.height || 1;
+                    const scale = Math.max(w / mw, h / mh);
+                    const bw = mw * scale;
+                    const bh = mh * scale;
+                    ctx.fillStyle = '#03040a';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0.2, Math.min(1, (CONFIG.bgOpacity || 80) / 100));
+                    ctx.drawImage(bgMedia, (w - bw) / 2, (h - bh) / 2, bw, bh);
+                    ctx.restore();
+                } else {
+                    ctx.fillStyle = 'rgba(5, 5, 10, 0.22)';
+                    ctx.fillRect(0, 0, w, h);
+                }
             }
 
             // Apply global Predictive Camera Shake & Buildup Zoom for all non-Phonk/Logo modes
@@ -3072,14 +3216,14 @@
 
         getShareablePresetUrl() {
             const base = 'https://progameryt-op.github.io/WaveForge/visualizer.html';
-            const params = new URLSearchParams();
-            params.set('mode', String(APP_STATE.mode));
-            params.set('palette', CONFIG.palette);
-            params.set('sens', String(CONFIG.sensitivity));
-            params.set('aspect', CONFIG.aspectRatio || '9:16');
-            if (CONFIG.overlayTitle) params.set('title', CONFIG.overlayTitle);
-            if (CONFIG.overlayArtist) params.set('artist', CONFIG.overlayArtist);
-            return `${base}?${params.toString()}`;
+            try {
+                const payload = { ...CONFIG, mode: APP_STATE.mode };
+                const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
+                    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                return `${base}#p=${b64}`;
+            } catch (e) {
+                return `${base}?mode=${APP_STATE.mode}&palette=${encodeURIComponent(CONFIG.palette)}`;
+            }
         },
 
         setupShare() {
@@ -3250,8 +3394,39 @@
             });
         },
 
+        _loadCustomVideo(file) {
+            if (!file) return;
+            if (APP_STATE.bgVideoUrl) {
+                try { URL.revokeObjectURL(APP_STATE.bgVideoUrl); } catch (e) {}
+            }
+            const url = URL.createObjectURL(file);
+            const vid = document.createElement('video');
+            vid.src = url;
+            vid.muted = true;
+            vid.loop = true;
+            vid.playsInline = true;
+            vid.crossOrigin = 'anonymous';
+            vid.playbackRate = CONFIG.bgVideoSpeed || 1.0;
+            vid.onloadeddata = () => {
+                APP_STATE.bgVideo = vid;
+                APP_STATE.bgVideoUrl = url;
+                vid.play().catch(() => {});
+                document.getElementById('btn-upload-bg').classList.add('has-file');
+                document.getElementById('bg-label').textContent = '🎬 ' + file.name.substring(0, 14);
+                const wizBg = document.getElementById('wiz-btn-bg');
+                if (wizBg) wizBg.classList.add('done-step');
+                const clearRow = document.getElementById('clear-branding-row');
+                if (clearRow) clearRow.classList.remove('hidden');
+                this.showToast('🎬 Looping MP4 video background loaded!', 'success');
+            };
+        },
+
         _loadCustomImage(file, targetType) {
             if (!file) return;
+            if (targetType === 'bg' && (file.type.startsWith('video/') || /\.(mp4|webm|mov)$/i.test(file.name))) {
+                this._loadCustomVideo(file);
+                return;
+            }
             const reader = new FileReader();
             reader.onload = (ev) => {
                 const img = new Image();
@@ -3317,6 +3492,26 @@
             linkSetting('set-overlay-font', 'overlayFont', 'string');
             linkSetting('set-pred-enabled', 'predictiveEnabled', 'bool');
             linkSetting('set-pred-intensity', 'predictiveIntensity', 'float');
+            linkSetting('set-bg-opacity', 'bgOpacity', 'float');
+            linkSetting('set-bg-speed', 'bgVideoSpeed', 'float');
+            linkSetting('set-fx-chromatic', 'fxChromatic', 'float');
+            linkSetting('set-fx-glitch', 'fxGlitch', 'float');
+            linkSetting('set-fx-vhs', 'fxVhs', 'float');
+            linkSetting('set-fx-zoomblur', 'fxZoomBlur', 'float');
+
+            const bgSpeedEl = document.getElementById('set-bg-speed');
+            if (bgSpeedEl) {
+                bgSpeedEl.addEventListener('input', (e) => {
+                    if (APP_STATE.bgVideo) APP_STATE.bgVideo.playbackRate = parseFloat(e.target.value) || 1.0;
+                });
+            }
+            const importPresetBtn = document.getElementById('btn-import-preset');
+            if (importPresetBtn) {
+                importPresetBtn.onclick = () => {
+                    const fi = document.getElementById('file-input');
+                    if (fi) fi.click();
+                };
+            }
             linkSetting('set-hue-cycle', 'hueCycle', 'bool');
             linkSetting('set-hue-speed', 'hueCycleSpeed', 'float');
 
@@ -3408,7 +3603,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `waveforge_preset_${Date.now()}.json`;
+                a.download = `waveforge_preset_${Date.now()}.wfpreset.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -3448,6 +3643,14 @@
                 clearBrandingBtn.onclick = () => {
                     APP_STATE.bgImg = null;
                     APP_STATE.logoImg = null;
+                    if (APP_STATE.bgVideo) {
+                        try { APP_STATE.bgVideo.pause(); } catch (e) {}
+                        APP_STATE.bgVideo = null;
+                    }
+                    if (APP_STATE.bgVideoUrl) {
+                        try { URL.revokeObjectURL(APP_STATE.bgVideoUrl); } catch (e) {}
+                        APP_STATE.bgVideoUrl = null;
+                    }
                     document.getElementById('btn-upload-bg').classList.remove('has-file');
                     document.getElementById('btn-upload-logo').classList.remove('has-file');
                     document.getElementById('bg-label').textContent = 'Upload Background';
@@ -3516,6 +3719,12 @@
             setVal('set-overlay-font', CONFIG.overlayFont || 'New Rocker');
             setVal('set-overlay-pos', CONFIG.overlayPosition);
             setVal('set-pred-intensity', CONFIG.predictiveIntensity);
+            setVal('set-bg-opacity', CONFIG.bgOpacity);
+            setVal('set-bg-speed', CONFIG.bgVideoSpeed);
+            setVal('set-fx-chromatic', CONFIG.fxChromatic);
+            setVal('set-fx-glitch', CONFIG.fxGlitch);
+            setVal('set-fx-vhs', CONFIG.fxVhs);
+            setVal('set-fx-zoomblur', CONFIG.fxZoomBlur);
             setVal('set-aspect', CONFIG.aspectRatio);
             setVal('export-aspect', CONFIG.aspectRatio);
             setVal('set-phonk-intro-dur', CONFIG.phonkIntroDuration);
@@ -3548,7 +3757,7 @@
         handleFile(file) {
             if (!file) return;
 
-            if (file.type.includes('json') || file.name.endsWith('.json')) {
+            if (file.type.includes('json') || file.name.endsWith('.json') || file.name.endsWith('.wfpreset')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
@@ -3573,6 +3782,8 @@
                     }
                 };
                 reader.readAsText(file);
+            } else if (file.type.startsWith('video/') || file.name.match(/\.(mp4|webm|mov)$/i)) {
+                this._loadCustomVideo(file);
             } else if (file.type.startsWith('image/') || file.name.match(/\.(png|jpe?g|webp|gif|svg)$/i)) {
                 this._loadCustomImage(file, APP_STATE.bgImg && !APP_STATE.logoImg ? 'logo' : 'bg');
             } else if (file.type.includes('audio') || file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac|webm)$/i)) {
@@ -3735,7 +3946,7 @@
             UI.applyTemplate(urlParams.get('template'));
         }
 
-        console.log('%c🧠 WaveForge Studio v9.1.0 — Predictive Audio Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+        console.log('%c🧠 WaveForge Studio v10.0.0 — Predictive Audio Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

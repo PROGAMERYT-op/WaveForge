@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '9.1.0';
+            var VER = '10.0.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -34,8 +34,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>WaveForge Studio 9.0 | Predictive Phonk &amp; Hardtekk Visualizer + 4K MP4 Export</title>
-    <meta name="description" content="WaveForge Studio 9.0 pre-analyzes your song to predict every drop, kick-drum shake, and zoom punch automatically. 6 unique viral templates, trending edit fonts, 9 pro visualizers, and 4K MP4 export.">
+    <title>WaveForge Studio 10.0 | Predictive Phonk &amp; Hardtekk Visualizer + 4K MP4 Export</title>
+    <meta name="description" content="WaveForge Studio 10.0 pre-analyzes your song to predict every drop, kick-drum shake, and zoom punch automatically. 6 unique viral templates, trending edit fonts, 9 pro visualizers, and 4K MP4 export.">
     <meta name="keywords" content="phonk visualizer, hardtekk visualizer, brazilian funk video maker, tiktok music visualizer, 9:16 audio visualizer, free music visualizer, logo visualizer, predictive beat drop visualizer">
     <meta name="author" content="WaveForge">
     <meta name="theme-color" content="#05070f">
@@ -48,7 +48,7 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <meta property="og:title" content="WaveForge Studio 9.0 — Predictive Phonk &amp; Hardtekk Visualizer">
+    <meta property="og:title" content="WaveForge Studio 10.0 — Predictive Phonk &amp; Hardtekk Visualizer">
     <meta property="og:description" content="Pre-analyzes your music to predict drops, shakes &amp; flashes automatically. 6 unique templates, trending fonts &amp; 4K MP4 export.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
 
@@ -58,20 +58,20 @@
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="assets/css/app.css?v=9.1.0">
+    <link rel="stylesheet" href="assets/css/app.css?v=10.0.0">
 
     <!-- Fast WebCodecs export: mp4-muxer -->
     <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- VISUALLY-HIDDEN FILE INPUTS AT BODY ROOT (Guarantees 100% reliable click triggers on Mobile Safari/Android/Desktop) -->
-    <input type="file" id="file-input" accept="audio/*,.mp3,.wav,.ogg,.flac,.m4a,.aac,.json" class="visually-hidden" tabindex="-1">
-    <input type="file" id="logo-bg-input" accept="image/*" class="visually-hidden" tabindex="-1">
+    <input type="file" id="file-input" accept="audio/*,.mp3,.wav,.ogg,.flac,.m4a,.aac,.json,.wfpreset,video/mp4,video/webm" class="visually-hidden" tabindex="-1">
+    <input type="file" id="logo-bg-input" accept="image/*,video/mp4,video/webm,video/quicktime" class="visually-hidden" tabindex="-1">
     <input type="file" id="logo-img-input" accept="image/*" class="visually-hidden" tabindex="-1">
 
     <main class="visually-hidden" role="main">
         <article>
-            <h2>WaveForge Studio 9.0 - Predictive Phonk &amp; Hardtekk Music Visualizer</h2>
+            <h2>WaveForge Studio 10.0 - Predictive Phonk &amp; Hardtekk Music Visualizer</h2>
             <p>Browser-based music visualizer with offline song pre-analysis, predictive beat-drop choreography, 6 unique viral templates, trending edit fonts, 9 pro visualizers, 3-band EQ, and 4K MP4 exports.</p>
         </article>
     </main>
@@ -102,8 +102,8 @@
     <div id="drop-overlay" aria-hidden="true">
         <div class="drop-box">
             <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span>Drop Audio Track, Image or Preset</span>
-            <small>MP3, WAV, FLAC, OGG, M4A, AAC, PNG/JPG (Background) &amp; .json</small>
+            <span>Drop Audio, MP4 Video BG, Image or Preset</span>
+            <small>MP3, WAV, FLAC, MP4/WebM Video Loop, PNG/JPG &amp; .wfpreset / .json</small>
         </div>
     </div>
 
@@ -383,17 +383,12 @@
                     </div>
                 </div>
 
-                <div id="logo-mode-notice" class="mode-notice-banner hidden">
-                    <p>Ring, backdrop, and AirPods intro controls apply to <strong>Hardtekk Phonk</strong> and <strong>Logo Visualizer</strong> modes.</p>
-                    <button type="button" id="btn-switch-phonk-mode" class="btn-studio-primary" style="padding:7px 12px;font-size:0.74rem;">😈 Switch to Hardtekk Phonk</button>
-                </div>
-
-                <div class="settings-group" id="logo-viz-settings">
-                    <h3>Custom Background &amp; Logo Upload</h3>
+                <div class="settings-group">
+                    <h3>Background Media (MP4 Video Loop or Image) &amp; Logo</h3>
                     <div class="upload-btn-group" style="margin-bottom:10px;">
                         <button type="button" class="upload-btn" id="btn-upload-bg">
-                            <span class="upload-icon" aria-hidden="true">🖼️</span>
-                            <span id="bg-label">Upload Background</span>
+                            <span class="upload-icon" aria-hidden="true">🎬</span>
+                            <span id="bg-label">MP4 Video / Image BG</span>
                         </button>
                         <button type="button" class="upload-btn" id="btn-upload-logo">
                             <span class="upload-icon" aria-hidden="true">⭕</span>
@@ -401,8 +396,25 @@
                         </button>
                     </div>
                     <div id="clear-branding-row" class="hidden" style="margin-bottom:12px;">
-                        <button type="button" id="btn-clear-branding" style="width:100%;font-size:0.74rem;padding:6px 10px;">✕ Clear Custom Background / Logo</button>
+                        <button type="button" id="btn-clear-branding" style="width:100%;font-size:0.74rem;padding:6px 10px;">✕ Clear Custom Video / Image / Logo</button>
                     </div>
+                    <div class="control-row">
+                        <label for="set-bg-opacity">Background Media Opacity</label>
+                        <input type="range" id="set-bg-opacity" min="20" max="100" step="5" value="80" data-unit="%">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-bg-speed">Video BG Loop Speed</label>
+                        <input type="range" id="set-bg-speed" min="0.5" max="2.0" step="0.1" value="1.0" data-unit="×">
+                    </div>
+                </div>
+
+                <div id="logo-mode-notice" class="mode-notice-banner hidden">
+                    <p>Ring, backdrop, and AirPods intro controls apply to <strong>Hardtekk Phonk</strong> and <strong>Logo Visualizer</strong> modes.</p>
+                    <button type="button" id="btn-switch-phonk-mode" class="btn-studio-primary" style="padding:7px 12px;font-size:0.74rem;">😈 Switch to Hardtekk Phonk</button>
+                </div>
+
+                <div class="settings-group" id="logo-viz-settings">
+                    <h3>Phonk &amp; Logo Ring Controls</h3>
 
                     <div class="control-row">
                         <label for="set-phonk-bg">Phonk Backdrop Style</label>
@@ -535,6 +547,26 @@
                 </div>
 
                 <div class="settings-group">
+                    <h3>WebGL2 GPU Beat-Synced Shaders <span class="shader-rack-badge">NEW v10</span></h3>
+                    <div class="control-row">
+                        <label for="set-fx-chromatic">Chromatic Aberration (RGB Split)</label>
+                        <input type="range" id="set-fx-chromatic" min="0" max="100" step="5" value="25" data-unit="%">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-fx-glitch">Digital Glitch Stutter (On Drops)</label>
+                        <input type="range" id="set-fx-glitch" min="0" max="100" step="5" value="0" data-unit="%">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-fx-vhs">VHS Analog Tape Drift &amp; Grain</label>
+                        <input type="range" id="set-fx-vhs" min="0" max="100" step="5" value="0" data-unit="%">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-fx-zoomblur">Radial Kick Zoom-Blur</label>
+                        <input type="range" id="set-fx-zoomblur" min="0" max="100" step="5" value="30" data-unit="%">
+                    </div>
+                </div>
+
+                <div class="settings-group">
                     <h3>Post-Processing FX Rack</h3>
                     <div class="control-row toggle-row">
                         <label for="set-mirror">Stereo Mirror Reflection</label>
@@ -631,7 +663,8 @@
                 <div class="settings-group">
                     <h3>Presets &amp; Snapshots</h3>
                     <div class="button-group">
-                        <button type="button" id="btn-export-preset">💾 Save Preset</button>
+                        <button type="button" id="btn-export-preset">💾 Save .wfpreset</button>
+                        <button type="button" id="btn-import-preset">📂 Load Preset</button>
                         <button type="button" id="btn-screenshot">📷 Screenshot</button>
                         <button type="button" id="btn-reset-settings" class="danger">↺ Reset</button>
                     </div>
@@ -650,7 +683,7 @@
             </div>
 
             <div class="version-info">
-                WaveForge Studio v9.0 • Predictive Audio Engine • 6 Unique Templates • Turbo 4K MP4<br>
+                WaveForge Studio v10.0 • Predictive Audio Engine • 6 Unique Templates • Turbo 4K MP4<br>
                 <button type="button" id="btn-shortcuts" class="inline-link-btn">Keyboard Shortcuts (?)</button> •
                 <a href="index.html">Back to Home</a>
             </div>
@@ -778,16 +811,40 @@
                         <option value="4:5">4:5 Portrait (Instagram Feed)</option>
                     </select>
                 </div>
+                <div class="spotify-canvas-bar">
+                    <button type="button" id="btn-spotify-canvas-preset" class="btn-spotify-canvas">
+                        <span>🟢 1-Click Spotify Canvas (8s Silent 9:16)</span>
+                    </button>
+                    <button type="button" id="btn-canvas-mute-test" class="btn-canvas-mute" title="Test how your loop looks muted like on Spotify">
+                        <span>🔇 Test Muted</span>
+                    </button>
+                </div>
                 <div class="control-row">
                     <label for="export-duration">Clip Duration</label>
                     <select id="export-duration">
-                        <option value="full">Full Track</option>
+                        <option value="5">5 seconds (Spotify Canvas Loop)</option>
+                        <option value="8">8 seconds (Spotify Canvas Max)</option>
                         <option value="15">15 seconds (TikTok / Reels Drop)</option>
                         <option value="30" selected>30 seconds (Viral Edit Length)</option>
                         <option value="60">1 minute</option>
                         <option value="120">2 minutes</option>
                         <option value="180">3 minutes</option>
+                        <option value="full">Full Track</option>
                     </select>
+                </div>
+                <div class="control-row">
+                    <label for="export-start-time">Clip Start Time (sec)</label>
+                    <div class="export-start-row">
+                        <input type="number" id="export-start-time" class="text-input" min="0" step="0.5" value="0" style="min-width:86px;width:90px;">
+                        <button type="button" id="btn-export-drop1" class="wiz-step-btn" title="Start right before your predicted Drop #1">⚡ Drop #1</button>
+                    </div>
+                </div>
+                <div class="control-row toggle-row">
+                    <label for="export-silent">🔇 Silent Export (No Audio — Spotify Canvas)</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="export-silent">
+                        <span class="toggle-slider"></span>
+                    </label>
                 </div>
                 <div class="control-row">
                     <label for="export-fps">Frame Rate</label>
@@ -860,18 +917,19 @@
     </div>
 
     <!-- VISUALIZER MODE REGISTRY (9 Curated Pro Modes) -->
-    <script src="Visualizers/bars.js?v=9.1.0"></script>
-    <script src="Visualizers/wave.js?v=9.1.0"></script>
-    <script src="Visualizers/radial.js?v=9.1.0"></script>
-    <script src="Visualizers/particles.js?v=9.1.0"></script>
-    <script src="Visualizers/logo.js?v=9.1.0"></script>
-    <script src="Visualizers/tunnel.js?v=9.1.0"></script>
-    <script src="Visualizers/trapnation.js?v=9.1.0"></script>
-    <script src="Visualizers/synthwave.js?v=9.1.0"></script>
-    <script src="Visualizers/phonk.js?v=9.1.0"></script>
+    <script src="Visualizers/bars.js?v=10.0.0"></script>
+    <script src="Visualizers/wave.js?v=10.0.0"></script>
+    <script src="Visualizers/radial.js?v=10.0.0"></script>
+    <script src="Visualizers/particles.js?v=10.0.0"></script>
+    <script src="Visualizers/logo.js?v=10.0.0"></script>
+    <script src="Visualizers/tunnel.js?v=10.0.0"></script>
+    <script src="Visualizers/trapnation.js?v=10.0.0"></script>
+    <script src="Visualizers/synthwave.js?v=10.0.0"></script>
+    <script src="Visualizers/phonk.js?v=10.0.0"></script>
 
     <!-- SMART MONETIZATION ENGINE & APPLICATION SCRIPT -->
-    <script src="assets/js/ads.js?v=9.1.0"></script>
-    <script src="assets/js/app.js?v=9.1.0"></script>
+    <script src="assets/js/ads.js?v=10.0.0"></script>
+    <script src="assets/js/webgl-fx.js?v=10.0.0"></script>
+    <script src="assets/js/app.js?v=10.0.0"></script>
 </body>
 </html>

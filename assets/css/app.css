@@ -1048,3 +1048,48 @@ kbd { font-family: var(--font-mono); font-size: 0.72rem; background: rgba(255, 2
     background: linear-gradient(180deg, #00f2ff 0%, var(--tpl-color) 100%);
     box-shadow: 0 0 10px var(--tpl-color);
 }
+
+/* ==========================================================================
+   v10.0 SPOTIFY CANVAS PRESET BAR & WEBGL2 SHADER RACK BADGE
+   ========================================================================== */
+.shader-rack-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 99px;
+    font-size: 0.56rem;
+    background: rgba(0, 242, 255, 0.16);
+    border: 1px solid rgba(0, 242, 255, 0.4);
+    color: #67e8f9;
+    vertical-align: middle;
+}
+.spotify-canvas-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+.btn-spotify-canvas {
+    flex: 1;
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.24), rgba(16, 185, 129, 0.18));
+    border: 1px solid rgba(29, 185, 84, 0.55);
+    color: #6ee7b7;
+    font-size: 0.76rem;
+    padding: 9px 12px;
+}
+.btn-spotify-canvas:hover, .btn-spotify-canvas.active-canvas {
+    background: #1db954;
+    color: #03150a;
+    border-color: #1db954;
+}
+.btn-canvas-mute {
+    font-size: 0.74rem;
+    padding: 9px 11px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.export-start-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}

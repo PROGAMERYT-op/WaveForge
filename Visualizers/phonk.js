@@ -350,13 +350,19 @@
             ctx.scale(zoomPunch, zoomPunch);
             ctx.translate(-cx, -cy);
 
-            // 1. Background Artwork (Uploaded bgImg OR Procedural Dark Mage/Phonk/Cyber Backdrop)
-            if (state.bgImg) {
-                const scale = Math.max(w / state.bgImg.width, h / state.bgImg.height);
-                const bw = state.bgImg.width * scale;
-                const bh = state.bgImg.height * scale;
-                ctx.globalAlpha = 0.72 + kickEnv * 0.22;
-                ctx.drawImage(state.bgImg, (w - bw) / 2, (h - bh) / 2, bw, bh);
+            // 1. Background Artwork (Uploaded MP4 Video Loop OR Image OR Procedural Backdrop)
+            const bgMedia = (state.bgVideo && state.bgVideo.readyState >= 2 && state.bgVideo.videoWidth > 0)
+                ? state.bgVideo
+                : state.bgImg;
+            if (bgMedia) {
+                const mw = bgMedia.videoWidth || bgMedia.width || 1;
+                const mh = bgMedia.videoHeight || bgMedia.height || 1;
+                const scale = Math.max(w / mw, h / mh);
+                const bw = mw * scale;
+                const bh = mh * scale;
+                const baseOp = ((typeof config.bgOpacity === 'number' ? config.bgOpacity : 80) / 100);
+                ctx.globalAlpha = Math.min(1, baseOp * (0.88 + kickEnv * 0.18));
+                ctx.drawImage(bgMedia, (w - bw) / 2, (h - bh) / 2, bw, bh);
                 ctx.globalAlpha = 1;
 
                 // Color tint + dark vignette over uploaded background
