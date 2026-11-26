@@ -1,5 +1,5 @@
 /**
- * WaveForge Music Visualizer Studio v10.0
+ * WaveForge Music Visualizer Studio v10.1
  * Features:
  *  - 13 Visualization Modes (including Mode 12: Hardtekk / Phonk Liquid Ring + AirPods Intro)
  *  - 1-Click Trending Templates Hub (6 viral presets + 3-step guided workflow bar)
@@ -1136,8 +1136,13 @@
                     }
                     spotifyBtn.classList.add('active-canvas');
                     persistConfig();
+                    this._refreshEngineNote();
                     UI.showToast('🟢 Spotify Canvas ready: 1080×1920 • 8s • Silent MP4', 'success');
                 };
+            }
+            const silentToggle = document.getElementById('export-silent');
+            if (silentToggle) {
+                silentToggle.addEventListener('change', () => this._refreshEngineNote());
             }
             const muteTestBtn = document.getElementById('btn-canvas-mute-test');
             if (muteTestBtn) {
@@ -1268,11 +1273,9 @@
         _hasFastExportApis() {
             return typeof window !== 'undefined'
                 && 'VideoEncoder' in window
-                && 'AudioEncoder' in window
                 && 'VideoFrame' in window
-                && 'AudioData' in window
-                && typeof window.Mp4Muxer !== 'undefined'
-                && typeof OfflineAudioContext !== 'undefined';
+                && typeof OfflineAudioContext !== 'undefined'
+                && (typeof window.Mp4Muxer !== 'undefined' || typeof window.WebMMuxer !== 'undefined');
         },
 
         // Expanded H.264 / AVC profiles & levels for full Android / iOS / Desktop compatibility
@@ -1301,88 +1304,157 @@
             'avc1.42001F'
         ],
 
-        async _pickVideoCodec(width, height, fps, bitrate) {
+        // Open-source VP9/VP8 fallback codecs for Brave / Linux / Firefox WebM offline rendering
+        _webmCodecCandidates: [
+            'vp09.00.41.08',
+            'vp09.00.31.08',
+            'vp09.00.10.08',
+            'vp8'
+        ],
+
+        async _pickVideoCodecForFamily(family, width, height, fps, bitrate) {
             const accelModes = ['prefer-hardware', 'no-preference', 'prefer-software'];
-            for (const hardwareAcceleration of accelModes) {
-                for (const codec of this._videoCodecCandidates) {
-                    try {
-                        const cfg = {
-                            codec,
-                            width,
-                            height,
-                            framerate: fps,
-                            bitrate,
-                            hardwareAcceleration,
-                            latencyMode: 'realtime',
-                            avc: { format: 'avc' }
-                        };
-                        const support = await VideoEncoder.isConfigSupported(cfg);
-                        if (support && support.supported) return support.config;
-                    } catch (e) {}
-                }
-            }
-            return null;
-        },
+            const latencyModes = ['quality', 'realtime'];
+            const candidates = family === 'avc' ? this._videoCodecCandidates : this._webmCodecCandidates;
 
-        async _negotiateBestVideoConfig(quality, aspectRatio, requestedFps) {
-            const bitrates = { '720': 5_000_000, '1080': 8_500_000, '1440': 14_000_000, '2160': 24_000_000 };
-            const tierOrder = ['2160', '1440', '1080', '720'];
-            const startIdx = Math.max(0, tierOrder.indexOf(String(quality)));
-            const candidateTiers = tierOrder.slice(startIdx);
-            const fpsCandidates = requestedFps > 30 ? [requestedFps, 30] : [requestedFps];
-
-            for (const tier of candidateTiers) {
-                const { width, height } = getExportDimensions(tier, aspectRatio);
-                const br = bitrates[tier] || 8_500_000;
-                for (const fpsTry of fpsCandidates) {
-                    const cfg = await this._pickVideoCodec(width, height, fpsTry, br);
-                    if (cfg) {
-                        return {
-                            videoCfg: cfg,
-                            width,
-                            height,
-                            fps: fpsTry,
-                            tier,
-                            downgraded: tier !== String(quality) || fpsTry !== requestedFps
-                        };
+            for (const latencyMode of latencyModes) {
+                for (const hardwareAcceleration of accelModes) {
+                    for (const codec of candidates) {
+                        try {
+                            const cfg = {
+                                codec,
+                                width,
+                                height,
+                                framerate: fps,
+                                bitrate,
+                                hardwareAcceleration,
+                                latencyMode
+                            };
+                            if (family === 'avc') {
+                                cfg.avc = { format: 'avc' };
+                            }
+                            const support = await VideoEncoder.isConfigSupported(cfg);
+                            if (support && support.supported) {
+                                return {
+                                    config: support.config,
+                                    muxerCodec: family === 'avc' ? 'avc' : (codec.startsWith('vp09') ? 'V_VP9' : 'V_VP8'),
+                                    label: family === 'avc' ? 'H.264' : (codec.startsWith('vp09') ? 'VP9' : 'VP8')
+                                };
+                            }
+                        } catch (e) {}
                     }
                 }
             }
             return null;
         },
 
-        async _pickAudioCodec(sampleRate, channels) {
-            const rates = [sampleRate, 48000, 44100];
-            for (const sr of rates) {
+        async _pickAudioCodecForContainer(container, sampleRate, channels) {
+            if (!('AudioEncoder' in window) || !('AudioData' in window)) return null;
+            const ch = Math.max(1, Math.min(2, channels || 2));
+
+            if (container === 'mp4') {
+                // Tier 1: AAC-LC (mp4a.40.2)
+                const aacRates = Array.from(new Set([sampleRate || 48000, 48000, 44100]));
+                for (const sr of aacRates) {
+                    try {
+                        const cfg = { codec: 'mp4a.40.2', sampleRate: sr, numberOfChannels: ch, bitrate: 192000 };
+                        const support = await AudioEncoder.isConfigSupported(cfg);
+                        if (support && support.supported) {
+                            return { config: support.config, muxerCodec: 'aac', label: 'AAC', sampleRate: support.config.sampleRate || sr };
+                        }
+                    } catch (e) {}
+                }
+                // Tier 2: Opus in MP4 (48000 Hz) — unlocks Brave / Linux / Android offline MP4!
                 try {
-                    const cfg = { codec: 'mp4a.40.2', sampleRate: sr, numberOfChannels: channels, bitrate: 192000 };
+                    const cfg = { codec: 'opus', sampleRate: 48000, numberOfChannels: ch, bitrate: 192000 };
                     const support = await AudioEncoder.isConfigSupported(cfg);
-                    if (support && support.supported) return support.config;
+                    if (support && support.supported) {
+                        return { config: support.config, muxerCodec: 'opus', label: 'Opus', sampleRate: 48000 };
+                    }
                 } catch (e) {}
+                return null;
+            }
+
+            if (container === 'webm') {
+                // Tier 3: Opus in WebM (48000 Hz)
+                try {
+                    const cfg = { codec: 'opus', sampleRate: 48000, numberOfChannels: ch, bitrate: 192000 };
+                    const support = await AudioEncoder.isConfigSupported(cfg);
+                    if (support && support.supported) {
+                        return { config: support.config, muxerCodec: 'A_OPUS', label: 'Opus', sampleRate: 48000 };
+                    }
+                } catch (e) {}
+                return null;
             }
             return null;
         },
 
-        async _checkFastExportSupport() {
+        async _negotiateOfflinePipeline(quality, aspectRatio, requestedFps, targetAudioRate, channels, isSilentExport) {
+            const bitrates = { '720': 5_000_000, '1080': 8_500_000, '1440': 14_000_000, '2160': 24_000_000 };
+            const tierOrder = ['2160', '1440', '1080', '720'];
+            const startIdx = Math.max(0, tierOrder.indexOf(String(quality)));
+            const candidateTiers = tierOrder.slice(startIdx);
+            const fpsCandidates = requestedFps > 30 ? [requestedFps, 30] : [requestedFps];
+
+            const containers = [];
+            if (typeof window.Mp4Muxer !== 'undefined') containers.push('mp4');
+            if (typeof window.WebMMuxer !== 'undefined') containers.push('webm');
+
+            for (const container of containers) {
+                let audioInfo = null;
+                if (!isSilentExport) {
+                    audioInfo = await this._pickAudioCodecForContainer(container, targetAudioRate, channels);
+                    if (!audioInfo) continue;
+                }
+
+                const family = container === 'mp4' ? 'avc' : 'webm';
+                for (const tier of candidateTiers) {
+                    const { width, height } = getExportDimensions(tier, aspectRatio);
+                    const br = bitrates[tier] || 8_500_000;
+                    for (const fpsTry of fpsCandidates) {
+                        const videoInfo = await this._pickVideoCodecForFamily(family, width, height, fpsTry, br);
+                        if (videoInfo) {
+                            const audioTag = isSilentExport ? 'Silent' : audioInfo.label;
+                            return {
+                                container,
+                                ext: container,
+                                mimeType: container === 'mp4' ? 'video/mp4' : 'video/webm',
+                                videoInfo,
+                                audioInfo,
+                                width,
+                                height,
+                                fps: fpsTry,
+                                tier,
+                                downgraded: tier !== String(quality) || fpsTry !== requestedFps,
+                                summary: `${videoInfo.label} + ${audioTag} ${container.toUpperCase()}`
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
+        },
+
+        async _checkFastExportSupport(isSilentExport = false) {
             if (!this._hasFastExportApis()) return { supported: false, reason: 'apis' };
-            const v = await this._pickVideoCodec(720, 1280, 30, 5_000_000) || await this._pickVideoCodec(1280, 720, 30, 5_000_000);
-            if (!v) return { supported: false, reason: 'video-codec' };
-            const a = await this._pickAudioCodec(48000, 2);
-            if (!a) return { supported: false, reason: 'audio-codec' };
-            return { supported: true };
+            const pipe = await this._negotiateOfflinePipeline('720', '9:16', 30, 48000, 2, isSilentExport)
+                || await this._negotiateOfflinePipeline('720', '16:9', 30, 48000, 2, isSilentExport);
+            if (!pipe) return { supported: false, reason: 'codec' };
+            return { supported: true, summary: pipe.summary, container: pipe.container };
         },
 
         async _refreshEngineNote() {
             const note = document.getElementById('export-engine-note');
             if (!note) return;
-            const result = await this._checkFastExportSupport().catch(() => ({ supported: false }));
+            const isSilentExport = Boolean(document.getElementById('export-silent') && document.getElementById('export-silent').checked);
+            const result = await this._checkFastExportSupport(isSilentExport).catch(() => ({ supported: false }));
             if (result.supported) {
-                note.textContent = '⚡ Turbo Zero-Suspend Engine active — hardware H.264 MP4 + Radix-2 FFT.';
+                note.textContent = `⚡ Offline Frame-by-Frame Engine active — ${result.summary} (Zero-Lag)`;
                 note.style.background = 'rgba(16, 185, 129, 0.08)';
                 note.style.color = '#34d399';
                 note.style.borderColor = 'rgba(16, 185, 129, 0.25)';
             } else {
-                note.textContent = '⏺ Realtime recording mode active.';
+                note.textContent = '⏺ Realtime recording mode active (browser lacks WebCodecs).';
                 note.style.background = 'rgba(255, 200, 80, 0.08)';
                 note.style.color = '#ffc850';
                 note.style.borderColor = 'rgba(255, 200, 80, 0.25)';
@@ -1409,6 +1481,11 @@
             }
             const aspectSelect = document.getElementById('export-aspect');
             if (aspectSelect) aspectSelect.value = CONFIG.aspectRatio || '9:16';
+            const startInput = document.getElementById('export-start-time');
+            if (startInput && audio.hasAudio()) {
+                const dur = audio.getDuration() || 0;
+                if (dur > 1) startInput.max = Math.max(0, Math.floor(dur - 0.5));
+            }
             document.getElementById('export-modal').classList.add('open');
             this._refreshEngineNote();
             if (window.WaveForgeAds) {
@@ -1518,7 +1595,8 @@
                 persistConfig();
             }
 
-            const support = await this._checkFastExportSupport().catch(() => ({ supported: false }));
+            const isSilentExport = Boolean(document.getElementById('export-silent') && document.getElementById('export-silent').checked);
+            const support = await this._checkFastExportSupport(isSilentExport).catch(() => ({ supported: false }));
             if (support.supported) {
                 try {
                     await this.startFastExport();
@@ -1571,28 +1649,46 @@
             APP_STATE.exportCanvas.height = height;
             APP_STATE.exportCtx = APP_STATE.exportCanvas.getContext('2d');
 
+            const isSilentExport = Boolean(document.getElementById('export-silent') && document.getElementById('export-silent').checked);
+            const startInputEl = document.getElementById('export-start-time');
+            const requestedStart = startInputEl ? Math.max(0, parseFloat(startInputEl.value) || 0) : 0;
             const trackDur = audio.getDuration() || 30;
-            if ((APP_STATE.mode === 12 && CONFIG.phonkIntroEnabled) || durationSetting === 'full' || (trackDur - audio.getCurrentTime() < 2)) {
-                audio.audioElement.currentTime = 0;
+            const targetStart = Math.min(Math.max(0, trackDur - 0.5), requestedStart);
+
+            if (Math.abs((audio.audioElement.currentTime || 0) - targetStart) > 0.05) {
+                await new Promise((resolve) => {
+                    let settled = false;
+                    const finish = () => {
+                        if (settled) return;
+                        settled = true;
+                        audio.audioElement.removeEventListener('seeked', finish);
+                        resolve();
+                    };
+                    audio.audioElement.addEventListener('seeked', finish, { once: true });
+                    try { audio.audioElement.currentTime = targetStart; } catch (e) { finish(); }
+                    setTimeout(finish, 400);
+                });
             }
 
-            let maxDuration = Math.max(1, (audio.getDuration() || 30) - audio.getCurrentTime());
+            let maxDuration = Math.max(0.5, trackDur - targetStart);
             if (durationSetting !== 'full') {
                 maxDuration = Math.min(maxDuration, parseInt(durationSetting, 10));
             }
 
             APP_STATE.isRecording = true;
             this._cancelledMediaRecorder = false;
+            this._recordedSilent = isSilentExport;
             APP_STATE.recordedChunks = [];
-            APP_STATE.recordingStartTime = audio.getCurrentTime();
+            APP_STATE.recordingStartTime = targetStart;
             APP_STATE.recordingDuration = maxDuration;
 
             const canvasStream = APP_STATE.exportCanvas.captureStream(fps);
-            const audioStream = audio.getAudioStream();
-            const audioTracks = audioStream.getAudioTracks();
-
-            if (audioTracks.length > 0) {
-                canvasStream.addTrack(audioTracks[0]);
+            if (!isSilentExport) {
+                const audioStream = audio.getAudioStream();
+                const audioTracks = audioStream.getAudioTracks();
+                if (audioTracks.length > 0) {
+                    canvasStream.addTrack(audioTracks[0]);
+                }
             }
 
             const picked = this._pickMediaRecorderMime();
@@ -1675,18 +1771,10 @@
             const durationSetting = document.getElementById('export-duration').value;
             const requestedFps = parseInt(document.getElementById('export-fps').value, 10) || 60;
             const modeSelect = document.getElementById('export-mode').value;
+            const isSilentExport = Boolean(document.getElementById('export-silent') && document.getElementById('export-silent').checked);
 
             if (modeSelect !== 'current') {
                 setMode(parseInt(modeSelect, 10));
-            }
-
-            const negotiated = await this._negotiateBestVideoConfig(quality, CONFIG.aspectRatio, requestedFps);
-            if (!negotiated) {
-                throw new Error('No supported H.264 hardware encoder found');
-            }
-            const { videoCfg, width, height, fps, downgraded } = negotiated;
-            if (downgraded) {
-                UI.showToast(`⚡ Adjusted to ${width}×${height} @ ${fps}fps for your device's hardware encoder`, 'info');
             }
 
             this._setStatus('Decoding audio…', 0);
@@ -1702,19 +1790,37 @@
                 APP_STATE.decodedAudioSrc = srcUrl;
             }
 
-            const targetAudioRate = decoded.sampleRate;
-            const audioCfg = await this._pickAudioCodec(targetAudioRate, Math.min(2, decoded.numberOfChannels));
-            if (!audioCfg) throw new Error('No supported AAC encoder for ' + targetAudioRate + 'Hz');
+            const numChannels = Math.min(2, decoded.numberOfChannels);
+            const pipeline = await this._negotiateOfflinePipeline(
+                quality,
+                CONFIG.aspectRatio,
+                requestedFps,
+                decoded.sampleRate,
+                numChannels,
+                isSilentExport
+            );
+            if (!pipeline) {
+                throw new Error('No supported offline WebCodecs video/audio pipeline found');
+            }
 
-            const isSilentExport = Boolean(document.getElementById('export-silent') && document.getElementById('export-silent').checked);
+            const { container, ext, mimeType, videoInfo, audioInfo, width, height, fps, downgraded, summary } = pipeline;
+            if (downgraded) {
+                UI.showToast(`⚡ Adjusted to ${width}×${height} @ ${fps}fps for your device's encoder`, 'info');
+            }
+
             const startInputEl = document.getElementById('export-start-time');
             const requestedStart = startInputEl ? Math.max(0, parseFloat(startInputEl.value) || 0) : 0;
-            const startTime = durationSetting === 'full'
-                ? 0
-                : Math.min(Math.max(0, decoded.duration - 1.0), requestedStart);
+            const maxStart = Math.max(0, decoded.duration - 0.5);
+            const startTime = Math.min(maxStart, requestedStart);
+            if (requestedStart > maxStart && startInputEl) {
+                startInputEl.value = startTime.toFixed(1);
+                UI.showToast(`Clip start clamped to ${startTime.toFixed(1)}s (track length ${decoded.duration.toFixed(1)}s)`, 'info');
+            }
 
-            let clipDuration = decoded.duration - startTime;
-            if (durationSetting !== 'full') clipDuration = Math.min(clipDuration, parseInt(durationSetting, 10));
+            let clipDuration = Math.max(0.1, decoded.duration - startTime);
+            if (durationSetting !== 'full') {
+                clipDuration = Math.min(clipDuration, parseInt(durationSetting, 10));
+            }
             if (clipDuration <= 0.05) throw new Error('Nothing to export from current position');
 
             const totalFrames = Math.max(1, Math.floor(clipDuration * fps));
@@ -1726,19 +1832,31 @@
                 UI.updatePlayButton();
             }
 
+            // Prepare deterministic frame-by-frame stepping for uploaded MP4/WebM video backgrounds
+            let bgVideoSnap = null;
+            if (APP_STATE.bgVideo && APP_STATE.bgVideo.readyState >= 2 && isFinite(APP_STATE.bgVideo.duration) && APP_STATE.bgVideo.duration > 0) {
+                bgVideoSnap = {
+                    el: APP_STATE.bgVideo,
+                    wasPaused: APP_STATE.bgVideo.paused,
+                    prevTime: APP_STATE.bgVideo.currentTime || 0
+                };
+                try { APP_STATE.bgVideo.pause(); } catch (e) {}
+            }
+
             APP_STATE.isRecording = true;
             APP_STATE.isFastExporting = true;
             this._cancelFast = false;
             this._showProgressUI();
             document.getElementById('status-dot').classList.add('recording');
-            document.getElementById('status-text').textContent = 'Turbo export…';
-            UI.showToast('⚡ Turbo export started (' + width + '×' + height + ')', 'info');
+            document.getElementById('status-text').textContent = 'Offline rendering…';
+            UI.showToast(`⚡ Offline render started (${summary} • ${width}×${height} from ${startTime.toFixed(1)}s)`, 'info');
 
             const savedState = this._saveAndResetVizState();
 
             this._setStatus('Pre-rendering 3-band EQ audio…', 2);
-            const numChannels = Math.min(2, decoded.numberOfChannels);
-            const renderSampleRate = audioCfg.sampleRate || decoded.sampleRate;
+            const renderSampleRate = (!isSilentExport && audioInfo && audioInfo.sampleRate)
+                ? audioInfo.sampleRate
+                : decoded.sampleRate;
             let audioBuffer;
             try {
                 const offlineCtx = new OfflineAudioContext(
@@ -1773,7 +1891,7 @@
 
                 audioBuffer = await offlineCtx.startRendering();
             } catch (err) {
-                this._abortFastExport(savedState, null, null, wasPlaying);
+                this._abortFastExport(savedState, null, null, wasPlaying, bgVideoSnap);
                 throw err;
             }
 
@@ -1790,31 +1908,44 @@
                 }
             }
 
-            const muxerOpts = {
-                target: new Mp4Muxer.ArrayBufferTarget(),
-                video: { codec: 'avc', width, height, frameRate: fps },
-                fastStart: 'in-memory',
-                firstTimestampBehavior: 'offset'
-            };
-            if (!isSilentExport) {
-                muxerOpts.audio = { codec: 'aac', numberOfChannels: numChannels, sampleRate };
+            let muxer;
+            if (container === 'mp4') {
+                const muxerOpts = {
+                    target: new Mp4Muxer.ArrayBufferTarget(),
+                    video: { codec: videoInfo.muxerCodec, width, height, frameRate: fps },
+                    fastStart: 'in-memory',
+                    firstTimestampBehavior: 'offset'
+                };
+                if (!isSilentExport && audioInfo) {
+                    muxerOpts.audio = { codec: audioInfo.muxerCodec, numberOfChannels: numChannels, sampleRate };
+                }
+                muxer = new Mp4Muxer.Muxer(muxerOpts);
+            } else {
+                const muxerOpts = {
+                    target: new WebMMuxer.ArrayBufferTarget(),
+                    video: { codec: videoInfo.muxerCodec, width, height, frameRate: fps },
+                    firstTimestampBehavior: 'offset'
+                };
+                if (!isSilentExport && audioInfo) {
+                    muxerOpts.audio = { codec: audioInfo.muxerCodec, numberOfChannels: numChannels, sampleRate };
+                }
+                muxer = new WebMMuxer.Muxer(muxerOpts);
             }
-            const muxer = new Mp4Muxer.Muxer(muxerOpts);
 
             let encodeError = null;
             const videoEncoder = new VideoEncoder({
                 output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
                 error: (e) => { encodeError = e; }
             });
-            videoEncoder.configure(videoCfg);
+            videoEncoder.configure(videoInfo.config);
 
             let audioEncoder = null;
-            if (!isSilentExport) {
+            if (!isSilentExport && audioInfo) {
                 audioEncoder = new AudioEncoder({
                     output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
                     error: (e) => { encodeError = e; }
                 });
-                audioEncoder.configure(audioCfg);
+                audioEncoder.configure(audioInfo.config);
             }
 
             const renderCanvas = document.createElement('canvas');
@@ -1859,20 +1990,53 @@
                 }
             });
 
+            // Tight 3-frame backpressure keeps 4GB RAM laptops cool and prevents swap lag
             const waitForEncoderQueue = () => new Promise((resolve) => {
-                if (videoEncoder.encodeQueueSize <= 14 || this._cancelFast) {
+                if (videoEncoder.encodeQueueSize <= 2 || this._cancelFast || encodeError) {
                     resolve();
                     return;
                 }
+                let settled = false;
                 const done = () => {
+                    if (settled) return;
+                    settled = true;
                     videoEncoder.removeEventListener('dequeue', onDeq);
                     resolve();
                 };
                 const onDeq = () => {
-                    if (videoEncoder.encodeQueueSize <= 10 || this._cancelFast) done();
+                    if (videoEncoder.encodeQueueSize <= 2 || this._cancelFast || encodeError) done();
                 };
                 videoEncoder.addEventListener('dequeue', onDeq);
-                setTimeout(done, 12);
+                setTimeout(done, 40);
+            });
+
+            const stepBgVideo = (absTimeSec) => new Promise((resolve) => {
+                if (!bgVideoSnap || !bgVideoSnap.el) {
+                    resolve();
+                    return;
+                }
+                const vid = bgVideoSnap.el;
+                const dur = vid.duration;
+                if (!isFinite(dur) || dur <= 0) {
+                    resolve();
+                    return;
+                }
+                const spd = Number(CONFIG.bgVideoSpeed) || 1.0;
+                const targetT = (((absTimeSec * spd) % dur) + dur) % dur;
+                if (Math.abs((vid.currentTime || 0) - targetT) < 0.008) {
+                    resolve();
+                    return;
+                }
+                let settled = false;
+                const done = () => {
+                    if (settled) return;
+                    settled = true;
+                    vid.removeEventListener('seeked', done);
+                    resolve();
+                };
+                vid.addEventListener('seeked', done, { once: true });
+                try { vid.currentTime = targetT; } catch (e) { done(); }
+                setTimeout(done, 150);
             });
 
             try {
@@ -1880,13 +2044,18 @@
                     if (this._cancelFast || encodeError) break;
 
                     const tFrame = i / fps;
+                    const absTime = startTime + tFrame;
                     const sampleIdx = Math.floor(tFrame * sampleRate);
+
+                    if (bgVideoSnap) {
+                        await stepBgVideo(absTime);
+                    }
 
                     fftAnalyzer.extractFrame(monoPcm, sampleIdx, smoothing, freqArr, waveArr);
 
-                    APP_STATE.exportTime = startTime + tFrame;
+                    APP_STATE.exportTime = absTime;
                     const isBeat = BeatDetector.update(freqArr);
-                    this.renderFrame(renderCtx, width, height, { freq: freqArr, wave: waveArr }, isBeat, (startTime + tFrame) / decoded.duration);
+                    this.renderFrame(renderCtx, width, height, { freq: freqArr, wave: waveArr }, isBeat, absTime / decoded.duration);
 
                     const vf = new VideoFrame(renderCanvas, {
                         timestamp: i * usPerFrame,
@@ -1898,7 +2067,7 @@
                         vf.close();
                     }
 
-                    if (videoEncoder.encodeQueueSize > 14) {
+                    if (videoEncoder.encodeQueueSize > 3) {
                         await waitForEncoderQueue();
                     }
 
@@ -1911,36 +2080,39 @@
                         const speedX = (framesDone / fps) / Math.max(0.001, elapsedSec);
                         const remSec = Math.max(0, Math.round(((totalFrames - framesDone) / fps) / Math.max(0.05, speedX)));
                         this._setStatus(
-                            `Encoding ${framesDone}/${totalFrames} • ${speedX.toFixed(1)}× speed • ~${remSec}s left`,
+                            `Rendering ${framesDone}/${totalFrames} • ${speedX.toFixed(1)}× speed • ~${remSec}s left`,
                             pct
                         );
                         await fastYield();
                     }
                 }
             } catch (err) {
-                this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying);
+                this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying, bgVideoSnap);
                 throw err;
             }
 
             if (this._cancelFast) {
-                this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying);
+                this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying, bgVideoSnap);
                 UI.showToast('Export cancelled', 'warning');
                 return;
             }
 
-            if (!isSilentExport && audioEncoder) {
-                this._setStatus('Muxing AAC audio…', 94);
+            if (!isSilentExport && audioEncoder && audioInfo) {
+                this._setStatus(`Muxing ${audioInfo.label} audio…`, 94);
 
-                const chunkFrames = 4096;
+                const chunkFrames = audioInfo.muxerCodec === 'aac' ? 4096 : 4800;
                 const planar = new Float32Array(numChannels * chunkFrames);
                 const chans = [];
                 for (let c = 0; c < numChannels; c++) chans.push(audioBuffer.getChannelData(c));
 
                 for (let offset = 0; offset < totalSamples; offset += chunkFrames) {
-                    if (this._cancelFast) {
-                        this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying);
-                        UI.showToast('Export cancelled', 'warning');
-                        return;
+                    if (this._cancelFast || encodeError) {
+                        this._abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying, bgVideoSnap);
+                        if (this._cancelFast) {
+                            UI.showToast('Export cancelled', 'warning');
+                            return;
+                        }
+                        throw encodeError;
                     }
                     const len = Math.min(chunkFrames, totalSamples - offset);
                     const buf = len === chunkFrames ? planar : new Float32Array(numChannels * len);
@@ -1956,23 +2128,32 @@
                         data: buf
                     });
                     try { audioEncoder.encode(ad); } finally { ad.close(); }
+                    if (audioEncoder.encodeQueueSize > 8) {
+                        await fastYield();
+                    }
                 }
             }
 
-            this._setStatus(isSilentExport ? 'Finalizing Silent Spotify Canvas MP4…' : 'Finalizing MP4 container…', 98);
+            this._setStatus(
+                isSilentExport
+                    ? `Finalizing Silent Spotify Canvas ${ext.toUpperCase()}…`
+                    : `Finalizing ${ext.toUpperCase()} container…`,
+                98
+            );
             await videoEncoder.flush();
             if (audioEncoder) await audioEncoder.flush();
             videoEncoder.close();
             if (audioEncoder) audioEncoder.close();
 
             if (encodeError) {
-                this._abortFastExport(savedState, null, null, wasPlaying);
+                this._abortFastExport(savedState, null, null, wasPlaying, bgVideoSnap);
                 throw encodeError;
             }
 
             muxer.finalize();
             const buffer = muxer.target.buffer;
 
+            this._restoreBgVideo(bgVideoSnap);
             this._restoreVizState(savedState);
             APP_STATE.exportTime = null;
             APP_STATE.isFastExporting = false;
@@ -1980,9 +2161,11 @@
             APP_STATE.exportCanvas = null;
             APP_STATE.exportCtx = null;
 
-            const blob = new Blob([buffer], { type: 'video/mp4' });
+            const blob = new Blob([buffer], { type: mimeType });
             const url = URL.createObjectURL(blob);
-            const filename = isSilentExport ? `waveforge_spotify_canvas_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.mp4` : `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.mp4`;
+            const filename = isSilentExport
+                ? `waveforge_spotify_canvas_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.${ext}`
+                : `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.${ext}`;
 
             if (wasPlaying) {
                 try {
@@ -1997,14 +2180,23 @@
 
             const totalElapsed = (performance.now() - startWall) / 1000;
             const speedX = clipDuration / Math.max(0.001, totalElapsed);
-            const summaryText = `✅ MP4 Rendered in ${totalElapsed.toFixed(1)}s (${speedX.toFixed(1)}× speed) • ${width}×${height}`;
+            const summaryText = `✅ ${ext.toUpperCase()} Rendered (${summary}) in ${totalElapsed.toFixed(1)}s (${speedX.toFixed(1)}× speed) • ${width}×${height}`;
 
             this._presentAdUnlockGate(url, filename, summaryText);
         },
 
-        _abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying) {
+        _restoreBgVideo(bgVideoSnap) {
+            if (!bgVideoSnap || !bgVideoSnap.el) return;
+            try {
+                bgVideoSnap.el.currentTime = bgVideoSnap.prevTime || 0;
+                if (!bgVideoSnap.wasPaused) bgVideoSnap.el.play().catch(() => {});
+            } catch (e) {}
+        },
+
+        _abortFastExport(savedState, videoEncoder, audioEncoder, wasPlaying, bgVideoSnap = null) {
             try { if (videoEncoder && videoEncoder.state !== 'closed') videoEncoder.close(); } catch (e) {}
             try { if (audioEncoder && audioEncoder.state !== 'closed') audioEncoder.close(); } catch (e) {}
+            this._restoreBgVideo(bgVideoSnap);
             this._restoreVizState(savedState);
             APP_STATE.exportTime = null;
             APP_STATE.isFastExporting = false;
@@ -2126,7 +2318,9 @@
             const blob = new Blob(APP_STATE.recordedChunks, { type: this._recordedMimeType || 'video/webm' });
             const url = URL.createObjectURL(blob);
             const ext = this._recordedMimeExt || 'webm';
-            const filename = `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.${ext}`;
+            const filename = this._recordedSilent
+                ? `waveforge_spotify_canvas_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.${ext}`
+                : `waveforge_${this.downloadBaseName()}_${CONFIG.aspectRatio.replace(':', 'x')}_${Date.now()}.${ext}`;
 
             APP_STATE.exportCanvas = null;
             APP_STATE.exportCtx = null;
@@ -3946,7 +4140,7 @@
             UI.applyTemplate(urlParams.get('template'));
         }
 
-        console.log('%c🧠 WaveForge Studio v10.0.0 — Predictive Audio Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+        console.log('%c🧠 WaveForge Studio v10.1.0 — Offline Frame-by-Frame Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
