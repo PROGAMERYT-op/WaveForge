@@ -1,11 +1,12 @@
 /**
- * WaveForge Studio v10.0 — WebGL2 Beat-Synced Post-FX Shader Engine
+ * WaveForge Studio v10.2 — WebGL2 Beat-Synced Post-FX Shader Engine
  * Zero-dependency GPU fragment shader pass for:
  *  - Chromatic Aberration (RGB Split)
  *  - Digital Glitch & Block Stutter
  *  - VHS / Analog Tape Drift & Grain
  *  - Radial Kick Zoom-Blur
- * Automatically falls back cleanly if WebGL2 is unavailable.
+ * Automatically disables heavy ReadPixels pass on software WebGL renderers
+ * (SwiftShader / llvmpipe / Basic Render) to prevent GPU stalls and export freezes.
  */
 (function (global) {
     'use strict';
@@ -95,15 +96,31 @@
     class WebGLPostFX {
         constructor() {
             this.supported = false;
+            this.isSoftwareRenderer = false;
             this.canvas = document.createElement('canvas');
             try {
                 const gl = this.canvas.getContext('webgl2', {
                     alpha: false,
                     antialias: false,
-                    preserveDrawingBuffer: true,
-                    powerPreference: 'high-performance'
+                    depth: false,
+                    stencil: false,
+                    preserveDrawingBuffer: false,
+                    powerPreference: 'high-performance',
+                    failIfMajorPerformanceCaveat: true
                 });
                 if (!gl) return;
+
+                // Detect software rasterizers (SwiftShader, llvmpipe, Basic Render) where ReadPixels causes severe stalls
+                try {
+                    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+                    const renderer = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) || '').toLowerCase();
+                    if (/swiftshader|llvmpipe|software|basic render|subzero|mesa offscreen/.test(renderer)) {
+                        this.isSoftwareRenderer = true;
+                        this.supported = false;
+                        return;
+                    }
+                } catch (e) {}
+
                 this.gl = gl;
                 this._initPipeline();
             } catch (e) {
@@ -166,16 +183,24 @@
         }
 
         apply(targetCtx, srcCanvas, w, h, params) {
-            if (!this.supported || !srcCanvas) return false;
+            if (!this.supported || this.isSoftwareRenderer || !srcCanvas) return false;
             const ca = Math.max(0, (params.chromatic || 0) / 100);
             const glt = Math.max(0, (params.glitch || 0) / 100);
             const vhs = Math.max(0, (params.vhs || 0) / 100);
             const zb = Math.max(0, (params.zoomBlur || 0) / 100);
-            if (ca < 0.005 && glt < 0.005 && vhs < 0.005 && zb < 0.005) return false;
+            const kick = Math.max(0, Math.min(1.5, params.kick || 0));
+
+            // Skip GPU readback pass completely if no visible shader effect will be rendered
+            if (ca < 0.005 && glt < 0.005 && vhs < 0.005 && (zb < 0.005 || kick <= 0.05)) return false;
 
             const gl = this.gl;
+            if (gl.isContextLost && gl.isContextLost()) {
+                this.supported = false;
+                return false;
+            }
             const cw = srcCanvas.width;
             const ch = srcCanvas.height;
+            if (cw < 2 || ch < 2) return false;
             if (this.canvas.width !== cw || this.canvas.height !== ch) {
                 this.canvas.width = cw;
                 this.canvas.height = ch;
@@ -191,7 +216,7 @@
             gl.uniform1f(this.u.glitch, glt);
             gl.uniform1f(this.u.vhs, vhs);
             gl.uniform1f(this.u.zoomblur, zb);
-            gl.uniform1f(this.u.kick, Math.max(0, Math.min(1.5, params.kick || 0)));
+            gl.uniform1f(this.u.kick, kick);
 
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 

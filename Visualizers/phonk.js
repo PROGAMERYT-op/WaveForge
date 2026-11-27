@@ -316,7 +316,8 @@
 
             // Smooth kick-drum impact envelope — driven by Predictive Lookahead Choreographer when available
             if (state.phonkKickEnv === undefined) state.phonkKickEnv = 0;
-            if (state.hasPredictiveMap && state.isPlaying) {
+            const isActivePlayback = state.isPlaying || state.exportTime !== null;
+            if (state.hasPredictiveMap && isActivePlayback) {
                 const predKick = Math.min(1.15, (state.predShake || 0) * 1.15 + (state.predFlash || 0) * 0.45);
                 state.phonkKickEnv = Math.max(predKick, state.phonkKickEnv * Math.pow(0.5, dt / 0.10));
             } else if (isBeat || bass > 0.62) {
@@ -325,7 +326,7 @@
                 state.phonkKickEnv *= Math.pow(0.5, dt / 0.12);
             }
             const kickEnv = Math.min(1.15, state.phonkKickEnv);
-            const buildupTension = (state.hasPredictiveMap && state.isPlaying) ? (state.predBuildup || 0) : 0;
+            const buildupTension = (state.hasPredictiveMap && isActivePlayback) ? (state.predBuildup || 0) : 0;
 
             // Optional Orbital Ring Rotation (shared with Logo & Phonk settings)
             if (config.logoRotateRing) {

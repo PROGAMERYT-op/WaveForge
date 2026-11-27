@@ -585,7 +585,7 @@
                 APP_STATE.isPlaying = true;
                 UI.updatePlayButton();
                 const bpmTxt = APP_STATE.predBpm ? ` • ${APP_STATE.predBpm} BPM` : '';
-                const dropTxt = APP_STATE.predDrops.length ? ` • ${APP_STATE.predDrops.length} drops predicted` : '';
+                const dropTxt = APP_STATE.predDrops.length ? ` • ${APP_STATE.predDrops.length} ${APP_STATE.predDrops.length === 1 ? 'drop' : 'drops'} detected` : '';
                 UI.showToast(`🧠 Synced & playing${bpmTxt}${dropTxt}!`, 'success');
             }).catch(() => {
                 APP_STATE.isPlaying = false;
@@ -976,7 +976,7 @@
             // Update BPM & Drop Markers UI
             const bpmEl = document.getElementById('bpm-badge');
             if (bpmEl) {
-                bpmEl.textContent = `⚡ ${estBpm} BPM${this.dropTimes.length ? ' · ' + this.dropTimes.length + ' Drops' : ''}`;
+                bpmEl.textContent = `${estBpm} BPM${this.dropTimes.length ? ' · ' + this.dropTimes.length + (this.dropTimes.length === 1 ? ' Drop' : ' Drops') : ''}`;
                 bpmEl.classList.remove('hidden');
             }
             const markersEl = document.getElementById('seek-markers');
@@ -1278,31 +1278,24 @@
                 && (typeof window.Mp4Muxer !== 'undefined' || typeof window.WebMMuxer !== 'undefined');
         },
 
-        // Expanded H.264 / AVC profiles & levels for full Android / iOS / Desktop compatibility
-        _videoCodecCandidates: [
-            'avc1.640034',
-            'avc1.640033',
-            'avc1.640032',
-            'avc1.64002A',
-            'avc1.640029',
-            'avc1.640028',
-            'avc1.64001F',
-            'avc1.4D4034',
-            'avc1.4D4033',
-            'avc1.4D4032',
-            'avc1.4D402A',
-            'avc1.4D4029',
-            'avc1.4D4028',
-            'avc1.4D401F',
-            'avc1.42E034',
-            'avc1.42E033',
-            'avc1.42E032',
-            'avc1.42E02A',
-            'avc1.42E028',
-            'avc1.42E01F',
-            'avc1.420028',
-            'avc1.42001F'
-        ],
+        // Resolution-matched H.264 Main/Baseline profiles first to prevent B-frame PTS/DTS reordering & mobile MediaCodec freezes
+        _getAvcCandidates(width, height) {
+            const pixels = width * height;
+            if (pixels <= 2_100_000) {
+                // 720p / 1080p: Main/Baseline Level 4.0-4.2 first (zero B-frame freeze on Android/iOS)
+                return [
+                    'avc1.4D402A', 'avc1.4D4029', 'avc1.4D4028', 'avc1.4D401F',
+                    'avc1.42E02A', 'avc1.42E028', 'avc1.42E01F', 'avc1.420028', 'avc1.42001F',
+                    'avc1.64002A', 'avc1.640029', 'avc1.640028', 'avc1.64001F'
+                ];
+            }
+            // 1440p / 4K: Level 5.0-5.2 Main/High
+            return [
+                'avc1.4D4034', 'avc1.4D4033', 'avc1.4D4032',
+                'avc1.640034', 'avc1.640033', 'avc1.640032',
+                'avc1.42E034', 'avc1.42E033', 'avc1.42E032'
+            ];
+        },
 
         // Open-source VP9/VP8 fallback codecs for Brave / Linux / Firefox WebM offline rendering
         _webmCodecCandidates: [
@@ -1314,8 +1307,9 @@
 
         async _pickVideoCodecForFamily(family, width, height, fps, bitrate) {
             const accelModes = ['prefer-hardware', 'no-preference', 'prefer-software'];
-            const latencyModes = ['quality', 'realtime'];
-            const candidates = family === 'avc' ? this._videoCodecCandidates : this._webmCodecCandidates;
+            // Prefer 'realtime' first to disable B-frame reordering (WebCodecs omits DTS, so B-frames cause mobile player freezes)
+            const latencyModes = ['realtime', 'quality'];
+            const candidates = family === 'avc' ? this._getAvcCandidates(width, height) : this._webmCodecCandidates;
 
             for (const latencyMode of latencyModes) {
                 for (const hardwareAcceleration of accelModes) {
@@ -1348,12 +1342,12 @@
             return null;
         },
 
-        async _pickAudioCodecForContainer(container, sampleRate, channels) {
+        async _pickAudioCodecForContainer(container, sampleRate, channels, allowOpusInMp4 = false) {
             if (!('AudioEncoder' in window) || !('AudioData' in window)) return null;
             const ch = Math.max(1, Math.min(2, channels || 2));
 
             if (container === 'mp4') {
-                // Tier 1: AAC-LC (mp4a.40.2)
+                // Tier 1: AAC-LC (mp4a.40.2) — universal compatibility on iOS, Android, TikTok, Instagram, Desktop
                 const aacRates = Array.from(new Set([sampleRate || 48000, 48000, 44100]));
                 for (const sr of aacRates) {
                     try {
@@ -1364,19 +1358,20 @@
                         }
                     } catch (e) {}
                 }
-                // Tier 2: Opus in MP4 (48000 Hz) — unlocks Brave / Linux / Android offline MP4!
-                try {
-                    const cfg = { codec: 'opus', sampleRate: 48000, numberOfChannels: ch, bitrate: 192000 };
-                    const support = await AudioEncoder.isConfigSupported(cfg);
-                    if (support && support.supported) {
-                        return { config: support.config, muxerCodec: 'opus', label: 'Opus', sampleRate: 48000 };
-                    }
-                } catch (e) {}
+                if (allowOpusInMp4) {
+                    try {
+                        const cfg = { codec: 'opus', sampleRate: 48000, numberOfChannels: ch, bitrate: 192000 };
+                        const support = await AudioEncoder.isConfigSupported(cfg);
+                        if (support && support.supported) {
+                            return { config: support.config, muxerCodec: 'opus', label: 'Opus', sampleRate: 48000 };
+                        }
+                    } catch (e) {}
+                }
                 return null;
             }
 
             if (container === 'webm') {
-                // Tier 3: Opus in WebM (48000 Hz)
+                // Tier 2: Opus in WebM (48000 Hz) — native, standards-compliant fallback when AAC is unavailable
                 try {
                     const cfg = { codec: 'opus', sampleRate: 48000, numberOfChannels: ch, bitrate: 192000 };
                     const support = await AudioEncoder.isConfigSupported(cfg);
@@ -1396,14 +1391,16 @@
             const candidateTiers = tierOrder.slice(startIdx);
             const fpsCandidates = requestedFps > 30 ? [requestedFps, 30] : [requestedFps];
 
-            const containers = [];
-            if (typeof window.Mp4Muxer !== 'undefined') containers.push('mp4');
-            if (typeof window.WebMMuxer !== 'undefined') containers.push('webm');
+            const containerPlans = [];
+            if (typeof window.Mp4Muxer !== 'undefined') containerPlans.push({ container: 'mp4', allowOpusInMp4: false });
+            if (typeof window.WebMMuxer !== 'undefined') containerPlans.push({ container: 'webm', allowOpusInMp4: false });
+            if (typeof window.Mp4Muxer !== 'undefined') containerPlans.push({ container: 'mp4', allowOpusInMp4: true });
 
-            for (const container of containers) {
+            for (const plan of containerPlans) {
+                const container = plan.container;
                 let audioInfo = null;
                 if (!isSilentExport) {
-                    audioInfo = await this._pickAudioCodecForContainer(container, targetAudioRate, channels);
+                    audioInfo = await this._pickAudioCodecForContainer(container, targetAudioRate, channels, plan.allowOpusInMp4);
                     if (!audioInfo) continue;
                 }
 
@@ -1616,10 +1613,10 @@
         _pickMediaRecorderMime() {
             if (typeof MediaRecorder === 'undefined') return { mimeType: '', ext: 'webm' };
             const candidates = [
+                { mimeType: 'video/mp4;codecs=avc1.42E01E,mp4a.40.2', ext: 'mp4' },
                 { mimeType: 'video/mp4;codecs=avc1,mp4a.40.2', ext: 'mp4' },
-                { mimeType: 'video/mp4', ext: 'mp4' },
-                { mimeType: 'video/webm;codecs=vp9,opus', ext: 'webm' },
                 { mimeType: 'video/webm;codecs=vp8,opus', ext: 'webm' },
+                { mimeType: 'video/webm;codecs=vp9,opus', ext: 'webm' },
                 { mimeType: 'video/webm', ext: 'webm' }
             ];
             for (const c of candidates) {
@@ -1709,13 +1706,16 @@
             };
 
             APP_STATE.mediaRecorder.onstop = () => this.finishRecording();
-            APP_STATE.mediaRecorder.start(100);
 
+            // Start audio playback first so video & audio clocks align from frame 0
             if (audio.audioElement.paused) {
-                audio.audioElement.play().catch(() => {});
-                APP_STATE.isPlaying = true;
-                UI.updatePlayButton();
+                try {
+                    await audio.audioElement.play();
+                    APP_STATE.isPlaying = true;
+                    UI.updatePlayButton();
+                } catch (e) {}
             }
+            APP_STATE.mediaRecorder.start(250);
 
             document.getElementById('btn-start-export').style.display = 'none';
             document.getElementById('btn-cancel-export').style.display = 'block';
@@ -1817,11 +1817,15 @@
                 UI.showToast(`Clip start clamped to ${startTime.toFixed(1)}s (track length ${decoded.duration.toFixed(1)}s)`, 'info');
             }
 
-            let clipDuration = Math.max(0.1, decoded.duration - startTime);
+            const playbackSpeed = Math.max(0.5, Math.min(2.0, Number(APP_STATE.playbackSpeed) || 1.0));
+            const availSourceDur = Math.max(0.1, decoded.duration - startTime);
+            const availOutputDur = availSourceDur / playbackSpeed;
+            let clipDuration = availOutputDur;
             if (durationSetting !== 'full') {
-                clipDuration = Math.min(clipDuration, parseInt(durationSetting, 10));
+                clipDuration = Math.min(availOutputDur, parseInt(durationSetting, 10));
             }
             if (clipDuration <= 0.05) throw new Error('Nothing to export from current position');
+            const sourceSpan = Math.min(availSourceDur, clipDuration * playbackSpeed);
 
             const totalFrames = Math.max(1, Math.floor(clipDuration * fps));
 
@@ -1866,6 +1870,7 @@
                 );
                 const offlineSrc = offlineCtx.createBufferSource();
                 offlineSrc.buffer = decoded;
+                offlineSrc.playbackRate.value = playbackSpeed;
 
                 const offBass = offlineCtx.createBiquadFilter();
                 offBass.type = 'lowshelf';
@@ -1887,7 +1892,7 @@
                 offBass.connect(offMid);
                 offMid.connect(offTreble);
                 offTreble.connect(offlineCtx.destination);
-                offlineSrc.start(0, startTime, clipDuration);
+                offlineSrc.start(0, startTime, sourceSpan);
 
                 audioBuffer = await offlineCtx.startRendering();
             } catch (err) {
@@ -1951,7 +1956,7 @@
             const renderCanvas = document.createElement('canvas');
             renderCanvas.width = width;
             renderCanvas.height = height;
-            const renderCtx = renderCanvas.getContext('2d', { alpha: false, desynchronized: true, willReadFrequently: false });
+            const renderCtx = renderCanvas.getContext('2d', { alpha: false, willReadFrequently: false });
 
             // Preserve neon glow while capping maximum blur radius for fast hardware-friendly frame rasterization
             try {
@@ -1973,42 +1978,37 @@
             const fftAnalyzer = this._createFastFftAnalyzer(exportFftSize);
             const freqArr = new Uint8Array(exportFftSize >> 1);
             const waveArr = new Uint8Array(exportFftSize);
-            const smoothing = CONFIG.smoothing;
-            const usPerFrame = Math.round(1_000_000 / fps);
+            // Normalize FFT smoothing for export FPS so 30fps mobile exports react identically to 60fps preview
+            const effectiveSmoothing = Math.pow(Math.max(0, Math.min(0.99, CONFIG.smoothing)), 60 / fps);
+            const halfFft = exportFftSize >> 1;
             const keyFrameInterval = Math.max(1, fps * 2);
 
             const startWall = performance.now();
             let lastUiUpdateWall = startWall;
 
-            const fastYield = () => new Promise((resolve) => {
-                if (typeof MessageChannel !== 'undefined') {
-                    const mc = new MessageChannel();
-                    mc.port1.onmessage = () => resolve();
-                    mc.port2.postMessage(null);
-                } else {
-                    setTimeout(resolve, 0);
-                }
-            });
+            const fastYield = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-            // Tight 3-frame backpressure keeps 4GB RAM laptops cool and prevents swap lag
-            const waitForEncoderQueue = () => new Promise((resolve) => {
-                if (videoEncoder.encodeQueueSize <= 2 || this._cancelFast || encodeError) {
-                    resolve();
-                    return;
+            // Strict backpressure: NEVER proceed while encodeQueueSize > 2 (prevents 4GB RAM OOM & mobile MediaCodec frame drops)
+            const waitForEncoderQueue = async () => {
+                while (videoEncoder.encodeQueueSize > 2 && !this._cancelFast && !encodeError && videoEncoder.state === 'configured') {
+                    await new Promise((resolve) => {
+                        let settled = false;
+                        let timer = null;
+                        const done = () => {
+                            if (settled) return;
+                            settled = true;
+                            if (timer) clearTimeout(timer);
+                            videoEncoder.removeEventListener('dequeue', onDeq);
+                            resolve();
+                        };
+                        const onDeq = () => {
+                            if (videoEncoder.encodeQueueSize <= 2 || this._cancelFast || encodeError) done();
+                        };
+                        videoEncoder.addEventListener('dequeue', onDeq);
+                        timer = setTimeout(done, 250);
+                    });
                 }
-                let settled = false;
-                const done = () => {
-                    if (settled) return;
-                    settled = true;
-                    videoEncoder.removeEventListener('dequeue', onDeq);
-                    resolve();
-                };
-                const onDeq = () => {
-                    if (videoEncoder.encodeQueueSize <= 2 || this._cancelFast || encodeError) done();
-                };
-                videoEncoder.addEventListener('dequeue', onDeq);
-                setTimeout(done, 40);
-            });
+            };
 
             const stepBgVideo = (absTimeSec) => new Promise((resolve) => {
                 if (!bgVideoSnap || !bgVideoSnap.el) {
@@ -2044,22 +2044,24 @@
                     if (this._cancelFast || encodeError) break;
 
                     const tFrame = i / fps;
-                    const absTime = startTime + tFrame;
-                    const sampleIdx = Math.floor(tFrame * sampleRate);
+                    const absTime = startTime + tFrame * playbackSpeed;
+                    const sampleIdx = Math.max(0, Math.floor(tFrame * sampleRate) - halfFft);
 
                     if (bgVideoSnap) {
                         await stepBgVideo(absTime);
                     }
 
-                    fftAnalyzer.extractFrame(monoPcm, sampleIdx, smoothing, freqArr, waveArr);
+                    fftAnalyzer.extractFrame(monoPcm, sampleIdx, effectiveSmoothing, freqArr, waveArr);
 
                     APP_STATE.exportTime = absTime;
                     const isBeat = BeatDetector.update(freqArr);
-                    this.renderFrame(renderCtx, width, height, { freq: freqArr, wave: waveArr }, isBeat, absTime / decoded.duration);
+                    this.renderFrame(renderCtx, width, height, { freq: freqArr, wave: waveArr }, isBeat, Math.min(1, absTime / Math.max(0.01, decoded.duration)));
 
+                    const frameTs = Math.round((i * 1_000_000) / fps);
+                    const nextTs = Math.round(((i + 1) * 1_000_000) / fps);
                     const vf = new VideoFrame(renderCanvas, {
-                        timestamp: i * usPerFrame,
-                        duration: usPerFrame
+                        timestamp: frameTs,
+                        duration: Math.max(1, nextTs - frameTs)
                     });
                     try {
                         videoEncoder.encode(vf, { keyFrame: i % keyFrameInterval === 0 });
@@ -2067,7 +2069,7 @@
                         vf.close();
                     }
 
-                    if (videoEncoder.encodeQueueSize > 3) {
+                    if (videoEncoder.encodeQueueSize > 2) {
                         await waitForEncoderQueue();
                     }
 
@@ -2367,8 +2369,23 @@
                 }
             }
 
+            const applyGlobalPred = APP_STATE.hasPredictiveMap && APP_STATE.mode !== 12 && APP_STATE.mode !== 8 && (APP_STATE.predShake > 0.02 || APP_STATE.predBuildup > 0.02);
+            ctx.save();
+            if (applyGlobalPred) {
+                const t = nowSec();
+                const cx = width / 2;
+                const cy = height / 2;
+                const sAmp = Math.min(width, height) * 0.014 * APP_STATE.predShake;
+                const sx = Math.sin(t * 46) * sAmp;
+                const sy = Math.cos(t * 39) * sAmp * 0.72;
+                const zScale = 1 + APP_STATE.predZoom * 0.055;
+                ctx.translate(cx + sx, cy + sy);
+                ctx.scale(zScale, zScale);
+                ctx.translate(-cx, -cy);
+            }
             const renderFn = mod.renderExport || mod.render;
             renderFn(viz, ctx, width, height, width / 2, height / 2, data, isBeat);
+            ctx.restore();
 
             if (typeof viz !== 'undefined' && viz) {
                 const prog = typeof progressRatio === 'number'
@@ -2725,12 +2742,17 @@
             const sDot = document.getElementById('status-dot');
             if (sDot && !APP_STATE.isRecording) sDot.classList.toggle('beat-hit', Boolean(isBeat && APP_STATE.isPlaying));
 
-            this.render(this.ctx, this.width, this.height, this.cx, this.cy, data, isBeat);
-
             if (APP_STATE.isRecording && !APP_STATE.isFastExporting && APP_STATE.exportCtx) {
+                // Render directly to export canvas only during realtime recording to avoid 2x GPU/CPU load & frame drops
                 const expW = APP_STATE.exportCanvas.width;
                 const expH = APP_STATE.exportCanvas.height;
                 Exporter.renderFrame(APP_STATE.exportCtx, expW, expH, data, isBeat);
+                // Blit lightweight preview to main canvas
+                try {
+                    this.ctx.drawImage(APP_STATE.exportCanvas, 0, 0, this.width, this.height);
+                } catch (e) {}
+            } else {
+                this.render(this.ctx, this.width, this.height, this.cx, this.cy, data, isBeat);
             }
         }
 
@@ -3847,7 +3869,7 @@
                     }
                     document.getElementById('btn-upload-bg').classList.remove('has-file');
                     document.getElementById('btn-upload-logo').classList.remove('has-file');
-                    document.getElementById('bg-label').textContent = 'Upload Background';
+                    document.getElementById('bg-label').textContent = 'MP4 Video / Image BG';
                     document.getElementById('logo-label').textContent = 'Upload Center Logo';
                     const wizBg = document.getElementById('wiz-btn-bg');
                     const wizLogo = document.getElementById('wiz-btn-logo');
@@ -4140,7 +4162,7 @@
             UI.applyTemplate(urlParams.get('template'));
         }
 
-        console.log('%c🧠 WaveForge Studio v10.1.0 — Offline Frame-by-Frame Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+        console.log('%c🧠 WaveForge Studio v10.2.0 — Pro Offline Frame Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

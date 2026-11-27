@@ -4,20 +4,20 @@
 
 :root,
 [data-theme="dark"] {
-    --bg: #05070f;
-    --bg-alt: #090d1a;
-    --surface: rgba(15, 21, 38, 0.82);
-    --surface-solid: #0f1526;
-    --surface-2: rgba(25, 34, 58, 0.7);
-    --text: #f8fafc;
-    --text-muted: #94a3b8;
-    --text-subtle: #64748b;
-    --border: rgba(148, 163, 184, 0.14);
-    --border-strong: rgba(148, 163, 184, 0.28);
-    --accent: #a855f7;
-    --accent-2: #00f2ff;
-    --accent-3: #6366f1;
-    --accent-soft: rgba(168, 85, 247, 0.15);
+    --bg: #09090b;
+    --bg-alt: #0e0e12;
+    --surface: rgba(24, 24, 27, 0.84);
+    --surface-solid: #111114;
+    --surface-2: #18181b;
+    --text: #fafafa;
+    --text-muted: #a1a1aa;
+    --text-subtle: #71717a;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    --accent: #6366f1;
+    --accent-2: #818cf8;
+    --accent-3: #4f46e5;
+    --accent-soft: rgba(99, 102, 241, 0.14);
     --shadow-sm: 0 8px 30px rgba(0, 0, 0, 0.35);
     --shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.65);
     --focus-ring: 0 0 0 3px rgba(168, 85, 247, 0.55);
@@ -45,7 +45,7 @@
 
 :root {
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-display: 'Space Grotesk', 'Inter', sans-serif;
+    --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
     --radius-sm: 10px;
     --radius-md: 14px;
@@ -89,8 +89,8 @@ a:focus-visible, button:focus-visible {
 
 .ambient-glow { position: fixed; pointer-events: none; z-index: 0; filter: blur(130px); opacity: 0.26; border-radius: 50%; }
 [data-theme="light"] .ambient-glow { opacity: 0.14; }
-.glow-1 { width: 620px; height: 420px; background: radial-gradient(circle, #a855f7 0%, transparent 70%); top: -120px; left: 50%; transform: translateX(-65%); }
-.glow-2 { width: 540px; height: 420px; background: radial-gradient(circle, #00f2ff 0%, transparent 70%); top: 140px; left: 50%; transform: translateX(10%); opacity: 0.18; }
+.glow-1 { width: 620px; height: 420px; background: radial-gradient(circle, rgba(99,102,241,0.55) 0%, transparent 70%); top: -140px; left: 50%; transform: translateX(-60%); opacity: 0.18; }
+.glow-2 { width: 500px; height: 380px; background: radial-gradient(circle, rgba(129,140,248,0.4) 0%, transparent 70%); top: 140px; left: 50%; transform: translateX(10%); opacity: 0.12; }
 
 .container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
@@ -149,8 +149,8 @@ a:focus-visible, button:focus-visible {
     transition: all var(--transition); border: 1px solid transparent; white-space: nowrap;
 }
 .btn-lg { padding: 13px 24px; font-size: 0.96rem; border-radius: 12px; }
-.btn-primary { background: linear-gradient(135deg, #a855f7, #6366f1); color: #ffffff; box-shadow: 0 8px 26px rgba(168, 85, 247, 0.38); }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(168, 85, 247, 0.52); }
+.btn-primary { background: var(--accent); color: #ffffff; box-shadow: 0 2px 12px rgba(99, 102, 241, 0.32); }
+.btn-primary:hover { background: var(--accent-3); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.42); }
 .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); backdrop-filter: blur(10px); }
 .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
 
@@ -198,10 +198,10 @@ a:focus-visible, button:focus-visible {
     transition: border-color var(--transition), transform var(--transition), color var(--transition);
 }
 .eyebrow-pill:hover { border-color: var(--accent); color: var(--text); transform: translateY(-1px); }
-.pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 10px #a855f7; animation: pulseDot 2s ease-in-out infinite; }
+.pulse-dot { width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%; background: var(--accent-2); animation: pulseDot 2s ease-in-out infinite; }
 @keyframes pulseDot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.35); opacity: 0.65; } }
 .hero h1 { font-family: var(--font-display); font-size: clamp(2.1rem, 5.2vw, 3.85rem); font-weight: 700; line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 18px; }
-.gradient-text { background: linear-gradient(135deg, #c084fc 0%, #00f2ff 52%, #ec4899 100%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; }
+.gradient-text { background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 55%, #818cf8 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 [data-theme="light"] .gradient-text { background: linear-gradient(135deg, #7c3aed 0%, #0891b2 55%, #db2777 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero .lead { font-size: clamp(0.96rem, 1.8vw, 1.12rem); color: var(--text-muted); max-width: 700px; margin: 0 auto 28px; }
 .hero-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
@@ -393,4 +393,15 @@ a:focus-visible, button:focus-visible {
     .preview-pill-group { flex-wrap: nowrap; }
     .preview-pill { flex: 0 0 auto; }
     .modes-showcase-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 460px) {
+    .nav-inner { padding: 0 12px; gap: 6px; }
+    .logo { gap: 7px; font-size: 0.98rem; min-width: 0; }
+    .logo-mark { width: 30px; height: 30px; }
+    .version-chip { display: none; }
+    .nav-actions { gap: 6px; flex-shrink: 0; }
+    .nav-actions .btn-primary { padding: 7px 10px; font-size: 0.76rem; gap: 4px; }
+    .nav-actions .btn-primary svg { display: none; }
+    .icon-btn, .mobile-toggle { width: 34px; height: 34px; }
 }

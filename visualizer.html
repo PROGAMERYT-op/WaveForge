@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '10.1.0';
+            var VER = '10.2.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -34,21 +34,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>WaveForge Studio 10.1 | Predictive Phonk &amp; Hardtekk Visualizer + 4K MP4 Export</title>
-    <meta name="description" content="WaveForge Studio 10.1 pre-analyzes your song to predict every drop, kick-drum shake, and zoom punch automatically. 6 unique viral templates, trending edit fonts, 9 pro visualizers, and 4K MP4 export.">
+    <title>WaveForge Studio 10.2 | Predictive Phonk &amp; Hardtekk Visualizer + 4K MP4 Export</title>
+    <meta name="description" content="WaveForge Studio 10.2 pre-analyzes your song to predict every drop, kick-drum shake, and zoom punch automatically. 6 unique viral templates, trending edit fonts, 9 pro visualizers, and 4K MP4 export.">
     <meta name="keywords" content="phonk visualizer, hardtekk visualizer, brazilian funk video maker, tiktok music visualizer, 9:16 audio visualizer, free music visualizer, logo visualizer, predictive beat drop visualizer">
     <meta name="author" content="WaveForge">
-    <meta name="theme-color" content="#05070f">
+    <meta name="theme-color" content="#09090b">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&family=New+Rocker&family=Orbitron:wght@700;900&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@500;600&family=New+Rocker&family=Orbitron:wght@700;900&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://progameryt-op.github.io/WaveForge/visualizer.html">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <meta property="og:title" content="WaveForge Studio 10.1 — Predictive Phonk &amp; Hardtekk Visualizer">
+    <meta property="og:title" content="WaveForge Studio 10.2 — Predictive Phonk &amp; Hardtekk Visualizer">
     <meta property="og:description" content="Pre-analyzes your music to predict drops, shakes &amp; flashes automatically. 6 unique templates, trending fonts &amp; 4K MP4 export.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
 
@@ -58,11 +58,11 @@
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="assets/css/app.css?v=10.1.0">
+    <link rel="stylesheet" href="assets/css/app.css?v=10.2.0">
 
     <!-- Fast WebCodecs export: mp4-muxer -->
-    <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/webm-muxer@5.1.3/build/webm-muxer.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/webm-muxer@5.1.3/build/webm-muxer.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- VISUALLY-HIDDEN FILE INPUTS AT BODY ROOT (Guarantees 100% reliable click triggers on Mobile Safari/Android/Desktop) -->
@@ -72,7 +72,7 @@
 
     <main class="visually-hidden" role="main">
         <article>
-            <h2>WaveForge Studio 10.1 - Predictive Phonk &amp; Hardtekk Music Visualizer</h2>
+            <h2>WaveForge Studio 10.2 - Predictive Phonk &amp; Hardtekk Music Visualizer</h2>
             <p>Browser-based music visualizer with offline song pre-analysis, predictive beat-drop choreography, 6 unique viral templates, trending edit fonts, 9 pro visualizers, 3-band EQ, and 4K MP4 exports.</p>
         </article>
     </main>
@@ -114,20 +114,22 @@
     <!-- COMPACT QUICK-START ONBOARDING CARD (Auto-hides on play or dismiss) -->
     <div id="studio-onboarding" class="studio-onboarding interactive" role="region" aria-label="Quick start guide">
         <button type="button" class="onboard-dismiss" id="onboard-close-btn" aria-label="Dismiss welcome card">✕</button>
-        <div class="onboard-icon-ring" aria-hidden="true">🧠</div>
-        <h2>Predictive Phonk &amp; 4K Studio</h2>
-        <p>WaveForge listens to your track first, predicts every drop, BPM &amp; kick shake mathematically, then plays in perfect sync.</p>
-        <div class="onboard-actions" style="grid-template-columns: 1fr;">
-            <button type="button" id="onboard-templates-btn" class="btn-studio-primary onboard-btn" style="background:linear-gradient(135deg,#a855f7,#ec4899);">
-                <span>🔥 Browse 6 Unique Templates</span>
+        <div class="onboard-icon-ring" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+        </div>
+        <h2>WaveForge Studio</h2>
+        <p>Pre-analyzes your audio to lock BPM, beat drops, and camera motion into frame-accurate 4K exports.</p>
+        <div class="onboard-actions onboard-actions-single">
+            <button type="button" id="onboard-templates-btn" class="btn-studio-primary onboard-btn">
+                <span>Browse 6 Templates</span>
             </button>
         </div>
         <div class="onboard-actions" style="margin-top:8px;">
             <button type="button" id="onboard-upload-btn" class="onboard-btn-secondary">
-                <span>📁 Upload Music</span>
+                <span>Upload Audio</span>
             </button>
             <button type="button" id="onboard-demo-btn" class="onboard-btn-secondary">
-                <span>▶ Analyze &amp; Play Demo</span>
+                <span>Play Demo</span>
             </button>
         </div>
     </div>
@@ -200,8 +202,8 @@
                 </div>
 
                 <div class="top-actions">
-                    <button type="button" id="btn-templates" class="btn-templates-pill" aria-label="Open trending templates" title="6 Unique Viral Templates (T)">
-                        <span aria-hidden="true">🔥</span>
+                    <button type="button" id="btn-templates" class="btn-templates-pill" aria-label="Open templates" title="Creator Templates (T)">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
                         <span class="tpl-btn-text">Templates</span>
                     </button>
                     <button type="button" id="btn-export" class="btn-studio-primary" aria-label="Export video" title="Export 4K MP4 / WebM Video">
@@ -304,7 +306,7 @@
                             <span class="dock-lbl">Mix</span>
                         </button>
 
-                        <button type="button" id="btn-mic" class="dock-btn" aria-label="Toggle microphone input" title="Live Microphone Input">
+                        <button type="button" id="btn-mic" class="dock-btn desktop-only-btn" aria-label="Toggle microphone input" title="Live Microphone Input">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                             <span class="dock-lbl">Mic</span>
                         </button>
@@ -684,7 +686,7 @@
             </div>
 
             <div class="version-info">
-                WaveForge Studio v10.1 • Predictive Audio Engine • 6 Unique Templates • Turbo 4K MP4<br>
+                WaveForge Studio v10.2 • Predictive Audio Engine • 6 Unique Templates • Turbo 4K MP4<br>
                 <button type="button" id="btn-shortcuts" class="inline-link-btn">Keyboard Shortcuts (?)</button> •
                 <a href="index.html">Back to Home</a>
             </div>
@@ -918,19 +920,19 @@
     </div>
 
     <!-- VISUALIZER MODE REGISTRY (9 Curated Pro Modes) -->
-    <script src="Visualizers/bars.js?v=10.1.0"></script>
-    <script src="Visualizers/wave.js?v=10.1.0"></script>
-    <script src="Visualizers/radial.js?v=10.1.0"></script>
-    <script src="Visualizers/particles.js?v=10.1.0"></script>
-    <script src="Visualizers/logo.js?v=10.1.0"></script>
-    <script src="Visualizers/tunnel.js?v=10.1.0"></script>
-    <script src="Visualizers/trapnation.js?v=10.1.0"></script>
-    <script src="Visualizers/synthwave.js?v=10.1.0"></script>
-    <script src="Visualizers/phonk.js?v=10.1.0"></script>
+    <script src="Visualizers/bars.js?v=10.2.0"></script>
+    <script src="Visualizers/wave.js?v=10.2.0"></script>
+    <script src="Visualizers/radial.js?v=10.2.0"></script>
+    <script src="Visualizers/particles.js?v=10.2.0"></script>
+    <script src="Visualizers/logo.js?v=10.2.0"></script>
+    <script src="Visualizers/tunnel.js?v=10.2.0"></script>
+    <script src="Visualizers/trapnation.js?v=10.2.0"></script>
+    <script src="Visualizers/synthwave.js?v=10.2.0"></script>
+    <script src="Visualizers/phonk.js?v=10.2.0"></script>
 
     <!-- SMART MONETIZATION ENGINE & APPLICATION SCRIPT -->
-    <script src="assets/js/ads.js?v=10.1.0"></script>
-    <script src="assets/js/webgl-fx.js?v=10.1.0"></script>
-    <script src="assets/js/app.js?v=10.1.0"></script>
+    <script src="assets/js/ads.js?v=10.2.0"></script>
+    <script src="assets/js/webgl-fx.js?v=10.2.0"></script>
+    <script src="assets/js/app.js?v=10.2.0"></script>
 </body>
 </html>
