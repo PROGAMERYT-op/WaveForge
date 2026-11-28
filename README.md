@@ -1,4 +1,4 @@
-# WaveForge Studio v10.4 — Free 4K Online Music Visualizer
+# WaveForge Studio v10.5 — Free 4K Online Music Visualizer
 
 **WaveForge** is a free, privacy-first browser music visualizer and 4K MP4/WebM video exporter built for **every music genre** — Lo-Fi, Hip-Hop & Type-Beats, EDM, Trap, Synthwave, Indie, Pop, Podcasts, Phonk, Hardtekk, and Brazilian Funk.
 
@@ -36,7 +36,7 @@ Everything runs **100% locally in your browser** (desktop and mobile) using the 
 WaveForge/
 ├── index.html              # Landing page & genre preset showcase
 ├── visualizer.html         # Full studio application
-├── sw.js                   # Offline PWA Service Worker (v10.4.0)
+├── sw.js                   # Offline PWA Service Worker (v10.5.0)
 ├── assets/
 │   ├── manifest.json       # PWA web app manifest
 │   ├── css/                # app.css, landing.css, legal.css

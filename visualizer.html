@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '10.4.0';
+            var VER = '10.5.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -34,7 +34,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>WaveForge Studio 10.4 | Free Online Music Visualizer &amp; 4K MP4 Exporter</title>
+    <title>WaveForge Studio 10.5 | Free Online Music Visualizer &amp; 4K MP4 Exporter</title>
     <meta name="description" content="Free online music visualizer for Lo-Fi, Hip-Hop, EDM, Synthwave, Pop, Indie, Phonk &amp; Podcasts. 9 audio-reactive visualizers, 8 genre presets, 3-band EQ, Spotify Canvas, and watermark-free 4K MP4 export.">
     <meta name="keywords" content="phonk visualizer, hardtekk visualizer, brazilian funk video maker, tiktok music visualizer, 9:16 audio visualizer, free music visualizer, logo visualizer, predictive beat drop visualizer">
     <meta name="author" content="WaveForge">
@@ -48,7 +48,7 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <meta property="og:title" content="WaveForge Studio 10.4 — Free 4K Online Music Visualizer">
+    <meta property="og:title" content="WaveForge Studio 10.5 — Free 4K Online Music Visualizer">
     <meta property="og:description" content="Pre-analyzes your music to predict drops, shakes &amp; flashes automatically. 6 unique templates, trending fonts &amp; 4K MP4 export.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
 
@@ -58,7 +58,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="assets/css/app.css?v=10.4.0">
+    <link rel="stylesheet" href="assets/css/app.css?v=10.5.0">
 
     <!-- Fast WebCodecs export: mp4-muxer -->
     <script defer src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
@@ -69,10 +69,11 @@
     <input type="file" id="file-input" accept="audio/*,.mp3,.wav,.ogg,.flac,.m4a,.aac,.json,.wfpreset,video/mp4,video/webm" class="visually-hidden" tabindex="-1">
     <input type="file" id="logo-bg-input" accept="image/*,video/mp4,video/webm,video/quicktime" class="visually-hidden" tabindex="-1">
     <input type="file" id="logo-img-input" accept="image/*" class="visually-hidden" tabindex="-1">
+    <input type="file" id="lyrics-file-input" accept=".lrc,.srt,.txt" class="visually-hidden" tabindex="-1">
 
     <main class="visually-hidden" role="main">
         <article>
-            <h2>WaveForge Studio 10.4 — Free Online Music Visualizer for Every Genre</h2>
+            <h2>WaveForge Studio 10.5 — Free Online Music Visualizer for Every Genre</h2>
             <p>Browser-based music visualizer with offline song pre-analysis, predictive beat-drop choreography, 6 unique viral templates, trending edit fonts, 9 pro visualizers, 3-band EQ, and 4K MP4 exports.</p>
         </article>
     </main>
@@ -403,6 +404,29 @@
                 </div>
 
                 <div class="settings-group">
+                    <h3>Synced &amp; Automatic Lyrics (AI / .LRC / .SRT)</h3>
+                    <div class="button-group" style="margin-bottom:8px;">
+                        <button type="button" id="btn-auto-lyrics" class="btn-studio-primary" style="font-size:0.75rem;">Auto-Lyrics (AI)</button>
+                        <button type="button" id="btn-import-lyrics" style="font-size:0.75rem;">Import .LRC / .SRT</button>
+                    </div>
+                    <p id="lyrics-status" style="font-size:0.72rem;color:var(--text-muted);margin:0 0 8px;">No lyrics loaded — generate with AI, import .LRC/.SRT, or paste below.</p>
+                    <div class="control-row">
+                        <label for="set-lyric-style">Lyric Display Style</label>
+                        <select id="set-lyric-style">
+                            <option value="karaoke" selected>Karaoke Glow (Active + Next)</option>
+                            <option value="subtitle">Minimal Subtitle Box</option>
+                            <option value="kinetic">Kinetic Center Stage</option>
+                            <option value="off">Hidden</option>
+                        </select>
+                    </div>
+                    <textarea id="set-lyrics-text" class="lyrics-textarea" rows="4" placeholder="[00:02.00] First lyric line&#10;[00:06.50] Second lyric line&#10;Or paste plain text &amp; tap Stamp while playing..."></textarea>
+                    <div class="button-group" style="margin-top:6px;">
+                        <button type="button" id="btn-stamp-lyric" style="font-size:0.72rem;padding:6px 10px;">Stamp Current Time</button>
+                        <button type="button" id="btn-clear-lyrics" style="font-size:0.72rem;padding:6px 10px;">Clear Lyrics</button>
+                    </div>
+                </div>
+
+                <div class="settings-group">
                     <h3>Background Media (MP4 Video Loop or Image) &amp; Logo</h3>
                     <div class="upload-btn-group" style="margin-bottom:10px;">
                         <button type="button" class="upload-btn" id="btn-upload-bg">
@@ -424,6 +448,20 @@
                     <div class="control-row">
                         <label for="set-bg-speed">Video BG Loop Speed</label>
                         <input type="range" id="set-bg-speed" min="0.5" max="2.0" step="0.1" value="1.0" data-unit="×">
+                    </div>
+                    <div class="control-row toggle-row">
+                        <label for="set-auto-color-art">Auto-Match Color to Cover Art</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-auto-color-art" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row toggle-row">
+                        <label for="set-fx-player-card">Glassmorphism Player Card Overlay</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-fx-player-card">
+                            <span class="toggle-slider"></span>
+                        </label>
                     </div>
                 </div>
 
@@ -630,6 +668,13 @@
                         </label>
                     </div>
                     <div class="control-row toggle-row">
+                        <label for="set-safe-zones">9:16 TikTok / Reels Safe-Zone Guide</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-safe-zones">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-row toggle-row">
                         <label for="set-fx-progress">Bottom Track Progress Bar</label>
                         <label class="toggle-switch">
                             <input type="checkbox" id="set-fx-progress" checked>
@@ -671,6 +716,27 @@
                             <option value="1.15">1.15× (Sped Up)</option>
                             <option value="1.25">1.25× (Nightcore)</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Slowed + Reverb &amp; Export Mastering FX</h3>
+                    <button type="button" id="btn-slowed-reverb" style="width:100%;margin-bottom:10px;">1-Click Slowed + Reverb</button>
+                    <div class="control-row">
+                        <label for="set-fx-reverb">Hall Reverb Mix (Exportable)</label>
+                        <input type="range" id="set-fx-reverb" min="0" max="100" step="2" value="0" data-unit="%">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-fx-saturation">Bass Saturation / Analog Drive</label>
+                        <input type="range" id="set-fx-saturation" min="0" max="100" step="5" value="0" data-unit="%">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-audio-fadein">Export Audio Fade-In</label>
+                        <input type="range" id="set-audio-fadein" min="0" max="5" step="0.5" value="0" data-unit="s">
+                    </div>
+                    <div class="control-row">
+                        <label for="set-audio-fadeout">Export Audio Fade-Out</label>
+                        <input type="range" id="set-audio-fadeout" min="0" max="5" step="0.5" value="0" data-unit="s">
                     </div>
                 </div>
 
@@ -723,7 +789,7 @@
             </div>
 
             <div class="version-info">
-                WaveForge Studio v10.4 • Free All-Genre Music Visualizer • 9 Engines • 4K MP4<br>
+                WaveForge Studio v10.5 • Free All-Genre Music Visualizer • 9 Engines • 4K MP4<br>
                 <button type="button" id="btn-shortcuts" class="inline-link-btn">Keyboard Shortcuts (?)</button> •
                 <a href="index.html">Back to Home</a>
             </div>
@@ -940,19 +1006,20 @@
     </div>
 
     <!-- VISUALIZER MODE REGISTRY (9 Curated Pro Modes) -->
-    <script src="Visualizers/bars.js?v=10.4.0"></script>
-    <script src="Visualizers/wave.js?v=10.4.0"></script>
-    <script src="Visualizers/radial.js?v=10.4.0"></script>
-    <script src="Visualizers/particles.js?v=10.4.0"></script>
-    <script src="Visualizers/logo.js?v=10.4.0"></script>
-    <script src="Visualizers/tunnel.js?v=10.4.0"></script>
-    <script src="Visualizers/trapnation.js?v=10.4.0"></script>
-    <script src="Visualizers/synthwave.js?v=10.4.0"></script>
-    <script src="Visualizers/phonk.js?v=10.4.0"></script>
+    <script src="Visualizers/bars.js?v=10.5.0"></script>
+    <script src="Visualizers/wave.js?v=10.5.0"></script>
+    <script src="Visualizers/radial.js?v=10.5.0"></script>
+    <script src="Visualizers/particles.js?v=10.5.0"></script>
+    <script src="Visualizers/logo.js?v=10.5.0"></script>
+    <script src="Visualizers/tunnel.js?v=10.5.0"></script>
+    <script src="Visualizers/trapnation.js?v=10.5.0"></script>
+    <script src="Visualizers/synthwave.js?v=10.5.0"></script>
+    <script src="Visualizers/phonk.js?v=10.5.0"></script>
 
     <!-- SMART MONETIZATION ENGINE & APPLICATION SCRIPT -->
-    <script src="assets/js/ads.js?v=10.4.0"></script>
-    <script src="assets/js/webgl-fx.js?v=10.4.0"></script>
-    <script src="assets/js/app.js?v=10.4.0"></script>
+    <script src="assets/js/ads.js?v=10.5.0"></script>
+    <script src="assets/js/webgl-fx.js?v=10.5.0"></script>
+    <script src="assets/js/lyrics.js?v=10.5.0"></script>
+    <script src="assets/js/app.js?v=10.5.0"></script>
 </body>
 </html>

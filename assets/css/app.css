@@ -1173,3 +1173,18 @@ kbd { font-family: var(--font-mono); font-size: 0.72rem; background: rgba(255, 2
     border-color: var(--accent-color);
     color: #ffffff;
 }
+
+/* LYRICS EDITOR TEXTAREA (v10.5) */
+.lyrics-textarea {
+    width: 100%;
+    min-height: 86px;
+    resize: vertical;
+    background: var(--surface-elevated);
+    border: 1px solid var(--panel-border-strong);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.48;
+    padding: 8px 10px;
+}

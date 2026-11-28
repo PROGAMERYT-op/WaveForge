@@ -455,7 +455,15 @@
         fxZoomBlur: 30,
         bgOpacity: 80,
         bgVideoSpeed: 1.0,
-        aspectRatio: '9:16'
+        aspectRatio: '9:16',
+        fxReverb: 0,
+        fxSaturation: 0,
+        audioFadeIn: 0,
+        audioFadeOut: 0,
+        fxPlayerCard: false,
+        autoColorFromArt: true,
+        showSafeZones: false,
+        lyricStyle: 'karaoke'
     };
 
     const DEFAULT_CONFIG = JSON.parse(JSON.stringify(CONFIG));
@@ -613,7 +621,45 @@
     }
 
     // ============================================
-    // AUDIO ENGINE (WITH 3-BAND HARDWARE EQ)
+    // WEB AUDIO DSP HELPERS (v10.5 Slowed+Reverb & Bass Saturation)
+    // ============================================
+    function createReverbImpulse(ctx, seconds = 2.6, decay = 2.8) {
+        const sr = ctx.sampleRate || 48000;
+        const len = Math.max(1, Math.floor(sr * seconds));
+        const buf = ctx.createBuffer(2, len, sr);
+        for (let ch = 0; ch < 2; ch++) {
+            const data = buf.getChannelData(ch);
+            let lp = 0;
+            for (let i = 0; i < len; i++) {
+                const env = Math.pow(1 - i / len, decay);
+                const noise = Math.random() * 2 - 1;
+                // Gentle low-pass damping for warm hall reverb tail
+                lp = lp * 0.72 + noise * 0.28;
+                data[i] = lp * env;
+            }
+        }
+        return buf;
+    }
+
+    function makeSaturationCurve(amountPct) {
+        const amt = Math.max(0, Math.min(100, Number(amountPct) || 0));
+        const n = 1024;
+        const curve = new Float32Array(n);
+        if (amt <= 1) {
+            for (let i = 0; i < n; i++) curve[i] = (i * 2) / n - 1;
+            return curve;
+        }
+        const drive = 1 + (amt / 100) * 8.5;
+        const norm = Math.tanh(drive);
+        for (let i = 0; i < n; i++) {
+            const x = (i * 2) / n - 1;
+            curve[i] = Math.tanh(x * drive) / norm;
+        }
+        return curve;
+    }
+
+    // ============================================
+    // AUDIO ENGINE (WITH 3-BAND HARDWARE EQ + REVERB & SATURATION)
     // ============================================
 
     class AudioEngine {
@@ -655,11 +701,27 @@
             this.audioElement.preload = 'auto';
             window.__wfAudioElement = this.audioElement;
 
+            this.shaperNode = this.ctx.createWaveShaper();
+            this.shaperNode.oversample = '2x';
+            this.shaperNode.curve = makeSaturationCurve(0);
+
+            this.convolverNode = this.ctx.createConvolver();
+            this.convolverNode.buffer = createReverbImpulse(this.ctx, 2.6, 2.8);
+            this.dryGain = this.ctx.createGain();
+            this.wetGain = this.ctx.createGain();
+            this.dryGain.gain.value = 1.0;
+            this.wetGain.gain.value = 0.0;
+
             this.sourceNode = this.ctx.createMediaElementSource(this.audioElement);
             this.sourceNode.connect(this.bassFilter);
             this.bassFilter.connect(this.midFilter);
             this.midFilter.connect(this.trebleFilter);
-            this.trebleFilter.connect(this.analyser);
+            this.trebleFilter.connect(this.shaperNode);
+            this.shaperNode.connect(this.dryGain);
+            this.shaperNode.connect(this.convolverNode);
+            this.convolverNode.connect(this.wetGain);
+            this.dryGain.connect(this.analyser);
+            this.wetGain.connect(this.analyser);
             this.analyser.connect(this.gainNode);
             this.gainNode.connect(this.ctx.destination);
             if (this.destinationNode) this.analyser.connect(this.destinationNode);
@@ -832,6 +894,19 @@
             this.bassFilter.gain.value = Number(CONFIG.eqBass) || 0;
             this.midFilter.gain.value = Number(CONFIG.eqMid) || 0;
             this.trebleFilter.gain.value = Number(CONFIG.eqTreble) || 0;
+
+            if (this.dryGain && this.wetGain) {
+                const wet = Math.max(0, Math.min(1, (Number(CONFIG.fxReverb) || 0) / 100));
+                this.dryGain.gain.value = 1 - wet * 0.42;
+                this.wetGain.gain.value = wet * 0.85;
+            }
+            if (this.shaperNode) {
+                const sat = Number(CONFIG.fxSaturation) || 0;
+                if (this._lastSat !== sat) {
+                    this._lastSat = sat;
+                    this.shaperNode.curve = makeSaturationCurve(sat);
+                }
+            }
 
             if (this.freqData.length !== this.analyser.frequencyBinCount) {
                 this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
@@ -2058,10 +2133,49 @@
                 offTreble.frequency.value = 4200;
                 offTreble.gain.value = Number(CONFIG.eqTreble) || 0;
 
+                const offShaper = offlineCtx.createWaveShaper();
+                offShaper.oversample = '2x';
+                offShaper.curve = makeSaturationCurve(CONFIG.fxSaturation || 0);
+
+                const offMasterGain = offlineCtx.createGain();
+                offMasterGain.gain.setValueAtTime(1.0, 0);
+
+                // Smooth export fade-in & fade-out (eliminates abrupt digital clicks)
+                const fadeIn = Math.max(0, Math.min(clipDuration * 0.45, Number(CONFIG.audioFadeIn) || 0));
+                const fadeOut = Math.max(0, Math.min(clipDuration * 0.45, Number(CONFIG.audioFadeOut) || 0));
+                if (fadeIn > 0.02) {
+                    offMasterGain.gain.setValueAtTime(0.0001, 0);
+                    offMasterGain.gain.linearRampToValueAtTime(1.0, fadeIn);
+                }
+                if (fadeOut > 0.02) {
+                    const fStart = Math.max(fadeIn, clipDuration - fadeOut);
+                    offMasterGain.gain.setValueAtTime(1.0, fStart);
+                    offMasterGain.gain.linearRampToValueAtTime(0.0001, clipDuration);
+                }
+
                 offlineSrc.connect(offBass);
                 offBass.connect(offMid);
                 offMid.connect(offTreble);
-                offTreble.connect(offlineCtx.destination);
+                offTreble.connect(offShaper);
+
+                const wetAmt = Math.max(0, Math.min(1, (Number(CONFIG.fxReverb) || 0) / 100));
+                if (wetAmt > 0.01) {
+                    const offConv = offlineCtx.createConvolver();
+                    offConv.buffer = createReverbImpulse(offlineCtx, 2.6, 2.8);
+                    const offDry = offlineCtx.createGain();
+                    const offWet = offlineCtx.createGain();
+                    offDry.gain.value = 1 - wetAmt * 0.42;
+                    offWet.gain.value = wetAmt * 0.85;
+                    offShaper.connect(offDry);
+                    offShaper.connect(offConv);
+                    offConv.connect(offWet);
+                    offDry.connect(offMasterGain);
+                    offWet.connect(offMasterGain);
+                } else {
+                    offShaper.connect(offMasterGain);
+                }
+
+                offMasterGain.connect(offlineCtx.destination);
                 offlineSrc.start(0, startTime, sourceSpan);
 
                 audioBuffer = await offlineCtx.startRendering();
@@ -2873,16 +2987,131 @@
                 ctx.restore();
             }
 
+            // P1: Synced Karaoke / Auto-Lyrics Overlay (Live + 4K Export)
+            if (window.WaveForgeLyrics && window.WaveForgeLyrics.lines.length > 0 && CONFIG.lyricStyle !== 'off') {
+                const lyricTime = (APP_STATE.exportTime !== null)
+                    ? APP_STATE.exportTime
+                    : (audio ? audio.getCurrentTime() : 0);
+                window.WaveForgeLyrics.renderOnCanvas(ctx, bounds, lyricTime, {
+                    style: CONFIG.lyricStyle || 'karaoke',
+                    font: CONFIG.overlayFont || 'Plus Jakarta Sans',
+                    accent: this.getColor(0),
+                    beatPulse: CONFIG.overlayBeatPulse,
+                    isBeat
+                });
+            }
+
+            // P1: Glassmorphism Music Player Card Overlay (Live + 4K Export)
+            if (CONFIG.fxPlayerCard) {
+                ctx.save();
+                const isVert = bounds.fh > bounds.fw;
+                const cardW = isVert ? Math.min(bounds.fw * 0.84, bounds.fw - 28) : Math.min(bounds.fw * 0.42, 460);
+                const cardH = Math.max(62, Math.round(Math.min(bounds.fw, bounds.fh) * (isVert ? 0.145 : 0.125)));
+                const cardX = isVert ? bounds.fx + (bounds.fw - cardW) / 2 : bounds.fx + bounds.fw * 0.04;
+                const cardY = bounds.fy + bounds.fh - cardH - Math.max(18, bounds.fh * (isVert ? 0.14 : 0.06));
+                const radius = Math.round(cardH * 0.22);
+
+                ctx.fillStyle = 'rgba(14, 14, 18, 0.72)';
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+                ctx.lineWidth = Math.max(1, cardH * 0.018);
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, radius);
+                else ctx.rect(cardX, cardY, cardW, cardH);
+                ctx.fill();
+                ctx.stroke();
+
+                const pad = Math.round(cardH * 0.14);
+                const artSize = cardH - pad * 2;
+                const artX = cardX + pad;
+                const artY = cardY + pad;
+                const artImg = APP_STATE.logoImg || APP_STATE.bgImg;
+
+                ctx.save();
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(artX, artY, artSize, artSize, Math.round(artSize * 0.18));
+                else ctx.rect(artX, artY, artSize, artSize);
+                ctx.clip();
+                if (artImg && artImg.width > 0) {
+                    const sc = Math.max(artSize / artImg.width, artSize / artImg.height);
+                    const dw = artImg.width * sc, dh = artImg.height * sc;
+                    ctx.drawImage(artImg, artX + (artSize - dw) / 2, artY + (artSize - dh) / 2, dw, dh);
+                } else {
+                    const g = ctx.createLinearGradient(artX, artY, artX + artSize, artY + artSize);
+                    g.addColorStop(0, this.getColor(0));
+                    g.addColorStop(1, '#18181b');
+                    ctx.fillStyle = g;
+                    ctx.fillRect(artX, artY, artSize, artSize);
+                }
+                ctx.restore();
+
+                const textX = artX + artSize + pad * 1.1;
+                const textMaxW = Math.max(40, cardX + cardW - textX - pad);
+                const cardTitle = (CONFIG.overlayTitle || APP_STATE.trackTitleLabel || 'Now Playing').trim();
+                const cardArtist = (CONFIG.overlayArtist || 'WaveForge Studio').trim();
+
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillStyle = '#fafafa';
+                ctx.font = `700 ${Math.max(12, Math.round(cardH * 0.21))}px 'Plus Jakarta Sans', Inter, sans-serif`;
+                ctx.fillText(cardTitle.slice(0, 32), textX, artY + artSize * 0.04, textMaxW);
+
+                ctx.fillStyle = '#a1a1aa';
+                ctx.font = `500 ${Math.max(10, Math.round(cardH * 0.155))}px Inter, sans-serif`;
+                ctx.fillText(cardArtist.slice(0, 34), textX, artY + artSize * 0.36, textMaxW);
+
+                // Mini progress bar inside glass card
+                const barY = artY + artSize * 0.74;
+                const barH = Math.max(3, Math.round(cardH * 0.055));
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(textX, barY, textMaxW, barH, barH);
+                else ctx.rect(textX, barY, textMaxW, barH);
+                ctx.fill();
+
+                ctx.fillStyle = this.getColor(0);
+                ctx.beginPath();
+                const fillW = Math.max(barH, textMaxW * Math.max(0, Math.min(1, progressRatio || 0)));
+                if (ctx.roundRect) ctx.roundRect(textX, barY, fillW, barH, barH);
+                else ctx.rect(textX, barY, fillW, barH);
+                ctx.fill();
+                ctx.restore();
+            }
+
             if (!isExport && (bounds.fw < w - 4 || bounds.fh < h - 4)) {
                 ctx.save();
-                ctx.strokeStyle = 'rgba(168, 85, 247, 0.48)';
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.5)';
                 ctx.lineWidth = 1.5;
                 ctx.setLineDash([6, 6]);
                 ctx.strokeRect(bounds.fx, bounds.fy, bounds.fw, bounds.fh);
                 ctx.setLineDash([]);
                 ctx.font = '600 11px Inter, sans-serif';
-                ctx.fillStyle = 'rgba(168, 85, 247, 0.88)';
+                ctx.fillStyle = 'rgba(129, 140, 248, 0.9)';
                 ctx.fillText(`Export Frame (${CONFIG.aspectRatio})`, bounds.fx + 8, bounds.fy + 16);
+                ctx.restore();
+            }
+
+            // P1: 9:16 TikTok / Reels / Shorts Safe-Zone Guide (Preview Only — never exported!)
+            if (!isExport && CONFIG.showSafeZones && CONFIG.aspectRatio === '9:16') {
+                ctx.save();
+                const topH = bounds.fh * 0.11;
+                const botH = bounds.fh * 0.21;
+                const rightW = bounds.fw * 0.17;
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.14)';
+                // Top search/status zone
+                ctx.fillRect(bounds.fx, bounds.fy, bounds.fw, topH);
+                // Bottom caption/audio bar zone
+                ctx.fillRect(bounds.fx, bounds.fy + bounds.fh - botH, bounds.fw, botH);
+                // Right engagement icons column
+                ctx.fillRect(bounds.fx + bounds.fw - rightW, bounds.fy + bounds.fh * 0.42, rightW, bounds.fh * 0.37);
+
+                ctx.strokeStyle = 'rgba(239, 68, 68, 0.55)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.strokeRect(bounds.fx + 6, bounds.fy + topH, bounds.fw - rightW - 8, bounds.fh - topH - botH);
+                ctx.setLineDash([]);
+                ctx.font = '600 10px JetBrains Mono, monospace';
+                ctx.fillStyle = 'rgba(252, 165, 165, 0.92)';
+                ctx.fillText('SAFE ZONE (TikTok / Reels)', bounds.fx + 12, bounds.fy + topH + 14);
                 ctx.restore();
             }
         }
@@ -3868,6 +4097,29 @@
             };
         },
 
+        _extractDominantColor(img) {
+            try {
+                const c = document.createElement('canvas');
+                c.width = 24; c.height = 24;
+                const g = c.getContext('2d');
+                g.drawImage(img, 0, 0, 24, 24);
+                const d = g.getImageData(0, 0, 24, 24).data;
+                let bestR = 99, bestG = 102, bestB = 241, bestScore = -1;
+                for (let i = 0; i < d.length; i += 4) {
+                    if (d[i + 3] < 180) continue;
+                    const r = d[i], gr = d[i + 1], b = d[i + 2];
+                    const max = Math.max(r, gr, b), min = Math.min(r, gr, b);
+                    const sat = max > 0 ? (max - min) / max : 0;
+                    const lum = (0.299 * r + 0.587 * gr + 0.114 * b) / 255;
+                    if (lum < 0.18 || lum > 0.90) continue;
+                    const score = sat * 1.4 + (1 - Math.abs(lum - 0.55));
+                    if (score > bestScore) { bestScore = score; bestR = r; bestG = gr; bestB = b; }
+                }
+                const toHex = (n) => Math.round(n).toString(16).padStart(2, '0');
+                return '#' + toHex(bestR) + toHex(bestG) + toHex(bestB);
+            } catch (e) { return null; }
+        },
+
         _loadCustomImage(file, targetType) {
             if (!file) return;
             if (targetType === 'bg' && (file.type.startsWith('video/') || /\.(mp4|webm|mov)$/i.test(file.name))) {
@@ -3895,6 +4147,16 @@
                     }
                     const clearRow = document.getElementById('clear-branding-row');
                     if (clearRow) clearRow.classList.remove('hidden');
+                    if (CONFIG.autoColorFromArt && this._extractDominantColor) {
+                        const hex = this._extractDominantColor(img);
+                        if (hex) {
+                            CONFIG.waveColor = hex;
+                            const wc = document.getElementById('set-wave-color');
+                            if (wc) wc.value = hex;
+                            persistConfig();
+                            this.showToast(`Matched accent color (${hex}) to cover art`, 'info');
+                        }
+                    }
                 };
                 img.src = ev.target.result;
             };
@@ -3946,6 +4208,136 @@
             linkSetting('set-fx-glitch', 'fxGlitch', 'float');
             linkSetting('set-fx-vhs', 'fxVhs', 'float');
             linkSetting('set-fx-zoomblur', 'fxZoomBlur', 'float');
+            linkSetting('set-fx-reverb', 'fxReverb', 'float');
+            linkSetting('set-fx-saturation', 'fxSaturation', 'float');
+            linkSetting('set-audio-fadein', 'audioFadeIn', 'float');
+            linkSetting('set-audio-fadeout', 'audioFadeOut', 'float');
+            linkSetting('set-fx-player-card', 'fxPlayerCard', 'bool');
+            linkSetting('set-auto-color-art', 'autoColorFromArt', 'bool');
+            linkSetting('set-safe-zones', 'showSafeZones', 'bool');
+            linkSetting('set-lyric-style', 'lyricStyle', 'string');
+
+            // 1-Click Slowed + Reverb toggle button
+            const srBtn = document.getElementById('btn-slowed-reverb');
+            if (srBtn) {
+                srBtn.onclick = () => {
+                    const active = srBtn.classList.toggle('active');
+                    if (active) {
+                        this.setPlaybackSpeed(0.85);
+                        CONFIG.fxReverb = 48;
+                        CONFIG.eqBass = Math.max(4, CONFIG.eqBass);
+                        CONFIG.eqTreble = -2;
+                        srBtn.textContent = 'Slowed + Reverb Active (0.85×)';
+                        this.showToast('Slowed + Reverb enabled (applies to export too!)', 'success');
+                    } else {
+                        this.setPlaybackSpeed(1);
+                        CONFIG.fxReverb = 0;
+                        srBtn.textContent = '1-Click Slowed + Reverb';
+                        this.showToast('Slowed + Reverb disabled', 'info');
+                    }
+                    this.applyConfigToUI();
+                    this.updateSliderLabels();
+                    this.syncAllRangeTracks();
+                    audio.updateSettings();
+                    persistConfig();
+                };
+            }
+
+            // P1: Synced Lyrics & AI Auto-Lyrics Controls
+            const lyricsArea = document.getElementById('set-lyrics-text');
+            const lyricsStatus = document.getElementById('lyrics-status');
+            const setLyricsStatus = (msg) => { if (lyricsStatus) lyricsStatus.textContent = msg; };
+
+            if (lyricsArea) {
+                lyricsArea.addEventListener('input', () => {
+                    if (!window.WaveForgeLyrics) return;
+                    const lines = window.WaveForgeLyrics.parseLyricsText(lyricsArea.value, audio ? audio.getDuration() : 0);
+                    setLyricsStatus(lines.length ? `${lines.length} lyric lines active` : 'No lyrics loaded');
+                });
+            }
+
+            const importLyrBtn = document.getElementById('btn-import-lyrics');
+            const lyrFileInput = document.getElementById('lyrics-file-input');
+            if (importLyrBtn && lyrFileInput) {
+                importLyrBtn.onclick = () => lyrFileInput.click();
+                lyrFileInput.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file || !window.WaveForgeLyrics) return;
+                    const fr = new FileReader();
+                    fr.onload = (ev) => {
+                        const raw = String(ev.target.result || '');
+                        const lines = window.WaveForgeLyrics.parseLyricsText(raw, audio ? audio.getDuration() : 0);
+                        if (lyricsArea) lyricsArea.value = window.WaveForgeLyrics.toLrcString(lines);
+                        setLyricsStatus(`Imported ${lines.length} lines from ${file.name}`);
+                        this.showToast(`Loaded ${lines.length} synced lyric lines`, 'success');
+                    };
+                    fr.readAsText(file);
+                    e.target.value = '';
+                };
+            }
+
+            const clearLyrBtn = document.getElementById('btn-clear-lyrics');
+            if (clearLyrBtn) {
+                clearLyrBtn.onclick = () => {
+                    if (window.WaveForgeLyrics) window.WaveForgeLyrics.clear();
+                    if (lyricsArea) lyricsArea.value = '';
+                    setLyricsStatus('Lyrics cleared');
+                };
+            }
+
+            const stampLyrBtn = document.getElementById('btn-stamp-lyric');
+            if (stampLyrBtn && lyricsArea) {
+                stampLyrBtn.onclick = () => {
+                    if (!window.WaveForgeLyrics || !audio) return;
+                    const t = audio.getCurrentTime() || 0;
+                    const tag = `[${window.WaveForgeLyrics.formatLrcTime(t)}] `;
+                    const rows = lyricsArea.value.split('\n');
+                    const nextIdx = rows.findIndex(r => r.trim() && !/^\[\d{1,2}:\d{2}/.test(r.trim()));
+                    if (nextIdx !== -1) {
+                        rows[nextIdx] = tag + rows[nextIdx].trim();
+                        lyricsArea.value = rows.join('\n');
+                        const lines = window.WaveForgeLyrics.parseLyricsText(lyricsArea.value, audio.getDuration());
+                        setLyricsStatus(`Stamped line ${nextIdx + 1} at ${window.WaveForgeLyrics.formatLrcTime(t)} (${lines.length} total)`);
+                    } else {
+                        this.showToast('Paste untimed lyrics in the box first, then tap Stamp while playing', 'info');
+                    }
+                };
+            }
+
+            const autoLyrBtn = document.getElementById('btn-auto-lyrics');
+            if (autoLyrBtn) {
+                autoLyrBtn.onclick = async () => {
+                    if (!window.WaveForgeLyrics) return;
+                    if (!audio || !audio.hasAudio()) {
+                        this.showToast('Upload a song first to auto-generate lyrics', 'warning');
+                        return;
+                    }
+                    autoLyrBtn.disabled = true;
+                    const origText = autoLyrBtn.textContent;
+                    autoLyrBtn.textContent = 'Loading AI…';
+                    try {
+                        let decoded = APP_STATE.decodedAudioBuffer;
+                        if (!decoded || APP_STATE.decodedAudioSrc !== audio.audioElement.src) {
+                            setLyricsStatus('Decoding track audio…');
+                            const resp = await fetch(audio.audioElement.src);
+                            decoded = await audio.ctx.decodeAudioData(await resp.arrayBuffer());
+                            APP_STATE.decodedAudioBuffer = decoded;
+                            APP_STATE.decodedAudioSrc = audio.audioElement.src;
+                        }
+                        const out = await window.WaveForgeLyrics.autoTranscribe(decoded, (msg) => {
+                            setLyricsStatus(msg);
+                        });
+                        if (lyricsArea) lyricsArea.value = out.lrc;
+                        this.showToast(`Auto-generated ${out.lines.length} lyric lines!`, 'success');
+                    } catch (err) {
+                        setLyricsStatus(err.message || 'Auto-lyrics failed (offline or unsupported)');
+                        this.showToast(err.message || 'Auto-lyrics unavailable — upload .LRC/.SRT instead', 'error');
+                    } finally {
+                        autoLyrBtn.disabled = false;
+                        autoLyrBtn.textContent = origText;
+                    }
+                };
+            }
 
             const bgSpeedEl = document.getElementById('set-bg-speed');
             if (bgSpeedEl) {
@@ -4173,6 +4565,11 @@
             setVal('set-fx-glitch', CONFIG.fxGlitch);
             setVal('set-fx-vhs', CONFIG.fxVhs);
             setVal('set-fx-zoomblur', CONFIG.fxZoomBlur);
+            setVal('set-fx-reverb', CONFIG.fxReverb);
+            setVal('set-fx-saturation', CONFIG.fxSaturation);
+            setVal('set-audio-fadein', CONFIG.audioFadeIn);
+            setVal('set-audio-fadeout', CONFIG.audioFadeOut);
+            setVal('set-lyric-style', CONFIG.lyricStyle || 'karaoke');
             setVal('set-aspect', CONFIG.aspectRatio);
             setVal('export-aspect', CONFIG.aspectRatio);
             setVal('set-phonk-intro-dur', CONFIG.phonkIntroDuration);
@@ -4193,6 +4590,9 @@
             setChk('set-phonk-intro', CONFIG.phonkIntroEnabled);
             setChk('set-pred-enabled', CONFIG.predictiveEnabled);
             setChk('set-auto-style', CONFIG.autoStyleMatch);
+            setChk('set-fx-player-card', CONFIG.fxPlayerCard);
+            setChk('set-auto-color-art', CONFIG.autoColorFromArt);
+            setChk('set-safe-zones', CONFIG.showSafeZones);
 
             document.body.classList.toggle('high-contrast', CONFIG.highContrast);
             document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
@@ -4395,7 +4795,7 @@
             UI.applyTemplate(urlParams.get('template'));
         }
 
-        console.log('%c🧠 WaveForge Studio v10.4.0 — Adaptive All-Genre Music Visualizer', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+        console.log('%c🧠 WaveForge Studio v10.5.0 — Synced Lyrics, Slowed+Reverb & Creator Suite', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
