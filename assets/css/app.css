@@ -1142,3 +1142,34 @@ kbd { font-family: var(--font-mono); font-size: 0.72rem; background: rgba(255, 2
     align-items: center;
     gap: 6px;
 }
+
+/* ADAPTIVE MUSIC STYLE PICKER PILLS (v10.4) */
+.style-picker-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+#settings-modal .style-picker-grid {
+    justify-content: flex-start;
+    margin-bottom: 4px;
+}
+.style-pill {
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--panel-border-strong);
+    color: var(--text-dim);
+}
+.style-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+.style-pill.active {
+    background: var(--accent-soft);
+    border-color: var(--accent-color);
+    color: #ffffff;
+}

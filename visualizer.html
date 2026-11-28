@@ -3,7 +3,7 @@
 <head>
     <script>
         (function () {
-            var VER = '10.2.0';
+            var VER = '10.4.0';
             try {
                 if (localStorage.getItem('wf_app_ver') !== VER) {
                     localStorage.setItem('wf_app_ver', VER);
@@ -34,8 +34,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>WaveForge Studio 10.2 | Predictive Phonk &amp; Hardtekk Visualizer + 4K MP4 Export</title>
-    <meta name="description" content="WaveForge Studio 10.2 pre-analyzes your song to predict every drop, kick-drum shake, and zoom punch automatically. 6 unique viral templates, trending edit fonts, 9 pro visualizers, and 4K MP4 export.">
+    <title>WaveForge Studio 10.4 | Free Online Music Visualizer &amp; 4K MP4 Exporter</title>
+    <meta name="description" content="Free online music visualizer for Lo-Fi, Hip-Hop, EDM, Synthwave, Pop, Indie, Phonk &amp; Podcasts. 9 audio-reactive visualizers, 8 genre presets, 3-band EQ, Spotify Canvas, and watermark-free 4K MP4 export.">
     <meta name="keywords" content="phonk visualizer, hardtekk visualizer, brazilian funk video maker, tiktok music visualizer, 9:16 audio visualizer, free music visualizer, logo visualizer, predictive beat drop visualizer">
     <meta name="author" content="WaveForge">
     <meta name="theme-color" content="#09090b">
@@ -48,7 +48,7 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://progameryt-op.github.io/WaveForge/visualizer.html">
-    <meta property="og:title" content="WaveForge Studio 10.2 — Predictive Phonk &amp; Hardtekk Visualizer">
+    <meta property="og:title" content="WaveForge Studio 10.4 — Free 4K Online Music Visualizer">
     <meta property="og:description" content="Pre-analyzes your music to predict drops, shakes &amp; flashes automatically. 6 unique templates, trending fonts &amp; 4K MP4 export.">
     <meta property="og:image" content="https://progameryt-op.github.io/WaveForge/assets/img/og-image.png">
 
@@ -58,7 +58,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="assets/img/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
-    <link rel="stylesheet" href="assets/css/app.css?v=10.2.0">
+    <link rel="stylesheet" href="assets/css/app.css?v=10.4.0">
 
     <!-- Fast WebCodecs export: mp4-muxer -->
     <script defer src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.js" crossorigin="anonymous"></script>
@@ -72,7 +72,7 @@
 
     <main class="visually-hidden" role="main">
         <article>
-            <h2>WaveForge Studio 10.2 - Predictive Phonk &amp; Hardtekk Music Visualizer</h2>
+            <h2>WaveForge Studio 10.4 — Free Online Music Visualizer for Every Genre</h2>
             <p>Browser-based music visualizer with offline song pre-analysis, predictive beat-drop choreography, 6 unique viral templates, trending edit fonts, 9 pro visualizers, 3-band EQ, and 4K MP4 exports.</p>
         </article>
     </main>
@@ -117,11 +117,19 @@
         <div class="onboard-icon-ring" aria-hidden="true">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
         </div>
-        <h2>WaveForge Studio</h2>
-        <p>Pre-analyzes your audio to lock BPM, beat drops, and camera motion into frame-accurate 4K exports.</p>
+        <h2>WaveForge Music Visualizer</h2>
+        <p>Auto-detects your track's vibe (Sad Lo-Fi, Piano, Chill, EDM, Hip-Hop, Phonk) — or pick your music style below:</p>
+        <div class="style-picker-grid" role="group" aria-label="Choose your music style">
+            <button type="button" class="style-pill" data-style="sad-lofi">Sad Lo-Fi</button>
+            <button type="button" class="style-pill" data-style="lofi">Chill Lo-Fi</button>
+            <button type="button" class="style-pill" data-style="ambient">Indie / Ambient</button>
+            <button type="button" class="style-pill" data-style="hiphop">Hip-Hop / Pop</button>
+            <button type="button" class="style-pill" data-style="edm">EDM / Bass</button>
+            <button type="button" class="style-pill" data-style="phonk">Phonk / Funk</button>
+        </div>
         <div class="onboard-actions onboard-actions-single">
             <button type="button" id="onboard-templates-btn" class="btn-studio-primary onboard-btn">
-                <span>Browse 6 Templates</span>
+                <span>Browse Genre Presets</span>
             </button>
         </div>
         <div class="onboard-actions" style="margin-top:8px;">
@@ -140,14 +148,22 @@
             <div class="sheet-handle" aria-hidden="true"></div>
             <div class="modal-header">
                 <div>
-                    <span class="modal-eyebrow">6 DISTINCT VISUAL ENGINES &amp; TRENDING FONTS</span>
-                    <h2 id="templates-title">🔥 Unique Creator Templates</h2>
+                    <span class="modal-eyebrow">9 GENRE-MATCHED VISUALIZER PRESETS</span>
+                    <h2 id="templates-title">Music Genre Presets</h2>
                 </div>
                 <button type="button" id="btn-close-templates" class="close-icon-btn" aria-label="Close templates">✕</button>
             </div>
             <p class="modal-lead">
-                Each template uses its own unique visualizer engine, trending TikTok/Reels typography font, predictive drop choreography, and Bass EQ.
+                Choose a preset tailored to your music style — automatically sets the matching visualizer, color palette, typography, aspect ratio, and EQ.
             </p>
+            <div class="mode-filter-row" id="tpl-filter-row" role="group" aria-label="Filter presets by music genre">
+                <button type="button" class="mode-filter-pill tpl-filter-pill active" data-genre="all">All Genres (9)</button>
+                <button type="button" class="mode-filter-pill tpl-filter-pill" data-genre="lofi">Lo-Fi &amp; Indie</button>
+                <button type="button" class="mode-filter-pill tpl-filter-pill" data-genre="hiphop">Hip-Hop &amp; Pop</button>
+                <button type="button" class="mode-filter-pill tpl-filter-pill" data-genre="edm">EDM &amp; Bass</button>
+                <button type="button" class="mode-filter-pill tpl-filter-pill" data-genre="synthwave">Synthwave</button>
+                <button type="button" class="mode-filter-pill tpl-filter-pill" data-genre="phonk">Phonk &amp; Funk</button>
+            </div>
             <div class="templates-grid" id="templates-grid"></div>
         </div>
     </div>
@@ -338,7 +354,7 @@
 
             <!-- 4-TAB SEGMENTED CONTROL -->
             <div class="settings-tabs" role="tablist" aria-label="Configuration sections">
-                <button type="button" class="settings-tab active" data-tab="tab-branding" role="tab" aria-selected="true">Fonts &amp; Phonk</button>
+                <button type="button" class="settings-tab active" data-tab="tab-branding" role="tab" aria-selected="true">Style &amp; Text</button>
                 <button type="button" class="settings-tab" data-tab="tab-visuals" role="tab" aria-selected="false">Visuals &amp; AI</button>
                 <button type="button" class="settings-tab" data-tab="tab-audio" role="tab" aria-selected="false">Audio &amp; EQ</button>
                 <button type="button" class="settings-tab" data-tab="tab-system" role="tab" aria-selected="false">Presets</button>
@@ -350,7 +366,7 @@
                     <h3>On-Canvas Trending Typography</h3>
                     <div class="control-row">
                         <label for="set-overlay-title">Track Title</label>
-                        <input type="text" id="set-overlay-title" class="text-input" placeholder="e.g. AINSI BAS LA VIDA (SLOWED)" maxlength="60">
+                        <input type="text" id="set-overlay-title" class="text-input" placeholder="e.g. Midnight Rain (Lo-Fi Mix)" maxlength="60">
                     </div>
                     <div class="control-row">
                         <label for="set-overlay-artist">Artist / Producer Tag</label>
@@ -490,6 +506,26 @@
             <!-- TAB 2: VISUALS & PREDICTIVE CHOREOGRAPHY -->
             <div class="settings-pane" id="tab-visuals" role="tabpanel">
                 <div class="settings-group">
+                    <h3>Music Style Adaptation</h3>
+                    <div class="control-row toggle-row">
+                        <label for="set-auto-style">Auto-Detect Music Style on Upload</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="set-auto-style" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="style-picker-grid" style="margin-top:8px;" role="group" aria-label="Switch music style preset">
+                        <button type="button" class="style-pill" data-style="sad-lofi">Sad Lo-Fi</button>
+                        <button type="button" class="style-pill" data-style="lofi">Chill Lo-Fi</button>
+                        <button type="button" class="style-pill" data-style="ambient">Indie / Ambient</button>
+                        <button type="button" class="style-pill" data-style="hiphop">Hip-Hop / Pop</button>
+                        <button type="button" class="style-pill" data-style="edm">EDM / Bass</button>
+                        <button type="button" class="style-pill" data-style="synthwave">Synthwave</button>
+                        <button type="button" class="style-pill" data-style="phonk">Phonk / Funk</button>
+                    </div>
+                </div>
+
+                <div class="settings-group">
                     <h3>Predictive Lookahead Choreography</h3>
                     <div class="control-row toggle-row">
                         <label for="set-pred-enabled">🧠 Pre-Analyze &amp; Auto-Predict Drops</label>
@@ -507,7 +543,7 @@
                 <div class="settings-group">
                     <h3>Color &amp; Framing</h3>
                     <div class="control-row">
-                        <label for="set-palette">Color Palette (12)</label>
+                        <label for="set-palette">Color Palette (13)</label>
                         <select id="set-palette">
                             <option value="synthwave">Synthwave (Purple / Cyan)</option>
                             <option value="cyberpunk">Cyberpunk (Cyan / Pink)</option>
@@ -521,6 +557,7 @@
                             <option value="sunset">Sunset (Purple / Amber)</option>
                             <option value="arctic">Arctic (Glacier Blue)</option>
                             <option value="noir">Monochrome Noir</option>
+                            <option value="melancholy">Melancholy Rain (Sad Lo-Fi Blue)</option>
                         </select>
                     </div>
                     <div class="control-row">
@@ -686,7 +723,7 @@
             </div>
 
             <div class="version-info">
-                WaveForge Studio v10.2 • Predictive Audio Engine • 6 Unique Templates • Turbo 4K MP4<br>
+                WaveForge Studio v10.4 • Free All-Genre Music Visualizer • 9 Engines • 4K MP4<br>
                 <button type="button" id="btn-shortcuts" class="inline-link-btn">Keyboard Shortcuts (?)</button> •
                 <a href="index.html">Back to Home</a>
             </div>
@@ -873,19 +910,13 @@
                 </div>
             </div>
 
-            <!-- 8-SECOND AD-TIMER + INSTANT SPONSOR UNLOCK DOWNLOAD GATE -->
+            <!-- INSTANT WATERMARK-FREE DOWNLOAD READY CARD -->
             <div id="export-unlock-gate" class="export-unlock-gate hidden">
                 <div class="unlock-gate-title" id="unlock-gate-summary">✅ Your video is rendered and ready!</div>
-                <p class="unlock-gate-sub">WaveForge is 100% free with no watermarks. View the sponsor ad below for 8 seconds (or visit our sponsor for instant unlock) to download your MP4:</p>
-                <div class="unlock-timer-bar">
-                    <div class="unlock-timer-fill" id="unlock-timer-fill"></div>
-                </div>
+                <p class="unlock-gate-sub">100% free, zero watermarks, rendered locally in your browser. Click below to save your video immediately.</p>
                 <div class="unlock-gate-actions">
-                    <button type="button" id="btn-download-ready" class="btn-unlock-timer" disabled>
-                        <span>⏳ Viewing Sponsor Ad... (8s)</span>
-                    </button>
-                    <button type="button" id="btn-unlock-sponsor" class="btn-unlock-instant">
-                        <span>⚡ Visit Sponsor &amp; Download Instantly ↗</span>
+                    <button type="button" id="btn-download-ready" class="btn-unlock-timer">
+                        <span>⬇️ Download Video Now</span>
                     </button>
                 </div>
             </div>
@@ -903,36 +934,25 @@
             <p id="export-engine-note" class="engine-note">
                 ⚡ Checking hardware encoder support…
             </p>
-
-            <!-- SPONSORED PLACEMENT (Supports Free 4K Hosting During Render & 8s Unlock Gate) -->
-            <div class="modal-ad-box" style="margin-top: 14px;">
-                <div class="modal-ad-header">
-                    <span class="ad-badge">SPONSORED AD</span>
-                    <a href="https://araplhn.org/4/f28b978e066eac35ed88538faa37500f" data-wf-smartlink target="_blank" rel="noopener sponsored" class="smartlink-inline-cta">Sponsored Partner ↗</a>
-                </div>
-                <div id="export-ad-slot" class="modal-ad-slot"></div>
-                <div class="native-ad-container" style="margin-top: 8px;">
-                    <script async="async" data-cfasync="false" src="https://bauval.org/21/7d5620353411eac086d1a38c87043739"></script>
-                    <div id="container-7d5620353411eac086d1a38c87043739"></div>
-                </div>
-            </div>
+        </div>
+    </div>
         </div>
     </div>
 
     <!-- VISUALIZER MODE REGISTRY (9 Curated Pro Modes) -->
-    <script src="Visualizers/bars.js?v=10.2.0"></script>
-    <script src="Visualizers/wave.js?v=10.2.0"></script>
-    <script src="Visualizers/radial.js?v=10.2.0"></script>
-    <script src="Visualizers/particles.js?v=10.2.0"></script>
-    <script src="Visualizers/logo.js?v=10.2.0"></script>
-    <script src="Visualizers/tunnel.js?v=10.2.0"></script>
-    <script src="Visualizers/trapnation.js?v=10.2.0"></script>
-    <script src="Visualizers/synthwave.js?v=10.2.0"></script>
-    <script src="Visualizers/phonk.js?v=10.2.0"></script>
+    <script src="Visualizers/bars.js?v=10.4.0"></script>
+    <script src="Visualizers/wave.js?v=10.4.0"></script>
+    <script src="Visualizers/radial.js?v=10.4.0"></script>
+    <script src="Visualizers/particles.js?v=10.4.0"></script>
+    <script src="Visualizers/logo.js?v=10.4.0"></script>
+    <script src="Visualizers/tunnel.js?v=10.4.0"></script>
+    <script src="Visualizers/trapnation.js?v=10.4.0"></script>
+    <script src="Visualizers/synthwave.js?v=10.4.0"></script>
+    <script src="Visualizers/phonk.js?v=10.4.0"></script>
 
     <!-- SMART MONETIZATION ENGINE & APPLICATION SCRIPT -->
-    <script src="assets/js/ads.js?v=10.2.0"></script>
-    <script src="assets/js/webgl-fx.js?v=10.2.0"></script>
-    <script src="assets/js/app.js?v=10.2.0"></script>
+    <script src="assets/js/ads.js?v=10.4.0"></script>
+    <script src="assets/js/webgl-fx.js?v=10.4.0"></script>
+    <script src="assets/js/app.js?v=10.4.0"></script>
 </body>
 </html>

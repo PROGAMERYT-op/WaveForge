@@ -1,15 +1,15 @@
 {
-    "name": "WaveForge Studio 10.1 — Phonk Templates & 4K Music Visualizer",
+    "name": "WaveForge Studio 10.4 — Free 4K Music Visualizer",
     "short_name": "WaveForge",
-    "description": "Free browser-based music visualizer with 1-click Hardtekk, Brazilian Funk & Phonk templates, AirPods volume intro, 13 modes, 3-band EQ, and 4K MP4 export.",
+    "description": "Free browser-based music visualizer for Lo-Fi, Hip-Hop, EDM, Synthwave, Indie, Pop, Phonk & Podcasts. 9 audio-reactive visualizers, 9 genre presets, 3-band EQ, Spotify Canvas, and 4K MP4 export with zero watermarks.",
     "lang": "en",
     "dir": "ltr",
     "start_url": "../visualizer.html",
     "scope": "../",
     "display": "standalone",
     "orientation": "any",
-    "background_color": "#05070f",
-    "theme_color": "#05070f",
+    "background_color": "#09090b",
+    "theme_color": "#09090b",
     "categories": ["music", "multimedia", "photo_and_video"],
     "icons": [
         {

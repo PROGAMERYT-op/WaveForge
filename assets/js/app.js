@@ -1,7 +1,7 @@
 /**
  * WaveForge Music Visualizer Studio v10.1
  * Features:
- *  - 13 Visualization Modes (including Mode 12: Hardtekk / Phonk Liquid Ring + AirPods Intro)
+ *  - 9 Curated Visualization Modes (including Mode 12: Hardtekk / Phonk Liquid Ring + AirPods Intro)
  *  - 1-Click Trending Templates Hub (6 viral presets + 3-step guided workflow bar)
  *  - 3-Band Hardware Equalizer, On-Canvas Typography, Post-FX & 4 Aspect Ratios
  *  - Zero-Suspend Radix-2 FFT Turbo MP4 Export Engine (with automatic mobile codec/resolution negotiation & neon glow preservation)
@@ -15,11 +15,250 @@
     // ============================================
     const TRENDING_TEMPLATES = [
         {
+            id: 'sad-lofi-piano',
+            genre: 'lofi',
+            styleKey: 'sad-lofi',
+            name: 'Sad Lo-Fi & Piano',
+            tag: 'SAD LO-FI',
+            fontLabel: 'Font: Cinzel (Emotional)',
+            desc: '16:9 Widescreen • Melancholic Rain-Blue Waveform • Zero Screen Shake • Silky Piano Smoothing & Soft Nostalgic VHS Grain',
+            color: '#60a5fa',
+            speed: 1,
+            settings: {
+                mode: 1,
+                aspectRatio: '16:9',
+                waveColor: '#60a5fa',
+                palette: 'melancholy',
+                overlayFont: 'Cinzel',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
+                logoShakeIntensity: 0,
+                beatEnabled: false,
+                smoothing: 0.91,
+                eqBass: 0,
+                eqMid: 1,
+                eqTreble: -1,
+                sensitivity: 1.25,
+                bloomIntensity: 52,
+                predictiveIntensity: 0,
+                fxVignette: true,
+                fxScanlines: false,
+                mirror: false,
+                fxChromatic: 0,
+                fxGlitch: 0,
+                fxVhs: 22,
+                fxZoomBlur: 0
+            }
+        },
+        {
+            id: 'lofi-chill-wave',
+            genre: 'lofi',
+            name: 'Lo-Fi Chill Waveform',
+            tag: 'LO-FI & CHILL',
+            fontLabel: 'Font: Syne (Clean Wide)',
+            desc: '16:9 Widescreen • Smooth Aurora Oscilloscope Ribbons • Warm Sunset Palette • Subtle Analog VHS Grain & Relaxed EQ',
+            color: '#f59e0b',
+            speed: 1,
+            settings: {
+                mode: 1,
+                aspectRatio: '16:9',
+                waveColor: '#f59e0b',
+                palette: 'sunset',
+                overlayFont: 'Syne',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
+                eqBass: 2,
+                eqMid: 1,
+                eqTreble: -1,
+                logoShakeIntensity: 0,
+                beatEnabled: false,
+                smoothing: 0.89,
+                sensitivity: 1.35,
+                bloomIntensity: 55,
+                predictiveIntensity: 0,
+                fxVignette: true,
+                fxScanlines: false,
+                mirror: false,
+                fxChromatic: 10,
+                fxGlitch: 0,
+                fxVhs: 28,
+                fxZoomBlur: 0
+            }
+        },
+        {
+            id: 'youtube-type-beat',
+            genre: 'hiphop',
+            name: 'Hip-Hop & Type-Beat 16:9',
+            tag: 'HIP-HOP & BEATS',
+            fontLabel: 'Font: Bebas Neue (Clean)',
+            desc: '16:9 Widescreen • Studio Bar Spectrum Analyzer • Glossy Mirror Floor Reflection • Peak LEDs & Lower-Third Title',
+            color: '#6366f1',
+            speed: 1,
+            settings: {
+                mode: 0,
+                aspectRatio: '16:9',
+                waveColor: '#6366f1',
+                palette: 'cyberpunk',
+                overlayFont: 'Bebas Neue',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
+                eqBass: 5,
+                eqMid: 1,
+                eqTreble: 2,
+                sensitivity: 1.55,
+                bloomIntensity: 62,
+                predictiveIntensity: 0.85,
+                fxVignette: true,
+                fxScanlines: false,
+                mirror: true,
+                fxChromatic: 15,
+                fxGlitch: 0,
+                fxVhs: 0,
+                fxZoomBlur: 15
+            }
+        },
+        {
+            id: 'ultra-slowed-ice',
+            genre: 'edm',
+            name: 'EDM & Bass Shockwave',
+            tag: 'EDM & BASS',
+            fontLabel: 'Font: Syne (Modern)',
+            desc: '9:16 Vertical • Glacier Cyan Triple Harmonic Bass Rings • Deep Sub-Bass Shockwaves • Punchy Club Glow',
+            color: '#00f2ff',
+            speed: 1,
+            settings: {
+                mode: 10,
+                aspectRatio: '9:16',
+                waveColor: '#00f2ff',
+                palette: 'cyberpunk',
+                overlayFont: 'Syne',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
+                eqBass: 7,
+                eqMid: -1,
+                eqTreble: 3,
+                sensitivity: 1.65,
+                bloomIntensity: 78,
+                predictiveIntensity: 1.05,
+                fxVignette: true,
+                fxScanlines: false,
+                mirror: false,
+                fxChromatic: 20,
+                fxGlitch: 0,
+                fxVhs: 0,
+                fxZoomBlur: 25
+            }
+        },
+        {
+            id: 'ambient-constellation',
+            genre: 'lofi',
+            name: 'Ambient & Indie Stars',
+            tag: 'INDIE & AMBIENT',
+            fontLabel: 'Font: Space Grotesk',
+            desc: '16:9 Widescreen • Quantum Particle Constellation • Arctic & Ocean Palette • Gentle Bass Vortex Motion for Acoustic & Indie',
+            color: '#38bdf8',
+            speed: 1,
+            settings: {
+                mode: 3,
+                aspectRatio: '16:9',
+                waveColor: '#38bdf8',
+                palette: 'arctic',
+                overlayFont: 'Space Grotesk',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
+                eqBass: 1,
+                eqMid: 2,
+                eqTreble: 2,
+                logoShakeIntensity: 0,
+                beatEnabled: false,
+                smoothing: 0.9,
+                sensitivity: 1.4,
+                bloomIntensity: 58,
+                predictiveIntensity: 0,
+                fxVignette: true,
+                fxScanlines: false,
+                mirror: false,
+                fxChromatic: 0,
+                fxGlitch: 0,
+                fxVhs: 0,
+                fxZoomBlur: 0
+            }
+        },
+        {
+            id: 'golden-royalty',
+            genre: 'hiphop',
+            name: 'Pop & Artist Logo Crest',
+            tag: 'POP & ARTIST LOGO',
+            fontLabel: 'Font: Cinzel (Serif)',
+            desc: '9:16 Vertical • Custom Artist Emblem with 24K Gold Radial Rays • Orbiting Sparks & Cinematic Camera Pan',
+            color: '#fbbf24',
+            speed: 1,
+            settings: {
+                mode: 8,
+                aspectRatio: '9:16',
+                waveColor: '#fbbf24',
+                palette: 'gold',
+                overlayFont: 'Cinzel',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
+                logoShakeIntensity: 12,
+                logoGlowSize: 40,
+                logoParticles: true,
+                logoRotateRing: true,
+                eqBass: 5,
+                eqMid: 1,
+                eqTreble: 2,
+                sensitivity: 1.6,
+                bloomIntensity: 70,
+                predictiveIntensity: 1.0,
+                fxVignette: true,
+                fxScanlines: false,
+                mirror: false,
+                fxChromatic: 15,
+                fxGlitch: 0,
+                fxVhs: 0,
+                fxZoomBlur: 20
+            }
+        },
+        {
+            id: 'drift-phonk-crimson',
+            genre: 'synthwave',
+            name: 'Synthwave Outrun VHS',
+            tag: 'SYNTHWAVE & RETRO',
+            fontLabel: 'Font: Orbitron (Retro)',
+            desc: '9:16 Vertical • 80s Outrun Laser Horizon & Audio-Reactive Mountains • CRT Scanlines & Analog Tape Drift',
+            color: '#ff0055',
+            speed: 1,
+            settings: {
+                mode: 11,
+                aspectRatio: '9:16',
+                waveColor: '#ff0055',
+                palette: 'fire',
+                overlayFont: 'Orbitron',
+                phonkIntroEnabled: false,
+                phonkIntroDuration: 0,
+                eqBass: 7,
+                eqMid: 2,
+                eqTreble: 2,
+                sensitivity: 1.75,
+                bloomIntensity: 72,
+                predictiveIntensity: 1.2,
+                fxVignette: true,
+                fxScanlines: true,
+                mirror: false,
+                fxChromatic: 30,
+                fxGlitch: 15,
+                fxVhs: 40,
+                fxZoomBlur: 20
+            }
+        },
+        {
             id: 'hardtekk-mage',
-            name: 'Hardtekk Purple Mage',
-            tag: '😈 PHONK RING',
-            fontLabel: 'Font: New Rocker (Gothic)',
-            desc: '9:16 Vertical • Liquid Neon Plasma Ring • 3.5s AirPods Volume Intro • Dark Mage Backdrop & Predictive Kick Zoom',
+            genre: 'phonk',
+            name: 'Phonk & Hardtekk Ring',
+            tag: 'PHONK & HARDTEKK',
+            fontLabel: 'Font: New Rocker',
+            desc: '9:16 Vertical • Liquid Neon Plasma Ring • Optional 3.5s AirPods Volume Intro • Dark Backdrop & Kick Zoom-Blur',
             color: '#a855f7',
             speed: 1,
             settings: {
@@ -51,10 +290,11 @@
         },
         {
             id: 'brazilian-funk',
-            name: 'Brazilian Funk Hyper-Tunnel',
-            tag: '⚡ 3D WARP TUNNEL',
-            fontLabel: 'Font: Anton (TikTok Bold)',
-            desc: '9:16 Vertical • Toxic Emerald 3D Hyperspace Octagon Tunnel • +10dB Sub-Bass • Heavy Predictive Drop Shake',
+            genre: 'phonk',
+            name: 'Brazilian Funk Tunnel',
+            tag: 'FUNK & CLUB',
+            fontLabel: 'Font: Anton (Bold)',
+            desc: '9:16 Vertical • Emerald 3D Hyperspace Octagon Tunnel • +10dB Sub-Bass EQ & Heavy Predictive Drop Shake',
             color: '#00ff88',
             speed: 1,
             settings: {
@@ -69,133 +309,28 @@
                 eqMid: 0,
                 eqTreble: 4,
                 sensitivity: 1.9,
-                bloomIntensity: 78,
-                predictiveIntensity: 1.45,
+                bloomIntensity: 76,
+                predictiveIntensity: 1.4,
                 fxVignette: true,
                 fxScanlines: false,
-                mirror: false,
-                fxChromatic: 45,
-                fxGlitch: 35,
-                fxVhs: 0,
-                fxZoomBlur: 45
-            }
-        },
-        {
-            id: 'drift-phonk-crimson',
-            name: 'Drift Phonk Outrun VHS',
-            tag: '🩸 RETRO LASER GRID',
-            fontLabel: 'Font: Orbitron (Cyber Drift)',
-            desc: '9:16 Vertical • Crimson Synthwave Laser Horizon & Mountains • CRT VHS Scanlines • Aggressive Drop Flash',
-            color: '#ff0055',
-            speed: 1,
-            settings: {
-                mode: 11,
-                aspectRatio: '9:16',
-                waveColor: '#ff0055',
-                palette: 'fire',
-                overlayFont: 'Orbitron',
-                phonkIntroEnabled: false,
-                phonkIntroDuration: 0,
-                eqBass: 9,
-                eqMid: 2,
-                eqTreble: 2,
-                sensitivity: 1.8,
-                bloomIntensity: 75,
-                predictiveIntensity: 1.35,
-                fxVignette: true,
-                fxScanlines: true,
                 mirror: false,
                 fxChromatic: 35,
-                fxGlitch: 20,
-                fxVhs: 45,
-                fxZoomBlur: 25
-            }
-        },
-        {
-            id: 'ultra-slowed-ice',
-            name: 'Ultra Slowed Bass Shockwave',
-            tag: '❄️ 0.85× SLOWED',
-            fontLabel: 'Font: Syne (Avant-Garde)',
-            desc: '9:16 Vertical • Glacier Cyan Triple Harmonic Bass Nation Rings • 0.85× Slowed Speed • Deep Sub-Bass Glow',
-            color: '#00f2ff',
-            speed: 0.85,
-            settings: {
-                mode: 10,
-                aspectRatio: '9:16',
-                waveColor: '#00f2ff',
-                palette: 'cyberpunk',
-                overlayFont: 'Syne',
-                phonkIntroEnabled: false,
-                phonkIntroDuration: 0,
-                eqBass: 7,
-                eqMid: -1,
-                eqTreble: 3,
-                sensitivity: 1.65,
-                bloomIntensity: 82,
-                predictiveIntensity: 1.05,
-                fxVignette: true,
-                fxScanlines: false,
-                mirror: false
-            }
-        },
-        {
-            id: 'golden-royalty',
-            name: '24K Gold Luxury Crest',
-            tag: '👑 LOGO SPOTLIGHT',
-            fontLabel: 'Font: Cinzel (Royal Serif)',
-            desc: '9:16 Vertical • Classic Logo Visualizer with 24K Gold Radial Rays, Orbiting Particles & Cinematic Drone Pan',
-            color: '#fbbf24',
-            speed: 1,
-            settings: {
-                mode: 8,
-                aspectRatio: '9:16',
-                waveColor: '#fbbf24',
-                palette: 'gold',
-                overlayFont: 'Cinzel',
-                phonkIntroEnabled: false,
-                phonkIntroDuration: 0,
-                logoShakeIntensity: 14,
-                logoGlowSize: 42,
-                logoParticles: true,
-                logoRotateRing: true,
-                eqBass: 6,
-                eqMid: 1,
-                eqTreble: 2,
-                sensitivity: 1.65,
-                bloomIntensity: 72,
-                predictiveIntensity: 1.1,
-                fxVignette: true,
-                fxScanlines: false,
-                mirror: false
-            }
-        },
-        {
-            id: 'youtube-type-beat',
-            name: 'YouTube Type-Beat 16:9',
-            tag: '📺 16:9 STUDIO BARS',
-            fontLabel: 'Font: Bebas Neue (Clean)',
-            desc: '16:9 Widescreen • Studio Bar Spectrum Analyzer with Mirror Floor Reflection, Peak LEDs & Lower-Third Title',
-            color: '#6366f1',
-            speed: 1,
-            settings: {
-                mode: 0,
-                aspectRatio: '16:9',
-                waveColor: '#00f2ff',
-                palette: 'cyberpunk',
-                overlayFont: 'Bebas Neue',
-                phonkIntroEnabled: false,
-                phonkIntroDuration: 0,
-                eqBass: 4,
-                eqMid: 1,
-                eqTreble: 2,
-                sensitivity: 1.55,
-                bloomIntensity: 62,
-                predictiveIntensity: 0.85,
-                fxVignette: true,
-                fxScanlines: false,
-                mirror: true
+                fxGlitch: 25,
+                fxVhs: 0,
+                fxZoomBlur: 35
             }
         }
+    ];
+
+
+    const MUSIC_STYLES = [
+        { id: 'sad-lofi', label: 'Sad Lo-Fi / Piano', templateId: 'sad-lofi-piano' },
+        { id: 'lofi', label: 'Chill Lo-Fi', templateId: 'lofi-chill-wave' },
+        { id: 'ambient', label: 'Indie / Ambient', templateId: 'ambient-constellation' },
+        { id: 'hiphop', label: 'Hip-Hop / Pop', templateId: 'youtube-type-beat' },
+        { id: 'edm', label: 'EDM / Bass', templateId: 'ultra-slowed-ice' },
+        { id: 'synthwave', label: 'Synthwave', templateId: 'drift-phonk-crimson' },
+        { id: 'phonk', label: 'Phonk / Funk', templateId: 'hardtekk-mage' }
     ];
 
     // ============================================
@@ -205,7 +340,7 @@
     const APP_STATE = {
         isPlaying: false,
         mode: 12,
-        modesCount: 13,
+        modesCount: 9,
         lastTime: 0,
         fps: 0,
         frames: 0,
@@ -259,7 +394,10 @@
         predFlash: 0,
         predEnergy: 0,
         predBpm: 0,
-        predDrops: []
+        predDrops: [],
+        detectedStyle: null,
+        detectedStyleLabel: '',
+        userLockedStyle: false
     };
 
     const VIS_MODS = window.WaveForgeVisualizers || {};
@@ -306,6 +444,7 @@
         overlayPosition: 'bottom-left',
         predictiveEnabled: true,
         predictiveIntensity: 1.1,
+        autoStyleMatch: true,
         overlayBeatPulse: true,
         fxScanlines: false,
         fxVignette: true,
@@ -374,7 +513,8 @@
         synthwave: ['#a855f7', '#00f5d4', '#ff2a85', '#fee440'],
         trapneon: ['#00ff88', '#00c4ff', '#ff0055', '#ffffff'],
         vaporwave: ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff'],
-        noir: ['#ffffff', '#cbd5e1', '#64748b', '#94a3b8']
+        noir: ['#ffffff', '#cbd5e1', '#64748b', '#94a3b8'],
+        melancholy: ['#60a5fa', '#818cf8', '#cbd5e1', '#1e3a8a']
     };
 
     const CONFIG_KEY = 'wf-config-v7';
@@ -580,17 +720,24 @@
                 PredictiveChoreographer.clear();
             }
 
+            // Auto-adapt visualizer settings to the detected music genre (e.g. zero shake for Sad Piano/Lo-Fi)
+            if (CONFIG.autoStyleMatch && APP_STATE.detectedStyle && !APP_STATE.userLockedStyle && typeof UI !== 'undefined' && UI.applyDetectedStyle) {
+                UI.applyDetectedStyle(APP_STATE.detectedStyle);
+            }
+
             this.updateSettings();
             this.audioElement.play().then(() => {
                 APP_STATE.isPlaying = true;
                 UI.updatePlayButton();
-                const bpmTxt = APP_STATE.predBpm ? ` • ${APP_STATE.predBpm} BPM` : '';
-                const dropTxt = APP_STATE.predDrops.length ? ` • ${APP_STATE.predDrops.length} ${APP_STATE.predDrops.length === 1 ? 'drop' : 'drops'} detected` : '';
-                UI.showToast(`🧠 Synced & playing${bpmTxt}${dropTxt}!`, 'success');
+                const styleTxt = APP_STATE.detectedStyleLabel ? `${APP_STATE.detectedStyleLabel}` : 'Synced';
+                const bpmTxt = APP_STATE.predBpm ? ` · ${APP_STATE.predBpm} BPM` : '';
+                const dropTxt = APP_STATE.predDrops.length ? ` · ${APP_STATE.predDrops.length} ${APP_STATE.predDrops.length === 1 ? 'drop' : 'drops'}` : '';
+                UI.showToast(`${styleTxt}${bpmTxt}${dropTxt}`, 'success');
             }).catch(() => {
                 APP_STATE.isPlaying = false;
                 UI.updatePlayButton();
-                UI.showToast('Track analyzed! Tap Play (▶) to start', 'info');
+                const styleTxt = APP_STATE.detectedStyleLabel ? ` (${APP_STATE.detectedStyleLabel})` : '';
+                UI.showToast(`Track analyzed${styleTxt} — tap Play to start`, 'info');
             });
         }
 
@@ -831,11 +978,31 @@
                 prevBass = bass;
             }
 
-            // Whole-song 95th-percentile normalization so quiet & loud songs both scale accurately
+            // Measure true acoustic character BEFORE normalization (prevents soft piano/lo-fi from shaking like Phonk!)
+            let sumRms = 0, sumBass = 0;
+            for (let f = 0; f < totalFrames; f++) {
+                sumRms += rawRms[f];
+                sumBass += rawBass[f];
+            }
+            const sortedRms = Array.from(rawRms).sort((a, b) => a - b);
             const sortedBass = Array.from(rawBass).sort((a, b) => a - b);
             const sortedFlux = Array.from(rawFlux).sort((a, b) => a - b);
+            const p90Rms = Math.max(0.001, sortedRms[Math.floor(sortedRms.length * 0.90)] || 0.05);
             const bassRef = Math.max(0.001, sortedBass[Math.floor(sortedBass.length * 0.96)] || 0.1);
             const fluxRef = Math.max(0.0005, sortedFlux[Math.floor(sortedFlux.length * 0.97)] || 0.05);
+
+            const bassRatio = sumBass / Math.max(1e-6, sumRms);
+            let sharpPunchFrames = 0;
+            const punchThresh = Math.max(0.012, p90Rms * 0.16);
+            for (let f = 0; f < totalFrames; f++) {
+                if (rawFlux[f] > punchThresh && rawBass[f] > p90Rms * 0.25) sharpPunchFrames++;
+            }
+            const transientDensity = sharpPunchFrames / Math.max(1, totalFrames);
+
+            // Percussive factor: ~0.0 for gentle piano / sad lo-fi, ~1.0 for heavy Phonk / EDM kicks
+            const bassScore = Math.max(0, Math.min(1, (bassRatio - 0.22) / 0.30));
+            const punchScore = Math.max(0, Math.min(1, transientDensity / 0.07));
+            const percussiveFactor = Math.max(0, Math.min(1, bassScore * 0.55 + punchScore * 0.45)) * (bassRatio < 0.28 && transientDensity < 0.025 ? 0.05 : 1.0);
 
             const normBass = new Float32Array(totalFrames);
             const normFlux = new Float32Array(totalFrames);
@@ -853,40 +1020,11 @@
                 return hi > lo ? (prefix[hi] - prefix[lo]) / (hi - lo) : 0;
             };
 
-            // Detect True Musical Drops via 2.5s forward lookahead vs 2.0s lookback energy jump
-            const lookBack = Math.round(fps * 2.0);
-            const lookAhead = Math.round(fps * 2.2);
-            const minDropGap = Math.round(fps * 6.0);
-            const dropFrames = [];
-            let lastDropF = -minDropGap;
-
-            for (let f = Math.round(fps * 1.2); f < totalFrames - Math.round(fps * 0.8); f++) {
-                if (f - lastDropF < minDropGap) continue;
-                const before = winAvg(f - lookBack, f);
-                const after = winAvg(f, f + lookAhead);
-                const jump = after - before;
-                if (normFlux[f] > 0.58 && normBass[f] > 0.62 && after > 0.52 && jump > 0.14) {
-                    dropFrames.push(f);
-                    lastDropF = f;
-                }
-            }
-
-            // Fallback: if song is constant energy (e.g. short loop), pick strongest bass transient
-            if (dropFrames.length === 0 && totalFrames > fps * 2) {
-                let bestF = Math.round(fps * 1.5);
-                let bestScore = 0;
-                for (let f = Math.round(fps * 1.0); f < Math.min(totalFrames, fps * 18); f++) {
-                    const sc = normFlux[f] * 0.65 + normBass[f] * 0.35;
-                    if (sc > bestScore) { bestScore = sc; bestF = f; }
-                }
-                if (bestScore > 0.35) dropFrames.push(bestF);
-            }
-
-            // Auto-BPM estimation via autocorrelation on onset flux (75–180 BPM)
+            // Auto-BPM estimation via autocorrelation on onset flux (60–180 BPM so slow piano/lo-fi detects accurately)
             const sampleLen = Math.min(totalFrames, fps * 35);
             const minLag = Math.round((fps * 60) / 180);
-            const maxLag = Math.round((fps * 60) / 75);
-            let bestLag = Math.round((fps * 60) / 130);
+            const maxLag = Math.round((fps * 60) / 60);
+            let bestLag = Math.round((fps * 60) / 90);
             let bestCorr = -1;
             for (let lag = minLag; lag <= maxLag; lag++) {
                 let corr = 0;
@@ -897,27 +1035,76 @@
             }
             const estBpm = Math.round((fps * 60) / Math.max(1, bestLag));
 
-            // Precompute predictive choreography curves: buildup, shake, zoom, flash, energy
+            // Acoustic Music Style Classification (Sad Piano / Lo-Fi / Indie / Hip-Hop / EDM / Phonk)
+            let detectedStyle = 'lofi';
+            let detectedStyleLabel = 'Chill Lo-Fi';
+            if (bassRatio < 0.34 && transientDensity < 0.03) {
+                detectedStyle = estBpm <= 105 ? 'sad-lofi' : 'ambient';
+                detectedStyleLabel = estBpm <= 105 ? 'Sad Lo-Fi / Piano' : 'Ambient / Indie';
+            } else if (transientDensity < 0.055 && estBpm <= 102) {
+                detectedStyle = 'lofi';
+                detectedStyleLabel = 'Chill Lo-Fi';
+            } else if (bassRatio >= 0.46 && transientDensity >= 0.075 && estBpm >= 122) {
+                detectedStyle = 'phonk';
+                detectedStyleLabel = 'Phonk / Hardtekk';
+            } else if (transientDensity >= 0.06 && estBpm >= 115) {
+                detectedStyle = 'edm';
+                detectedStyleLabel = 'EDM / Bass';
+            } else {
+                detectedStyle = 'hiphop';
+                detectedStyleLabel = 'Hip-Hop / Pop';
+            }
+            APP_STATE.detectedStyle = detectedStyle;
+            APP_STATE.detectedStyleLabel = detectedStyleLabel;
+
+            // Detect True Musical Drops ONLY on percussive/energetic tracks (never fake drops on calm piano!)
+            const lookBack = Math.round(fps * 2.0);
+            const lookAhead = Math.round(fps * 2.2);
+            const minDropGap = Math.round(fps * 6.0);
+            const dropFrames = [];
+            let lastDropF = -minDropGap;
+
+            if (percussiveFactor >= 0.32) {
+                for (let f = Math.round(fps * 1.2); f < totalFrames - Math.round(fps * 0.8); f++) {
+                    if (f - lastDropF < minDropGap) continue;
+                    const before = winAvg(f - lookBack, f);
+                    const after = winAvg(f, f + lookAhead);
+                    const jump = after - before;
+                    if (normFlux[f] > 0.58 && normBass[f] > 0.62 && after > 0.52 && jump > 0.14) {
+                        dropFrames.push(f);
+                        lastDropF = f;
+                    }
+                }
+                if (dropFrames.length === 0 && totalFrames > fps * 2 && percussiveFactor >= 0.48) {
+                    let bestF = Math.round(fps * 1.5);
+                    let bestScore = 0;
+                    for (let f = Math.round(fps * 1.0); f < Math.min(totalFrames, fps * 18); f++) {
+                        const sc = normFlux[f] * 0.65 + normBass[f] * 0.35;
+                        if (sc > bestScore) { bestScore = sc; bestF = f; }
+                    }
+                    if (bestScore > 0.45) dropFrames.push(bestF);
+                }
+            }
+
+            // Precompute predictive choreography curves scaled by true percussiveFactor
             const shakeArr = new Float32Array(totalFrames);
             const zoomArr = new Float32Array(totalFrames);
             const buildupArr = new Float32Array(totalFrames);
             const flashArr = new Float32Array(totalFrames);
             const energyArr = new Float32Array(totalFrames);
 
-            // 1. Mark 2.5-second pre-drop anticipation build-ups & drop flashes
             const buildupLen = Math.round(fps * 2.5);
             const dropSet = new Set(dropFrames);
             for (const df of dropFrames) {
                 for (let k = 1; k <= buildupLen; k++) {
                     const idx = df - k;
                     if (idx >= 0) {
-                        const ramp = Math.pow(1 - k / buildupLen, 1.7);
+                        const ramp = Math.pow(1 - k / buildupLen, 1.7) * percussiveFactor;
                         if (ramp > buildupArr[idx]) buildupArr[idx] = ramp;
                     }
                 }
             }
 
-            // 2. Compute spring-damped shake, zoom punch & flash envelopes
             let shakeEnv = 0;
             let flashEnv = 0;
             for (let f = 0; f < totalFrames; f++) {
@@ -925,17 +1112,17 @@
                 energyArr[f] = Math.min(1, localE);
 
                 const isDrop = dropSet.has(f);
-                const kickImpact = (normFlux[f] > 0.42 && normBass[f] > 0.48)
-                    ? Math.min(1, normFlux[f] * 0.72 + normBass[f] * 0.35) * (0.45 + 0.65 * energyArr[f])
+                const kickImpact = (percussiveFactor >= 0.25 && normFlux[f] > 0.42 && normBass[f] > 0.48)
+                    ? Math.min(1, normFlux[f] * 0.72 + normBass[f] * 0.35) * (0.45 + 0.65 * energyArr[f]) * percussiveFactor
                     : 0;
 
                 if (isDrop) {
-                    shakeEnv = 1.25;
-                    flashEnv = 1.0;
+                    shakeEnv = 1.25 * percussiveFactor;
+                    flashEnv = 1.0 * percussiveFactor;
                 } else if (kickImpact > shakeEnv) {
                     shakeEnv = kickImpact;
-                    if (kickImpact > 0.88 && energyArr[f] > 0.62) {
-                        flashEnv = Math.max(flashEnv, 0.38);
+                    if (kickImpact > 0.72 && energyArr[f] > 0.62) {
+                        flashEnv = Math.max(flashEnv, 0.38 * percussiveFactor);
                     }
                 }
 
@@ -1219,32 +1406,15 @@
             if (summaryEl) summaryEl.textContent = summaryText || '✅ Your video is rendered and ready!';
             gate.classList.remove('hidden');
 
-            // Refresh modal ad banner right when user enters the 8-second unlock gate
-            if (window.WaveForgeAds) {
-                window.WaveForgeAds.mountResponsiveBanner(document.getElementById('export-ad-slot'), { compact: true, eager: true });
+            // Instant, zero-wait, watermark-free download (no ad timer gate)
+            if (APP_STATE.unlockTimerId) {
+                clearInterval(APP_STATE.unlockTimerId);
+                APP_STATE.unlockTimerId = null;
             }
-
-            let secondsLeft = 8;
-            dlBtn.disabled = true;
-            dlBtn.innerHTML = `<span>⏳ Viewing Sponsor Ad... (${secondsLeft}s)</span>`;
-            if (timerFill) timerFill.style.width = '0%';
-
-            if (APP_STATE.unlockTimerId) clearInterval(APP_STATE.unlockTimerId);
-            APP_STATE.unlockTimerId = setInterval(() => {
-                secondsLeft--;
-                const pct = Math.min(100, ((8 - secondsLeft) / 8) * 100);
-                if (timerFill) timerFill.style.width = pct + '%';
-
-                if (secondsLeft <= 0) {
-                    clearInterval(APP_STATE.unlockTimerId);
-                    APP_STATE.unlockTimerId = null;
-                    dlBtn.disabled = false;
-                    dlBtn.innerHTML = '<span>⬇️ Download Video Now (Unlocked)</span>';
-                    UI.showToast('🔓 Video download unlocked!', 'success');
-                } else {
-                    dlBtn.innerHTML = `<span>⏳ Viewing Sponsor Ad... (${secondsLeft}s)</span>`;
-                }
-            }, 1000);
+            if (timerFill) timerFill.style.width = '100%';
+            dlBtn.disabled = false;
+            dlBtn.innerHTML = '<span>⬇️ Download Video Now</span>';
+            UI.showToast('✅ Video ready — click Download!', 'success');
         },
 
         triggerFinalDownload() {
@@ -2976,6 +3146,7 @@
                 const card = document.createElement('div');
                 card.className = 'template-card' + (isActive ? ' active' : '');
                 card.dataset.templateId = tpl.id;
+                card.dataset.genre = tpl.genre || 'all';
                 card.setAttribute('role', 'button');
                 card.setAttribute('tabindex', '0');
                 card.innerHTML = `
@@ -2988,8 +3159,10 @@
                             ? '<div class="tpl-vis-shock"></div>'
                             : tpl.id === 'golden-royalty'
                             ? '<div class="tpl-vis-gold">👑</div>'
-                            : tpl.id === 'youtube-type-beat'
+                            : tpl.id === 'youtube-type-beat' || tpl.id === 'lofi-chill-wave'
                             ? '<div class="tpl-vis-bars"><span style="height:36%"></span><span style="height:72%"></span><span style="height:100%"></span><span style="height:64%"></span><span style="height:88%"></span><span style="height:48%"></span><span style="height:78%"></span></div>'
+                            : tpl.id === 'ambient-constellation'
+                            ? '<div class="tpl-vis-shock"></div>'
                             : '<div class="tpl-ring-demo"></div>'}
                         <span class="tpl-badge">${tpl.tag}</span>
                     </div>
@@ -3063,7 +3236,46 @@
                 if (audio.audioElement.paused) audio.togglePlay();
             }
 
-            this.showToast(`🔥 Applied "${tpl.name}" template!`, 'success');
+            this.syncStylePills();
+            this.showToast(`Applied "${tpl.name}" preset`, 'success');
+        },
+
+        applyMusicStyle(styleId, fromAuto = false) {
+            const st = MUSIC_STYLES.find(s => s.id === styleId);
+            if (!st) return;
+            const tpl = TRENDING_TEMPLATES.find(t => t.id === st.templateId);
+            if (!tpl) return;
+            if (!fromAuto) APP_STATE.userLockedStyle = true;
+            APP_STATE.activeTemplateId = tpl.id;
+            Object.assign(CONFIG, tpl.settings);
+            if (VIS_MODS[tpl.settings.mode]) APP_STATE.mode = tpl.settings.mode;
+            if (typeof tpl.speed === 'number') this.setPlaybackSpeed(tpl.speed);
+            audio.updateSettings();
+            this.applyConfigToUI();
+            this.updateModeDisplay();
+            this.updateModeCards();
+            this.updateSliderLabels();
+            this.syncDependentSettings();
+            this.syncEqPresetButtons();
+            this.syncAllRangeTracks();
+            this.syncWizardBar();
+            this.syncStylePills();
+            persistConfig();
+            if (!fromAuto) {
+                this.showToast(`Music Style: ${st.label} (${tpl.name})`, 'success');
+            }
+        },
+
+        applyDetectedStyle(styleId) {
+            this.applyMusicStyle(styleId, true);
+        },
+
+        syncStylePills() {
+            const activeTpl = TRENDING_TEMPLATES.find(t => t.id === APP_STATE.activeTemplateId);
+            const activeStyle = MUSIC_STYLES.find(s => s.templateId === (activeTpl ? activeTpl.id : ''));
+            document.querySelectorAll('.style-pill').forEach(btn => {
+                btn.classList.toggle('active', Boolean(activeStyle && btn.dataset.style === activeStyle.id));
+            });
         },
 
         buildModeGrid() {
@@ -3166,6 +3378,25 @@
                     if (e.target === this.els.templatesModal) closeTemplates();
                 };
             }
+
+            // Quick Music Style Selector Pills (Onboarding + Settings)
+            document.querySelectorAll('.style-pill').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    this.applyMusicStyle(btn.dataset.style, false);
+                });
+            });
+            this.syncStylePills();
+
+            // Template Genre Filter Pills
+            document.querySelectorAll('.tpl-filter-pill').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const genre = btn.dataset.genre;
+                    document.querySelectorAll('.tpl-filter-pill').forEach(b => b.classList.toggle('active', b === btn));
+                    document.querySelectorAll('.template-card').forEach(c => {
+                        c.classList.toggle('hidden', genre !== 'all' && c.dataset.genre !== genre);
+                    });
+                });
+            });
 
             // Mode Category Filter Pills
             document.querySelectorAll('.mode-filter-pill').forEach(btn => {
@@ -3443,7 +3674,7 @@
         },
 
         setupShare() {
-            const SHARE_TITLE = 'Check out my custom Phonk/Music visualizer preset on WaveForge Studio!';
+            const SHARE_TITLE = 'Check out my custom music visualizer preset on WaveForge Studio!';
             const embed = (str) => encodeURIComponent(str);
             const urlInput = document.getElementById('share-url-input');
             const nativeBtn = document.getElementById('btn-native-share');
@@ -3707,6 +3938,7 @@
             linkSetting('set-watermark', 'watermark', 'bool');
             linkSetting('set-overlay-font', 'overlayFont', 'string');
             linkSetting('set-pred-enabled', 'predictiveEnabled', 'bool');
+            linkSetting('set-auto-style', 'autoStyleMatch', 'bool');
             linkSetting('set-pred-intensity', 'predictiveIntensity', 'float');
             linkSetting('set-bg-opacity', 'bgOpacity', 'float');
             linkSetting('set-bg-speed', 'bgVideoSpeed', 'float');
@@ -3960,6 +4192,7 @@
             setChk('set-fx-progress', CONFIG.fxProgressBar);
             setChk('set-phonk-intro', CONFIG.phonkIntroEnabled);
             setChk('set-pred-enabled', CONFIG.predictiveEnabled);
+            setChk('set-auto-style', CONFIG.autoStyleMatch);
 
             document.body.classList.toggle('high-contrast', CONFIG.highContrast);
             document.getElementById('fps-display').style.display = CONFIG.showFps ? '' : 'none';
@@ -4162,7 +4395,7 @@
             UI.applyTemplate(urlParams.get('template'));
         }
 
-        console.log('%c🧠 WaveForge Studio v10.2.0 — Pro Offline Frame Engine', 'color: #a855f7; font-size: 20px; font-weight: bold;');
+        console.log('%c🧠 WaveForge Studio v10.4.0 — Adaptive All-Genre Music Visualizer', 'color: #a855f7; font-size: 20px; font-weight: bold;');
     });
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
